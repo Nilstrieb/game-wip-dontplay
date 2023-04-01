@@ -13,3 +13,6 @@ sfml = "0.20.0"
 
 [dependencies.s2dc]
 git = "https://github.com/crumblingstatue/s2dc.git"
+
+[dependencies.sfml-xt]
+git = "https://github.com/crumblingstatue/sfml-xt.git"

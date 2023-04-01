@@ -2,6 +2,7 @@ use sfml::{
     graphics::RenderWindow,
     window::{ContextSettings, Style, VideoMode},
 };
+use sfml_xt::graphics::RenderWindowExt;
 
 struct ScreenRes {
     w: u16,
@@ -28,5 +29,6 @@ pub fn make_window() -> RenderWindow {
         &ContextSettings::default(),
     );
     rw.set_framerate_limit(60);
+    rw.center();
     rw
 }

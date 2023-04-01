@@ -181,6 +181,7 @@ dependencies = [
  "rand",
  "s2dc",
  "sfml",
+ "sfml-xt",
 ]
 
 [[package]]
@@ -307,6 +308,14 @@ dependencies = [
  "num-traits",
  "once_cell",
  "widestring",
+]
+
+[[package]]
+name = "sfml-xt"
+version = "0.1.0"
+source = "git+https://github.com/crumblingstatue/sfml-xt.git#4eb3ab9e54c3464360709ba8351afc75927908d0"
+dependencies = [
+ "sfml",
 ]
 
 [[package]]
