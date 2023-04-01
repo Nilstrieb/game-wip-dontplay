@@ -1,6 +1,7 @@
 # Premise
 
-- Evil at bottom of playable map
+- Evil source at bottom of playable map
+- Evil is surging upwards
 - Player is the one tasked with going to the bottom and destroying evil source
 - Very long way to bottom
 - Going deeper = main source progression
