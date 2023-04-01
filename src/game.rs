@@ -1,3 +1,4 @@
+use gamedebug_core::imm_dbg;
 use sfml::graphics::{Rect, RenderTarget, RenderWindow, Sprite, Transformable};
 
 use crate::{
@@ -8,8 +9,8 @@ use crate::{
 };
 
 pub struct GameState {
-    camera_offset: WorldPos,
-    world: World,
+    pub camera_offset: WorldPos,
+    pub world: World,
 }
 impl GameState {
     pub(crate) fn draw_world(&mut self, rw: &mut RenderWindow, res: &Res) {
@@ -24,19 +25,17 @@ impl GameState {
 }
 
 fn for_each_tile(camera_offset: WorldPos, mut f: impl FnMut(TilePos, ScreenPos)) {
-    for y in (camera_offset.y..camera_offset.y + NATIVE_RESOLUTION.h as WorldPosScalar).step_by(32)
-    {
-        for x in
-            (camera_offset.x..camera_offset.x + NATIVE_RESOLUTION.w as WorldPosScalar).step_by(32)
-        {
+    for y in (0..NATIVE_RESOLUTION.h).step_by(32) {
+        for x in (0..NATIVE_RESOLUTION.w).step_by(32) {
             f(
                 TilePos {
-                    x: x / 32,
-                    y: y / 32,
+                    x: (camera_offset.x + x as i32) / 32,
+                    y: (camera_offset.y + y as i32) / 32,
                 },
                 ScreenPos {
-                    x: (x - camera_offset.x) as i16,
-                    y: (y - camera_offset.y) as i16,
+                    x: imm_dbg!(imm_dbg!(x as i32) - (imm_dbg!(camera_offset.x as i32)) % 32)
+                        as i16,
+                    y: (y as i32 - (camera_offset.y as i32 % 32)) as i16,
                 },
             )
         }

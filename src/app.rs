@@ -1,3 +1,5 @@
+use egui_sfml::{egui, SfEgui};
+use gamedebug_core::imm;
 use sfml::{
     graphics::{Color, RenderTarget, RenderWindow},
     window::Event,
@@ -7,19 +9,23 @@ use crate::{game::GameState, graphics, res::Res};
 
 /// Application level state (includes game and ui state, etc.)
 pub struct App {
-    rw: RenderWindow,
-    should_quit: bool,
-    game: GameState,
-    res: Res,
+    pub rw: RenderWindow,
+    pub should_quit: bool,
+    pub game: GameState,
+    pub res: Res,
+    pub sf_egui: SfEgui,
 }
 
 impl App {
     pub fn new() -> anyhow::Result<Self> {
+        let rw = graphics::make_window();
+        let sf_egui = SfEgui::new(&rw);
         Ok(Self {
-            rw: graphics::make_window(),
+            rw,
             should_quit: false,
             game: GameState::default(),
             res: Res::load()?,
+            sf_egui,
         })
     }
 
@@ -28,11 +34,13 @@ impl App {
             self.do_event_handling();
             self.do_update();
             self.do_rendering();
+            gamedebug_core::inc_frame();
         }
     }
 
     fn do_event_handling(&mut self) {
         while let Some(ev) = self.rw.poll_event() {
+            self.sf_egui.add_event(&ev);
             match ev {
                 Event::Closed => self.should_quit = true,
                 _ => {}
@@ -45,6 +53,27 @@ impl App {
     fn do_rendering(&mut self) {
         self.rw.clear(Color::BLACK);
         self.game.draw_world(&mut self.rw, &self.res);
+        self.sf_egui
+            .do_frame(|ctx| {
+                egui::Window::new("Debug").show(ctx, |ui| {
+                    ui.label("Cam x");
+                    ui.add(egui::DragValue::new(&mut self.game.camera_offset.x));
+                    ui.label("Cam y");
+                    ui.add(egui::DragValue::new(&mut self.game.camera_offset.y));
+                    ui.separator();
+                    egui::ScrollArea::vertical().show(ui, |ui| {
+                        gamedebug_core::for_each_imm(|info| match info {
+                            gamedebug_core::Info::Msg(msg) => {
+                                ui.label(msg);
+                            }
+                            gamedebug_core::Info::Rect(_, _, _, _, _) => todo!(),
+                        });
+                    });
+                    gamedebug_core::clear_immediates();
+                });
+            })
+            .unwrap();
+        self.sf_egui.draw(&mut self.rw, None);
         self.rw.display();
     }
 }

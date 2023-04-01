@@ -301,6 +301,11 @@ dependencies = [
 ]
 
 [[package]]
+name = "gamedebug_core"
+version = "0.1.0"
+source = "git+https://github.com/crumblingstatue/gamedebug_core.git#0afa12c84d865e266ccf6ee31970ff70da0e2ac6"
+
+[[package]]
 name = "gdk-pixbuf-sys"
 version = "0.16.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -534,6 +539,7 @@ dependencies = [
  "anyhow",
  "egui-sfml",
  "fnv",
+ "gamedebug_core",
  "hecs",
  "rand",
  "rfd",
@@ -690,9 +696,9 @@ checksum = "5b40af805b3121feab8a3c29f04d8ad262fa8e0561883e7653e024ae4479e6de"
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.54"
+version = "1.0.55"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e472a104799c74b514a57226160104aa483546de37e839ec50e3c2e41dd87534"
+checksum = "1d0dd4be24fcdcfeaa12a432d588dc59bbad6cad3510c67e74a2b6b2fc950564"
 dependencies = [
  "unicode-ident",
 ]

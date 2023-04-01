@@ -6,15 +6,15 @@ use sfml::{
 use sfml_xt::graphics::RenderWindowExt;
 
 pub struct ScreenRes {
-    pub w: u16,
-    pub h: u16,
+    pub w: i16,
+    pub h: i16,
 }
 
 impl ScreenRes {
     fn to_sf(&self) -> VideoMode {
         VideoMode {
-            width: self.w.into(),
-            height: self.h.into(),
+            width: self.w as _,
+            height: self.h as _,
             bits_per_pixel: 32,
         }
     }
