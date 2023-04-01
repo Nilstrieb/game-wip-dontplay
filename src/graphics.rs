@@ -1,12 +1,13 @@
 use sfml::{
     graphics::RenderWindow,
+    system::Vector2f,
     window::{ContextSettings, Style, VideoMode},
 };
 use sfml_xt::graphics::RenderWindowExt;
 
-struct ScreenRes {
-    w: u16,
-    h: u16,
+pub struct ScreenRes {
+    pub w: u16,
+    pub h: u16,
 }
 
 impl ScreenRes {
@@ -19,7 +20,19 @@ impl ScreenRes {
     }
 }
 
-const NATIVE_RESOLUTION: ScreenRes = ScreenRes { w: 640, h: 360 };
+// We assume this game won't be played above 32767*32767 resolution
+pub struct ScreenPos {
+    pub x: i16,
+    pub y: i16,
+}
+
+impl ScreenPos {
+    pub fn to_sf_vec(&self) -> Vector2f {
+        Vector2f::new(self.x.into(), self.y.into())
+    }
+}
+
+pub const NATIVE_RESOLUTION: ScreenRes = ScreenRes { w: 960, h: 540 };
 
 pub fn make_window() -> RenderWindow {
     let mut rw = RenderWindow::new(
