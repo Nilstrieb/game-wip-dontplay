@@ -1,16 +1,22 @@
-use crate::{math::WorldPos, world::World};
+use sfml::graphics::{RenderTarget, RenderWindow, Sprite};
+
+use crate::{math::WorldPos, res::Res, world::World};
 
 pub struct GameState {
-    transient: TransientGameState,
-    persistent: PersistentGameState,
-}
-
-/// Transient game state, not saved to disk
-pub struct TransientGameState {
     camera_offset: WorldPos,
+    world: World,
+}
+impl GameState {
+    pub(crate) fn draw_world(&mut self, rw: &mut RenderWindow, res: &Res) {
+        rw.draw(&Sprite::with_texture(&res.tile_atlas));
+    }
 }
 
-/// Persistent game state, saved to disk
-pub struct PersistentGameState {
-    world: World,
+impl Default for GameState {
+    fn default() -> Self {
+        Self {
+            camera_offset: WorldPos { x: 0, y: 0 },
+            world: Default::default(),
+        }
+    }
 }

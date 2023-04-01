@@ -3,20 +3,24 @@ use sfml::{
     window::Event,
 };
 
-use crate::graphics;
+use crate::{game::GameState, graphics, res::Res};
 
 /// Application level state (includes game and ui state, etc.)
 pub struct App {
     rw: RenderWindow,
     should_quit: bool,
+    game: GameState,
+    res: Res,
 }
 
 impl App {
-    pub fn new() -> Self {
-        Self {
+    pub fn new() -> anyhow::Result<Self> {
+        Ok(Self {
             rw: graphics::make_window(),
             should_quit: false,
-        }
+            game: GameState::default(),
+            res: Res::load()?,
+        })
     }
 
     pub fn do_game_loop(&mut self) {
@@ -40,6 +44,7 @@ impl App {
 
     fn do_rendering(&mut self) {
         self.rw.clear(Color::BLACK);
+        self.game.draw_world(&mut self.rw, &self.res);
         self.rw.display();
     }
 }

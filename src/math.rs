@@ -1,6 +1,6 @@
 pub type WorldPosScalar = i32;
 
 pub struct WorldPos {
-    x: WorldPosScalar,
-    y: WorldPosScalar,
+    pub x: WorldPosScalar,
+    pub y: WorldPosScalar,
 }
