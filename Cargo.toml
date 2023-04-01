@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 egui-sfml = "0.4.0"
+fnv = "1.0.7"
 hecs = "0.10.1"
 rand = "0.8.5"
 sfml = "0.20.0"
