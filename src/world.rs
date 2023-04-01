@@ -22,28 +22,28 @@ impl Default for World {
 }
 
 const CHUNK_EXTENT: u16 = 256;
-const CHUNK_N_BLOCKS: usize = CHUNK_EXTENT as usize * CHUNK_EXTENT as usize;
+const CHUNK_N_TILES: usize = CHUNK_EXTENT as usize * CHUNK_EXTENT as usize;
 
-type ChunkBlocks = [Block; CHUNK_N_BLOCKS];
+type ChunkTiles = [Tile; CHUNK_N_TILES];
 
 pub struct Chunk {
-    blocks: ChunkBlocks,
+    tiles: ChunkTiles,
 }
 
 impl Chunk {
     pub fn new_rand() -> Self {
         let mut rng = thread_rng();
-        let mut blocks = [Block { id: 0 }; CHUNK_N_BLOCKS];
-        for b in &mut blocks {
+        let mut tiles = [Tile { id: 0 }; CHUNK_N_TILES];
+        for b in &mut tiles {
             b.id = rng.gen();
         }
-        Self { blocks }
+        Self { tiles }
     }
 }
 
-type BlockId = u16;
+type TileId = u16;
 
 #[derive(Clone, Copy)]
-pub struct Block {
-    id: BlockId,
+pub struct Tile {
+    id: TileId,
 }
