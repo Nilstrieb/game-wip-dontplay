@@ -25,8 +25,8 @@ impl GameState {
 }
 
 fn for_each_tile(camera_offset: WorldPos, mut f: impl FnMut(TilePos, ScreenPos)) {
-    for y in (0..NATIVE_RESOLUTION.h).step_by(32) {
-        for x in (0..NATIVE_RESOLUTION.w).step_by(32) {
+    for y in (-32..NATIVE_RESOLUTION.h + 32).step_by(32) {
+        for x in (-32..NATIVE_RESOLUTION.w + 32).step_by(32) {
             f(
                 TilePos {
                     x: (camera_offset.x + x as i32) / 32,
