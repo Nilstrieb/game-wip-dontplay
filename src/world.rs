@@ -82,14 +82,6 @@ fn test_chk_pos() {
     assert_eq!(chk_pos(-129), -2);
 }
 
-/*fn chunk_local(global: TilePosScalar) -> ChunkLocalTilePosScalar {
-    if global.is_negative() {
-        (CHUNK_EXTENT as i32 + global % CHUNK_EXTENT as i32) as u8
-    } else {
-        (global % CHUNK_EXTENT as i32) as u8
-    }
-}*/
-
 fn chunk_local(global: TilePosScalar) -> ChunkLocalTilePosScalar {
     let mut result = global % CHUNK_EXTENT as i32;
     if result.is_negative() {
