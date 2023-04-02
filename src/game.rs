@@ -2,7 +2,7 @@ use sfml::graphics::{Rect, RenderTarget, RenderWindow, Sprite, Transformable};
 
 use crate::{
     graphics::{ScreenPos, NATIVE_RESOLUTION},
-    math::WorldPos,
+    math::{wp_to_tp, WorldPos, WorldPosScalar},
     res::Res,
     world::{TilePos, World},
 };
@@ -28,8 +28,8 @@ fn for_each_tile(camera_offset: WorldPos, mut f: impl FnMut(TilePos, ScreenPos))
         for x in (-32..NATIVE_RESOLUTION.w + 32).step_by(32) {
             f(
                 TilePos {
-                    x: (camera_offset.x + x as i32) / 32,
-                    y: (camera_offset.y + y as i32) / 32,
+                    x: wp_to_tp(camera_offset.x + x as WorldPosScalar),
+                    y: wp_to_tp(camera_offset.y + y as WorldPosScalar),
                 },
                 ScreenPos {
                     x: (x as i32 - camera_offset.x % 32) as i16,

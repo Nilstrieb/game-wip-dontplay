@@ -140,7 +140,7 @@ fn test_to_chunk_and_local() {
 }
 
 // Need to support at least 4 million tiles long
-type TilePosScalar = i32;
+pub type TilePosScalar = i32;
 
 const CHUNK_EXTENT: u16 = 128;
 const CHUNK_N_TILES: usize = CHUNK_EXTENT as usize * CHUNK_EXTENT as usize;
