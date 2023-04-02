@@ -1,9 +1,8 @@
-use gamedebug_core::imm_dbg;
 use sfml::graphics::{Rect, RenderTarget, RenderWindow, Sprite, Transformable};
 
 use crate::{
     graphics::{ScreenPos, NATIVE_RESOLUTION},
-    math::{WorldPos, WorldPosScalar, TILE_SIZE},
+    math::WorldPos,
     res::Res,
     world::{TilePos, World},
 };
@@ -33,9 +32,8 @@ fn for_each_tile(camera_offset: WorldPos, mut f: impl FnMut(TilePos, ScreenPos))
                     y: (camera_offset.y + y as i32) / 32,
                 },
                 ScreenPos {
-                    x: imm_dbg!(imm_dbg!(x as i32) - (imm_dbg!(camera_offset.x as i32)) % 32)
-                        as i16,
-                    y: (y as i32 - (camera_offset.y as i32 % 32)) as i16,
+                    x: (x as i32 - camera_offset.x % 32) as i16,
+                    y: (y as i32 - (camera_offset.y % 32)) as i16,
                 },
             )
         }

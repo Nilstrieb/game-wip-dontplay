@@ -1,5 +1,5 @@
 use egui_sfml::{egui, SfEgui};
-use gamedebug_core::imm;
+use gamedebug_core::imm_dbg;
 use sfml::{
     graphics::{Color, RenderTarget, RenderWindow},
     window::Event,
@@ -48,7 +48,11 @@ impl App {
         }
     }
 
-    fn do_update(&mut self) {}
+    fn do_update(&mut self) {
+        let tp = self.game.camera_offset.tile_pos();
+        imm_dbg!(tp);
+        imm_dbg!(tp.to_chunk_and_local());
+    }
 
     fn do_rendering(&mut self) {
         self.rw.clear(Color::BLACK);
