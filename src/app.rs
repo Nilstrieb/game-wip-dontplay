@@ -69,16 +69,16 @@ impl App {
             2
         };
         if self.kb_input.down(Key::Left) {
-            self.game.camera_offset.x -= spd;
+            self.game.camera_offset.x = self.game.camera_offset.x.saturating_sub(spd);
         }
         if self.kb_input.down(Key::Right) {
-            self.game.camera_offset.x += spd;
+            self.game.camera_offset.x = self.game.camera_offset.x.saturating_add(spd);
         }
         if self.kb_input.down(Key::Up) {
-            self.game.camera_offset.y -= spd;
+            self.game.camera_offset.y = self.game.camera_offset.y.saturating_sub(spd);
         }
         if self.kb_input.down(Key::Down) {
-            self.game.camera_offset.y += spd;
+            self.game.camera_offset.y = self.game.camera_offset.y.saturating_add(spd);
         }
         let tp = self.game.camera_offset.tile_pos();
         imm_dbg!(tp);
