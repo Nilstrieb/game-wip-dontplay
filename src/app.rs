@@ -139,15 +139,18 @@ impl App {
             self.game.camera_offset.x = (x - NATIVE_RESOLUTION.w as i32 / 2) as u32;
             self.game.camera_offset.y = (y - NATIVE_RESOLUTION.h as i32 / 2) as u32;
         }
+        let loc = self.input.mouse_down_loc;
+        let mut wpos = self.game.camera_offset;
+        wpos.x = wpos.x.saturating_add_signed(loc.x.into());
+        wpos.y = wpos.y.saturating_add_signed(loc.y.into());
+        let mouse_tpos = wpos.tile_pos();
+        imm!("Mouse @ tile {}, {}", mouse_tpos.x, mouse_tpos.y);
+        if self.debug.freecam && self.input.pressed(Key::P) {
+            self.game.player.col_en.en.pos.x = wpos.x as i32;
+            self.game.player.col_en.en.pos.y = wpos.y as i32;
+        }
         if self.input.lmb_down {
-            let loc = self.input.mouse_down_loc;
-            let mut wpos = self.game.camera_offset;
-            wpos.x = wpos.x.saturating_add_signed(loc.x.into());
-            wpos.y = wpos.y.saturating_add_signed(loc.y.into());
-            imm!("Mouse down at {}, {}", wpos.x, wpos.y);
-            let tpos = wpos.tile_pos();
-            imm_dbg!(tpos);
-            let t = self.game.world.tile_at_mut(tpos);
+            let t = self.game.world.tile_at_mut(mouse_tpos);
             t.mid = 0;
             t.fg = 0;
         }
