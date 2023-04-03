@@ -110,7 +110,7 @@ impl Chunk {
     pub fn gen(pos: ChunkPos) -> Self {
         let mut rng = thread_rng();
         let mut tiles = [Tile { id: 0 }; CHUNK_N_TILES];
-        if pos.y > 40 {
+        if pos.y > 38 {
             for b in &mut tiles {
                 b.id = rng.gen_range(1..5);
             }
