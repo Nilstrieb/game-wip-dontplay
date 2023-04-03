@@ -77,14 +77,14 @@ impl App {
                 4.0
             };
             self.game.player.hspeed = 0.;
-            if self.input.down(Key::Left) {
+            if self.input.down(Key::A) {
                 self.game.player.hspeed = -spd;
             }
-            if self.input.down(Key::Right) {
+            if self.input.down(Key::D) {
                 self.game.player.hspeed = spd;
             }
-            if self.input.pressed(Key::Up) {
-                self.game.player.vspeed = -14.0;
+            if self.input.pressed(Key::W) {
+                self.game.player.vspeed = -10.0;
             }
             let terminal_velocity = 60.0;
             self.game.player.vspeed = self
