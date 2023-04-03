@@ -57,7 +57,6 @@ impl App {
 
     fn do_update(&mut self) {
         let tp = self.game.camera_offset.tile_pos();
-        self.game.camera_offset.y += 800;
         imm_dbg!(tp);
         imm_dbg!(tp.to_chunk_and_local());
     }
@@ -76,6 +75,10 @@ impl App {
                     ui.label(format!(
                         "Depth: {}",
                         LengthDisp(tile_off.y as i64 - wp_to_tp(WorldPos::SURFACE) as i64)
+                    ));
+                    ui.label(format!(
+                        "Offset from center: {}",
+                        LengthDisp(tile_off.x as i64 - wp_to_tp(WorldPos::CENTER) as i64)
                     ));
                     ui.separator();
                     egui::ScrollArea::vertical().show(ui, |ui| {
