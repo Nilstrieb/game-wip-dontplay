@@ -20,7 +20,7 @@ impl WorldPos {
     /// Horizontal center of the world
     pub const CENTER: WorldPosScalar = WorldPosScalar::MAX / 2;
     /// Vertical surface level
-    pub const SURFACE: WorldPosScalar = WorldPosScalar::MAX / 3;
+    pub const SURFACE: WorldPosScalar = WorldPosScalar::MAX / 16;
     pub const SURFACE_CENTER: Self = Self {
         x: Self::CENTER,
         y: Self::SURFACE,
