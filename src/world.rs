@@ -1,7 +1,7 @@
 use fnv::FnvHashMap;
 use rand::{thread_rng, Rng};
 
-type ChunkPosScalar = u16;
+type ChunkPosScalar = u32;
 
 #[derive(Hash, PartialEq, Eq, Debug, Clone, Copy)]
 pub struct ChunkPos {
