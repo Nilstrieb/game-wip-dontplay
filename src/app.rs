@@ -1,3 +1,5 @@
+use std::fmt::{self};
+
 use egui_sfml::{egui, SfEgui};
 use gamedebug_core::imm_dbg;
 use sfml::{
@@ -5,7 +7,12 @@ use sfml::{
     window::Event,
 };
 
-use crate::{game::GameState, graphics, res::Res};
+use crate::{
+    game::GameState,
+    graphics,
+    math::{wp_to_tp, WorldPos},
+    res::Res,
+};
 
 /// Application level state (includes game and ui state, etc.)
 pub struct App {
@@ -64,6 +71,11 @@ impl App {
                     ui.add(egui::DragValue::new(&mut self.game.camera_offset.x));
                     ui.label("Cam y");
                     ui.add(egui::DragValue::new(&mut self.game.camera_offset.y));
+                    let tile_off = self.game.camera_offset.tile_pos();
+                    ui.label(format!(
+                        "Depth: {}",
+                        LengthDisp(tile_off.y as i64 - wp_to_tp(WorldPos::SURFACE) as i64)
+                    ));
                     ui.separator();
                     egui::ScrollArea::vertical().show(ui, |ui| {
                         gamedebug_core::for_each_imm(|info| match info {
@@ -79,5 +91,15 @@ impl App {
             .unwrap();
         self.sf_egui.draw(&mut self.rw, None);
         self.rw.display();
+    }
+}
+
+struct LengthDisp(i64);
+
+impl fmt::Display for LengthDisp {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let km = self.0 / 1000;
+        let m = self.0 % 1000;
+        write!(f, "{km} km, {m} m")
     }
 }
