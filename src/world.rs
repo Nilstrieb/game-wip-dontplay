@@ -28,7 +28,7 @@ impl World {
     /// Loads or generates the containing chunk if necessary.
     pub fn tile_at_mut(&mut self, pos: TilePos) -> &mut Tile {
         let (chk, local) = pos.to_chunk_and_local();
-        let chk = self.chunks.entry(chk).or_insert_with(Chunk::new_rand);
+        let chk = self.chunks.entry(chk).or_insert_with(|| Chunk::gen(chk));
         chk.at_mut(local)
     }
 }
@@ -107,11 +107,13 @@ pub struct Chunk {
 }
 
 impl Chunk {
-    pub fn new_rand() -> Self {
+    pub fn gen(pos: ChunkPos) -> Self {
         let mut rng = thread_rng();
         let mut tiles = [Tile { id: 0 }; CHUNK_N_TILES];
-        for b in &mut tiles {
-            b.id = rng.gen_range(0..8);
+        if pos.y > 40 {
+            for b in &mut tiles {
+                b.id = rng.gen_range(1..5);
+            }
         }
         Self { tiles }
     }
@@ -126,4 +128,8 @@ type TileId = u16;
 #[derive(Clone, Copy)]
 pub struct Tile {
     pub id: TileId,
+}
+
+impl Tile {
+    pub const AIR: TileId = 0;
 }

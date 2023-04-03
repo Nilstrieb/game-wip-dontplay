@@ -86,7 +86,7 @@ impl App {
     }
 
     fn do_rendering(&mut self) {
-        self.rw.clear(Color::BLACK);
+        self.rw.clear(Color::rgb(55, 221, 231));
         self.game.draw_world(&mut self.rw, &self.res);
         self.sf_egui
             .do_frame(|ctx| {

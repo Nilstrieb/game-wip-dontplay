@@ -4,7 +4,7 @@ use crate::{
     graphics::{ScreenPos, ScreenPosScalar, NATIVE_RESOLUTION},
     math::{wp_to_tp, WorldPos, WorldPosScalar},
     res::Res,
-    world::{TilePos, World},
+    world::{Tile, TilePos, World},
 };
 
 pub struct GameState {
@@ -16,7 +16,10 @@ impl GameState {
         let mut s = Sprite::with_texture(&res.tile_atlas);
         for_each_tile_on_screen(self.camera_offset, |tp, sp| {
             let tile = self.world.tile_at_mut(tp);
-            s.set_texture_rect(Rect::new(tile.id as i32 * 32, 0, 32, 32));
+            if tile.id == Tile::AIR {
+                return;
+            }
+            s.set_texture_rect(Rect::new((tile.id - 1) as i32 * 32, 0, 32, 32));
             s.set_position(sp.to_sf_vec());
             rw.draw(&s);
         });
