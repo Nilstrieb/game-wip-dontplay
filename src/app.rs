@@ -3,6 +3,7 @@ use std::fmt::{self};
 use egui_sfml::{egui, SfEgui};
 use gamedebug_core::{imm, imm_dbg};
 use sfml::{
+    audio::SoundSource,
     graphics::{Color, RenderTarget, RenderWindow},
     window::{Event, Key},
 };
@@ -33,6 +34,8 @@ impl App {
         let rw = graphics::make_window();
         let sf_egui = SfEgui::new(&rw);
         let mut res = Res::load()?;
+        res.music.set_looping(true);
+        res.music.set_volume(10.0);
         res.music.play();
         Ok(Self {
             rw,
@@ -198,7 +201,7 @@ impl App {
         self.sf_egui
             .do_frame(|ctx| {
                 if self.debug.panel {
-                    debug_panel_ui(&mut self.debug, &mut self.game, ctx);
+                    debug_panel_ui(&mut self.debug, &mut self.game, ctx, &mut self.res);
                 }
             })
             .unwrap();
@@ -207,7 +210,12 @@ impl App {
     }
 }
 
-fn debug_panel_ui(debug: &mut DebugState, game: &mut GameState, ctx: &egui::Context) {
+fn debug_panel_ui(
+    debug: &mut DebugState,
+    game: &mut GameState,
+    ctx: &egui::Context,
+    res: &mut Res,
+) {
     egui::Window::new("Debug (F12)").show(ctx, |ui| {
         if debug.freecam {
             ui.label("Cam x");
@@ -245,6 +253,10 @@ fn debug_panel_ui(debug: &mut DebugState, game: &mut GameState, ctx: &egui::Cont
         }
         ui.label("Tile to place");
         ui.add(egui::DragValue::new(&mut game.tile_to_place));
+        ui.label("Music volume");
+        let mut vol = res.music.volume();
+        ui.add(egui::DragValue::new(&mut vol));
+        res.music.set_volume(vol);
         ui.separator();
         egui::ScrollArea::vertical().show(ui, |ui| {
             gamedebug_core::for_each_imm(|info| match info {
