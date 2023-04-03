@@ -157,6 +157,13 @@ impl App {
             let t = self.game.world.tile_at_mut(mouse_tpos);
             t.mid = 0;
             t.fg = 0;
+        } else if self.input.rmb_down {
+            let t = self.game.world.tile_at_mut(mouse_tpos);
+            if self.game.tile_to_place != 7 {
+                t.mid = self.game.tile_to_place;
+            } else {
+                t.bg = self.game.tile_to_place;
+            }
         }
     }
 
@@ -234,6 +241,8 @@ fn debug_panel_ui(debug: &mut DebugState, game: &mut GameState, ctx: &egui::Cont
             ui.label("Gravity");
             ui.add(egui::DragValue::new(&mut game.gravity));
         }
+        ui.label("Tile to place");
+        ui.add(egui::DragValue::new(&mut game.tile_to_place));
         ui.separator();
         egui::ScrollArea::vertical().show(ui, |ui| {
             gamedebug_core::for_each_imm(|info| match info {

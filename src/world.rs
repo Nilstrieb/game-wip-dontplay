@@ -137,7 +137,7 @@ impl Chunk {
     }
 }
 
-type TileId = u16;
+pub type TileId = u16;
 
 #[derive(Clone, Copy)]
 pub struct Tile {

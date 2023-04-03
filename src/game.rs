@@ -6,7 +6,7 @@ use crate::{
     graphics::{ScreenPos, ScreenPosScalar, NATIVE_RESOLUTION},
     math::{wp_to_tp, WorldPos},
     res::Res,
-    world::{Tile, TilePos, World},
+    world::{Tile, TileId, TilePos, World},
 };
 
 use self::player::Player;
@@ -16,6 +16,7 @@ pub struct GameState {
     pub world: World,
     pub player: Player,
     pub gravity: f32,
+    pub tile_to_place: TileId,
 }
 impl GameState {
     pub(crate) fn draw_world(&mut self, rw: &mut RenderWindow, res: &Res) {
@@ -75,6 +76,7 @@ impl Default for GameState {
             world: Default::default(),
             player: Player::new_at(spawn_point),
             gravity: 0.7,
+            tile_to_place: 1,
         }
     }
 }
