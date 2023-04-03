@@ -22,12 +22,19 @@ impl GameState {
         let mut s = Sprite::with_texture(&res.tile_atlas);
         for_each_tile_on_screen(self.camera_offset, |tp, sp| {
             let tile = self.world.tile_at_mut(tp);
-            if tile.id == Tile::AIR {
-                return;
-            }
-            s.set_texture_rect(Rect::new((tile.id - 1) as i32 * 32, 0, 32, 32));
             s.set_position(sp.to_sf_vec());
-            rw.draw(&s);
+            if tile.bg != Tile::EMPTY {
+                s.set_texture_rect(Rect::new((tile.bg - 1) as i32 * 32, 0, 32, 32));
+                rw.draw(&s);
+            }
+            if tile.mid != Tile::EMPTY {
+                s.set_texture_rect(Rect::new((tile.mid - 1) as i32 * 32, 0, 32, 32));
+                rw.draw(&s);
+            }
+            if tile.fg != Tile::EMPTY {
+                s.set_texture_rect(Rect::new((tile.fg - 1) as i32 * 32, 0, 32, 32));
+                rw.draw(&s);
+            }
         });
     }
     pub fn draw_entities(&mut self, rw: &mut RenderWindow) {

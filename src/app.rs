@@ -98,8 +98,8 @@ impl App {
                 .move_y(self.game.player.vspeed, |player_en, off| {
                     let mut col = false;
                     for_each_tile_on_screen(self.game.camera_offset, |tp, _sp| {
-                        let tid = self.game.world.tile_at_mut(tp).id;
-                        if tid == Tile::AIR {
+                        let tid = self.game.world.tile_at_mut(tp).mid;
+                        if tid == Tile::EMPTY {
                             return;
                         }
                         let tsize = TILE_SIZE as i32;
@@ -119,8 +119,8 @@ impl App {
                 .move_x(self.game.player.hspeed, |player_en, off| {
                     let mut col = false;
                     for_each_tile_on_screen(self.game.camera_offset, |tp, _sp| {
-                        let tid = self.game.world.tile_at_mut(tp).id;
-                        if tid == Tile::AIR {
+                        let tid = self.game.world.tile_at_mut(tp).mid;
+                        if tid == Tile::EMPTY {
                             return;
                         }
                         let tsize = TILE_SIZE as i32;
@@ -147,7 +147,9 @@ impl App {
             imm!("Mouse down at {}, {}", wpos.x, wpos.y);
             let tpos = wpos.tile_pos();
             imm_dbg!(tpos);
-            self.game.world.tile_at_mut(tpos).id = 0;
+            let t = self.game.world.tile_at_mut(tpos);
+            t.mid = 0;
+            t.fg = 0;
         }
     }
 

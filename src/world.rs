@@ -109,16 +109,24 @@ pub struct Chunk {
 impl Chunk {
     pub fn gen(pos: ChunkPos) -> Self {
         let mut rng = thread_rng();
-        let mut tiles = [Tile { id: 0 }; CHUNK_N_TILES];
+        let mut tiles = [Tile {
+            bg: 0,
+            mid: 0,
+            fg: 0,
+        }; CHUNK_N_TILES];
         if pos.y > 38 {
             for b in &mut tiles {
-                b.id = rng.gen_range(1..5);
+                b.bg = 7;
+                b.mid = rng.gen_range(1..5);
+                if rng.gen_bool(0.1) {
+                    b.fg = 6;
+                }
             }
         }
         // Unbreakable layer at bottom
         if pos.y > 510 {
             for b in &mut tiles {
-                b.id = Tile::UNBREAKANIUM;
+                b.mid = Tile::UNBREAKANIUM;
             }
         }
         Self { tiles }
@@ -133,10 +141,15 @@ type TileId = u16;
 
 #[derive(Clone, Copy)]
 pub struct Tile {
-    pub id: TileId,
+    /// Background wall behind entities
+    pub bg: TileId,
+    /// The solid wall on the same level as entities
+    pub mid: TileId,
+    /// A layer on top of the mid wall. Usually ores or decorative pieces.
+    pub fg: TileId,
 }
 
 impl Tile {
-    pub const AIR: TileId = 0;
+    pub const EMPTY: TileId = 0;
     pub const UNBREAKANIUM: TileId = 5;
 }
