@@ -28,12 +28,12 @@ fn for_each_tile(camera_offset: WorldPos, mut f: impl FnMut(TilePos, ScreenPos))
         for x in (-32..NATIVE_RESOLUTION.w + 32).step_by(32) {
             f(
                 TilePos {
-                    x: wp_to_tp(camera_offset.x + x as WorldPosScalar),
-                    y: wp_to_tp(camera_offset.y + y as WorldPosScalar),
+                    x: wp_to_tp(camera_offset.x.saturating_add(x as WorldPosScalar)),
+                    y: wp_to_tp(camera_offset.y.saturating_add(y as WorldPosScalar)),
                 },
                 ScreenPos {
-                    x: (x as i32 - camera_offset.x % 32) as i16,
-                    y: (y as i32 - (camera_offset.y % 32)) as i16,
+                    x: ((x as WorldPosScalar).saturating_sub(camera_offset.x % 32)) as i16,
+                    y: ((y as WorldPosScalar).saturating_sub(camera_offset.y % 32)) as i16,
                 },
             )
         }

@@ -62,11 +62,7 @@ impl TilePos {
 }
 
 fn chk_pos(tile: TilePosScalar) -> ChunkPosScalar {
-    if tile.is_negative() {
-        ((tile + 1) / CHUNK_EXTENT as i32) as i16 - 1
-    } else {
-        (tile / CHUNK_EXTENT as i32) as i16
-    }
+    (tile / CHUNK_EXTENT as TilePosScalar) as i16
 }
 
 #[test]
@@ -75,26 +71,15 @@ fn test_chk_pos() {
     assert_eq!(chk_pos(1), 0);
     assert_eq!(chk_pos(127), 0);
     assert_eq!(chk_pos(128), 1);
-    assert_eq!(chk_pos(-1), -1);
-    assert_eq!(chk_pos(-2), -1);
-    assert_eq!(chk_pos(-127), -1);
-    assert_eq!(chk_pos(-128), -1);
-    assert_eq!(chk_pos(-129), -2);
 }
 
 fn chunk_local(global: TilePosScalar) -> ChunkLocalTilePosScalar {
-    let mut result = global % CHUNK_EXTENT as i32;
-    if result.is_negative() {
-        result += CHUNK_EXTENT as i32;
-    }
-    result as u8
+    (global % CHUNK_EXTENT as TilePosScalar) as ChunkLocalTilePosScalar
 }
 
 #[test]
 fn test_chunk_local() {
     assert_eq!(chunk_local(0), 0);
-    assert_eq!(chunk_local(-1), 127);
-    assert_eq!(chunk_local(-128), 0);
 }
 
 #[test]
@@ -107,32 +92,10 @@ fn test_to_chunk_and_local() {
         TilePos { x: 1, y: 1 }.to_chunk_and_local(),
         (ChunkPos { x: 0, y: 0 }, ChunkLocalTilePos { x: 1, y: 1 })
     );
-    assert_eq!(
-        TilePos { x: -1, y: -1 }.to_chunk_and_local(),
-        (
-            ChunkPos { x: -1, y: -1 },
-            ChunkLocalTilePos { x: 127, y: 127 }
-        )
-    );
-    assert_eq!(
-        TilePos { x: -127, y: -127 }.to_chunk_and_local(),
-        (ChunkPos { x: -1, y: -1 }, ChunkLocalTilePos { x: 1, y: 1 })
-    );
-    assert_eq!(
-        TilePos { x: -128, y: -128 }.to_chunk_and_local(),
-        (ChunkPos { x: -1, y: -1 }, ChunkLocalTilePos { x: 0, y: 0 })
-    );
-    assert_eq!(
-        TilePos { x: -129, y: -129 }.to_chunk_and_local(),
-        (
-            ChunkPos { x: -2, y: -2 },
-            ChunkLocalTilePos { x: 127, y: 127 }
-        )
-    );
 }
 
 // Need to support at least 4 million tiles long
-pub type TilePosScalar = i32;
+pub type TilePosScalar = u32;
 
 const CHUNK_EXTENT: u16 = 128;
 const CHUNK_N_TILES: usize = CHUNK_EXTENT as usize * CHUNK_EXTENT as usize;

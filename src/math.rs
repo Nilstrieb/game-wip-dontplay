@@ -1,6 +1,6 @@
 use crate::world::{TilePos, TilePosScalar};
 
-pub type WorldPosScalar = i32;
+pub type WorldPosScalar = u32;
 
 #[derive(Clone, Copy)]
 pub struct WorldPos {
@@ -20,11 +20,7 @@ impl WorldPos {
 }
 
 pub fn wp_to_tp(wp: WorldPosScalar) -> TilePosScalar {
-    if wp.is_negative() {
-        (wp + 1) / TILE_SIZE as TilePosScalar - 1
-    } else {
-        wp / TILE_SIZE as TilePosScalar
-    }
+    wp / TILE_SIZE as TilePosScalar
 }
 
 #[test]
@@ -32,7 +28,4 @@ fn test_wp_to_tp() {
     assert_eq!(wp_to_tp(0), 0);
     assert_eq!(wp_to_tp(1), 0);
     assert_eq!(wp_to_tp(33), 1);
-    assert_eq!(wp_to_tp(-1), -1);
-    assert_eq!(wp_to_tp(-32), -1);
-    assert_eq!(wp_to_tp(-33), -2);
 }
