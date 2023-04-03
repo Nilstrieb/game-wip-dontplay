@@ -43,7 +43,7 @@ fn for_each_tile_on_screen(camera_offset: WorldPos, mut f: impl FnMut(TilePos, S
 impl Default for GameState {
     fn default() -> Self {
         Self {
-            camera_offset: WorldPos { x: 0, y: 0 },
+            camera_offset: WorldPos::SURFACE_CENTER,
             world: Default::default(),
         }
     }

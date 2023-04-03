@@ -17,6 +17,14 @@ impl WorldPos {
             y: wp_to_tp(self.y),
         }
     }
+    /// Horizontal center of the world
+    pub const CENTER: WorldPosScalar = WorldPosScalar::MAX / 2;
+    /// Vertical surface level
+    pub const SURFACE: WorldPosScalar = WorldPosScalar::MAX / 3;
+    pub const SURFACE_CENTER: Self = Self {
+        x: Self::CENTER,
+        y: Self::SURFACE,
+    };
 }
 
 pub fn wp_to_tp(wp: WorldPosScalar) -> TilePosScalar {
