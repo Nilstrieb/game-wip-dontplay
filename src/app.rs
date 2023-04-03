@@ -4,12 +4,13 @@ use egui_sfml::{egui, SfEgui};
 use gamedebug_core::imm_dbg;
 use sfml::{
     graphics::{Color, RenderTarget, RenderWindow},
-    window::Event,
+    window::{Event, Key},
 };
 
 use crate::{
     game::GameState,
     graphics,
+    input::KbInput,
     math::{wp_to_tp, WorldPos},
     res::Res,
 };
@@ -21,6 +22,7 @@ pub struct App {
     pub game: GameState,
     pub res: Res,
     pub sf_egui: SfEgui,
+    pub kb_input: KbInput,
 }
 
 impl App {
@@ -33,6 +35,7 @@ impl App {
             game: GameState::default(),
             res: Res::load()?,
             sf_egui,
+            kb_input: KbInput::default(),
         })
     }
 
@@ -41,6 +44,7 @@ impl App {
             self.do_event_handling();
             self.do_update();
             self.do_rendering();
+            self.kb_input.clear_pressed();
             gamedebug_core::inc_frame();
         }
     }
@@ -48,6 +52,7 @@ impl App {
     fn do_event_handling(&mut self) {
         while let Some(ev) = self.rw.poll_event() {
             self.sf_egui.add_event(&ev);
+            self.kb_input.update_from_event(&ev);
             match ev {
                 Event::Closed => self.should_quit = true,
                 _ => {}
@@ -56,6 +61,25 @@ impl App {
     }
 
     fn do_update(&mut self) {
+        let spd = if self.kb_input.down(Key::LShift) {
+            100
+        } else if self.kb_input.down(Key::LControl) {
+            1000
+        } else {
+            2
+        };
+        if self.kb_input.down(Key::Left) {
+            self.game.camera_offset.x -= spd;
+        }
+        if self.kb_input.down(Key::Right) {
+            self.game.camera_offset.x += spd;
+        }
+        if self.kb_input.down(Key::Up) {
+            self.game.camera_offset.y -= spd;
+        }
+        if self.kb_input.down(Key::Down) {
+            self.game.camera_offset.y += spd;
+        }
         let tp = self.game.camera_offset.tile_pos();
         imm_dbg!(tp);
         imm_dbg!(tp.to_chunk_and_local());

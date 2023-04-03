@@ -1,6 +1,7 @@
 mod app;
 mod game;
 mod graphics;
+mod input;
 mod math;
 mod res;
 mod world;
