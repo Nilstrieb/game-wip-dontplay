@@ -4,7 +4,7 @@ use sfml::graphics::{Rect, RectangleShape, RenderTarget, RenderWindow, Sprite, T
 
 use crate::{
     graphics::{ScreenPos, ScreenPosScalar, NATIVE_RESOLUTION},
-    math::{wp_to_tp, WorldPos, WorldPosScalar},
+    math::{wp_to_tp, WorldPos},
     res::Res,
     world::{Tile, TilePos, World},
 };
@@ -41,13 +41,13 @@ impl GameState {
     }
 }
 
-fn for_each_tile_on_screen(camera_offset: WorldPos, mut f: impl FnMut(TilePos, ScreenPos)) {
+pub fn for_each_tile_on_screen(camera_offset: WorldPos, mut f: impl FnMut(TilePos, ScreenPos)) {
     for y in (-32..NATIVE_RESOLUTION.h + 32).step_by(32) {
         for x in (-32..NATIVE_RESOLUTION.w + 32).step_by(32) {
             f(
                 TilePos {
-                    x: wp_to_tp(camera_offset.x.saturating_add(x as WorldPosScalar)),
-                    y: wp_to_tp(camera_offset.y.saturating_add(y as WorldPosScalar)),
+                    x: wp_to_tp(camera_offset.x.saturating_add(x.try_into().unwrap_or(0))),
+                    y: wp_to_tp(camera_offset.y.saturating_add(y.try_into().unwrap_or(0))),
                 },
                 ScreenPos {
                     x: ((x as i64) - ((camera_offset.x as i64) % 32)) as ScreenPosScalar,
@@ -60,10 +60,12 @@ fn for_each_tile_on_screen(camera_offset: WorldPos, mut f: impl FnMut(TilePos, S
 
 impl Default for GameState {
     fn default() -> Self {
+        let mut spawn_point = WorldPos::SURFACE_CENTER;
+        spawn_point.y -= 300;
         Self {
-            camera_offset: WorldPos::SURFACE_CENTER,
+            camera_offset: spawn_point,
             world: Default::default(),
-            player: Player::new_at(WorldPos::SURFACE_CENTER),
+            player: Player::new_at(spawn_point),
         }
     }
 }

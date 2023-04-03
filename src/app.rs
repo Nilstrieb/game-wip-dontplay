@@ -9,11 +9,12 @@ use sfml::{
 
 use crate::{
     debug::DebugState,
-    game::GameState,
+    game::{for_each_tile_on_screen, GameState},
     graphics::{self, NATIVE_RESOLUTION},
     input::KbInput,
-    math::{wp_to_tp, WorldPos},
+    math::{wp_to_tp, WorldPos, TILE_SIZE},
     res::Res,
+    world::Tile,
 };
 
 /// Application level state (includes game and ui state, etc.)
@@ -81,12 +82,31 @@ impl App {
             if self.kb_input.down(Key::Right) {
                 self.game.player.col_en.move_x(spd, |_, _| false);
             }
-            if self.kb_input.down(Key::Up) {
-                self.game.player.col_en.move_y(-spd, |_, _| false);
+            if self.kb_input.pressed(Key::Up) {
+                self.game.player.vspeed = -14.0;
             }
-            if self.kb_input.down(Key::Down) {
-                self.game.player.col_en.move_y(spd, |_, _| false);
-            }
+            self.game
+                .player
+                .col_en
+                .move_y(self.game.player.vspeed, |player_en, off| {
+                    let mut col = false;
+                    for_each_tile_on_screen(self.game.camera_offset, |tp, _sp| {
+                        let tid = self.game.world.tile_at_mut(tp).id;
+                        if tid == Tile::AIR {
+                            return;
+                        }
+                        let tsize = TILE_SIZE as i32;
+                        let x = tp.x as i32 * TILE_SIZE as i32;
+                        let y = tp.y as i32 * TILE_SIZE as i32;
+                        let en = s2dc::Entity::from_rect_corners(x, y, x + tsize, y + tsize);
+                        if player_en.would_collide(&en, off) {
+                            col = true;
+                            self.game.player.vspeed = 0.;
+                        }
+                    });
+                    col
+                });
+            self.game.player.vspeed += 1.0;
             let (x, y, _w, _h) = self.game.player.col_en.en.xywh();
             self.game.camera_offset.x = (x - NATIVE_RESOLUTION.w as i32 / 2) as u32;
             self.game.camera_offset.y = (y - NATIVE_RESOLUTION.h as i32 / 2) as u32;
