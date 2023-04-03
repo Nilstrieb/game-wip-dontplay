@@ -8,6 +8,7 @@ use crate::{
 pub struct Player {
     pub col_en: MobileEntity,
     pub vspeed: f32,
+    pub hspeed: f32,
 }
 
 impl Player {
@@ -15,6 +16,7 @@ impl Player {
         Self {
             col_en: MobileEntity::from_pos_and_bb(vec2(pos.x as i32, pos.y as i32), vec2(15, 24)),
             vspeed: 0.0,
+            hspeed: 0.0,
         }
     }
     pub fn center_tp(&self) -> TilePos {

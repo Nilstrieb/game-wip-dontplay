@@ -76,11 +76,12 @@ impl App {
             } else {
                 4.0
             };
+            self.game.player.hspeed = 0.;
             if self.input.down(Key::Left) {
-                self.game.player.col_en.move_x(-spd, |_, _| false);
+                self.game.player.hspeed = -spd;
             }
             if self.input.down(Key::Right) {
-                self.game.player.col_en.move_x(spd, |_, _| false);
+                self.game.player.hspeed = spd;
             }
             if self.input.pressed(Key::Up) {
                 self.game.player.vspeed = -14.0;
@@ -103,6 +104,27 @@ impl App {
                         if player_en.would_collide(&en, off) {
                             col = true;
                             self.game.player.vspeed = 0.;
+                        }
+                    });
+                    col
+                });
+            self.game
+                .player
+                .col_en
+                .move_x(self.game.player.hspeed, |player_en, off| {
+                    let mut col = false;
+                    for_each_tile_on_screen(self.game.camera_offset, |tp, _sp| {
+                        let tid = self.game.world.tile_at_mut(tp).id;
+                        if tid == Tile::AIR {
+                            return;
+                        }
+                        let tsize = TILE_SIZE as i32;
+                        let x = tp.x as i32 * TILE_SIZE as i32;
+                        let y = tp.y as i32 * TILE_SIZE as i32;
+                        let en = s2dc::Entity::from_rect_corners(x, y, x + tsize, y + tsize);
+                        if player_en.would_collide(&en, off) {
+                            col = true;
+                            self.game.player.hspeed = 0.;
                         }
                     });
                     col
