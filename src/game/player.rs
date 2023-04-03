@@ -9,6 +9,7 @@ pub struct Player {
     pub col_en: MobileEntity,
     pub vspeed: f32,
     pub hspeed: f32,
+    pub jumps_left: u8,
 }
 
 impl Player {
@@ -17,6 +18,7 @@ impl Player {
             col_en: MobileEntity::from_pos_and_bb(vec2(pos.x as i32, pos.y as i32), vec2(15, 24)),
             vspeed: 0.0,
             hspeed: 0.0,
+            jumps_left: 0,
         }
     }
     pub fn center_tp(&self) -> TilePos {
@@ -24,5 +26,8 @@ impl Player {
             x: (self.col_en.en.pos.x / TILE_SIZE as i32) as TilePosScalar,
             y: (self.col_en.en.pos.y / TILE_SIZE as i32) as TilePosScalar,
         }
+    }
+    pub fn can_jump(&self) -> bool {
+        self.jumps_left > 0
     }
 }

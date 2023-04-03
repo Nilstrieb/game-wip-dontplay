@@ -83,8 +83,9 @@ impl App {
             if self.input.down(Key::D) {
                 self.game.player.hspeed = spd;
             }
-            if self.input.pressed(Key::W) {
+            if self.input.down(Key::W) && self.game.player.can_jump() {
                 self.game.player.vspeed = -10.0;
+                self.game.player.jumps_left = 0;
             }
             let terminal_velocity = 60.0;
             self.game.player.vspeed = self
@@ -108,6 +109,9 @@ impl App {
                         let en = s2dc::Entity::from_rect_corners(x, y, x + tsize, y + tsize);
                         if player_en.would_collide(&en, off) {
                             col = true;
+                            if self.game.player.vspeed > 0. {
+                                self.game.player.jumps_left = 1;
+                            }
                             self.game.player.vspeed = 0.;
                         }
                     });
