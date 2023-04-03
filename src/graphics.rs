@@ -21,6 +21,7 @@ impl ScreenRes {
 }
 
 // We assume this game won't be played above 32767*32767 resolution
+#[derive(Default, Clone, Copy)]
 pub struct ScreenPos {
     pub x: ScreenPosScalar,
     pub y: ScreenPosScalar,

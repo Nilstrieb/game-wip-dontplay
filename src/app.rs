@@ -1,7 +1,7 @@
 use std::fmt::{self};
 
 use egui_sfml::{egui, SfEgui};
-use gamedebug_core::imm_dbg;
+use gamedebug_core::{imm, imm_dbg};
 use sfml::{
     graphics::{Color, RenderTarget, RenderWindow},
     window::{Event, Key},
@@ -11,7 +11,7 @@ use crate::{
     debug::DebugState,
     game::{for_each_tile_on_screen, GameState},
     graphics::{self, NATIVE_RESOLUTION},
-    input::KbInput,
+    input::Input,
     math::{wp_to_tp, WorldPos, TILE_SIZE},
     res::Res,
     world::Tile,
@@ -24,7 +24,7 @@ pub struct App {
     pub game: GameState,
     pub res: Res,
     pub sf_egui: SfEgui,
-    pub kb_input: KbInput,
+    pub input: Input,
     pub debug: DebugState,
 }
 
@@ -38,7 +38,7 @@ impl App {
             game: GameState::default(),
             res: Res::load()?,
             sf_egui,
-            kb_input: KbInput::default(),
+            input: Input::default(),
             debug: DebugState::default(),
         })
     }
@@ -48,7 +48,7 @@ impl App {
             self.do_event_handling();
             self.do_update();
             self.do_rendering();
-            self.kb_input.clear_pressed();
+            self.input.clear_pressed();
             gamedebug_core::inc_frame();
         }
     }
@@ -56,7 +56,7 @@ impl App {
     fn do_event_handling(&mut self) {
         while let Some(ev) = self.rw.poll_event() {
             self.sf_egui.add_event(&ev);
-            self.kb_input.update_from_event(&ev);
+            self.input.update_from_event(&ev);
             match ev {
                 Event::Closed => self.should_quit = true,
                 _ => {}
@@ -65,24 +65,24 @@ impl App {
     }
 
     fn do_update(&mut self) {
-        self.debug.update(&self.kb_input);
+        self.debug.update(&self.input);
         if self.debug.freecam {
             self.do_freecam();
         } else {
-            let spd = if self.kb_input.down(Key::LShift) {
+            let spd = if self.input.down(Key::LShift) {
                 16.0
-            } else if self.kb_input.down(Key::LControl) {
+            } else if self.input.down(Key::LControl) {
                 256.0
             } else {
                 4.0
             };
-            if self.kb_input.down(Key::Left) {
+            if self.input.down(Key::Left) {
                 self.game.player.col_en.move_x(-spd, |_, _| false);
             }
-            if self.kb_input.down(Key::Right) {
+            if self.input.down(Key::Right) {
                 self.game.player.col_en.move_x(spd, |_, _| false);
             }
-            if self.kb_input.pressed(Key::Up) {
+            if self.input.pressed(Key::Up) {
                 self.game.player.vspeed = -14.0;
             }
             self.game.player.vspeed = self.game.player.vspeed.clamp(-80., 80.);
@@ -112,26 +112,36 @@ impl App {
             self.game.camera_offset.x = (x - NATIVE_RESOLUTION.w as i32 / 2) as u32;
             self.game.camera_offset.y = (y - NATIVE_RESOLUTION.h as i32 / 2) as u32;
         }
+        if self.input.lmb_down {
+            let loc = self.input.mouse_down_loc;
+            let mut wpos = self.game.camera_offset;
+            wpos.x = wpos.x.saturating_add_signed(loc.x.into());
+            wpos.y = wpos.y.saturating_add_signed(loc.y.into());
+            imm!("Mouse down at {}, {}", wpos.x, wpos.y);
+            let tpos = wpos.tile_pos();
+            imm_dbg!(tpos);
+            self.game.world.tile_at_mut(tpos).id = 0;
+        }
     }
 
     fn do_freecam(&mut self) {
-        let spd = if self.kb_input.down(Key::LShift) {
+        let spd = if self.input.down(Key::LShift) {
             100
-        } else if self.kb_input.down(Key::LControl) {
+        } else if self.input.down(Key::LControl) {
             1000
         } else {
             2
         };
-        if self.kb_input.down(Key::Left) {
+        if self.input.down(Key::Left) {
             self.game.camera_offset.x = self.game.camera_offset.x.saturating_sub(spd);
         }
-        if self.kb_input.down(Key::Right) {
+        if self.input.down(Key::Right) {
             self.game.camera_offset.x = self.game.camera_offset.x.saturating_add(spd);
         }
-        if self.kb_input.down(Key::Up) {
+        if self.input.down(Key::Up) {
             self.game.camera_offset.y = self.game.camera_offset.y.saturating_sub(spd);
         }
-        if self.kb_input.down(Key::Down) {
+        if self.input.down(Key::Down) {
             self.game.camera_offset.y = self.game.camera_offset.y.saturating_add(spd);
         }
     }

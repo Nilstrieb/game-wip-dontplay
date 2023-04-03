@@ -1,6 +1,6 @@
 use sfml::window::Key;
 
-use crate::input::KbInput;
+use crate::input::Input;
 
 #[derive(Default)]
 pub struct DebugState {
@@ -9,7 +9,7 @@ pub struct DebugState {
 }
 
 impl DebugState {
-    pub fn update(&mut self, input: &KbInput) {
+    pub fn update(&mut self, input: &Input) {
         if input.pressed(Key::F12) {
             self.panel ^= true;
         }
