@@ -17,7 +17,16 @@ pub struct GameState {
     pub player: Player,
     pub gravity: f32,
     pub tile_to_place: TileId,
+    pub current_biome: Biome,
+    pub prev_biome: Biome,
 }
+
+#[derive(PartialEq, Eq, Clone, Copy)]
+pub enum Biome {
+    Surface,
+    Underground,
+}
+
 impl GameState {
     pub(crate) fn draw_world(&mut self, rw: &mut RenderWindow, res: &Res) {
         let mut s = Sprite::with_texture(&res.tile_atlas);
@@ -77,6 +86,8 @@ impl Default for GameState {
             player: Player::new_at(spawn_point),
             gravity: 0.7,
             tile_to_place: 1,
+            current_biome: Biome::Surface,
+            prev_biome: Biome::Surface,
         }
     }
 }

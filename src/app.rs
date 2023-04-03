@@ -10,7 +10,7 @@ use sfml::{
 
 use crate::{
     debug::DebugState,
-    game::{for_each_tile_on_screen, GameState},
+    game::{for_each_tile_on_screen, Biome, GameState},
     graphics::{self, NATIVE_RESOLUTION},
     input::Input,
     math::{wp_to_tp, WorldPos, TILE_SIZE},
@@ -34,9 +34,9 @@ impl App {
         let rw = graphics::make_window();
         let sf_egui = SfEgui::new(&rw);
         let mut res = Res::load()?;
-        res.music.set_looping(true);
-        res.music.set_volume(10.0);
-        res.music.play();
+        res.surf_music.set_looping(true);
+        res.surf_music.set_volume(10.0);
+        res.surf_music.play();
         Ok(Self {
             rw,
             should_quit: false,
@@ -170,6 +170,26 @@ impl App {
                 t.bg = self.game.tile_to_place;
             }
         }
+        if self.game.camera_offset.y > 163800 {
+            self.game.current_biome = Biome::Underground;
+        } else {
+            self.game.current_biome = Biome::Surface;
+        }
+        if self.game.current_biome != self.game.prev_biome {
+            self.game.prev_biome = self.game.current_biome;
+            match self.game.current_biome {
+                Biome::Surface => {
+                    self.res.und_music.stop();
+                    self.res.surf_music.play();
+                }
+                Biome::Underground => {
+                    self.res.surf_music.stop();
+                    self.res.und_music.set_volume(self.res.surf_music.volume());
+                    self.res.und_music.set_looping(true);
+                    self.res.und_music.play();
+                }
+            }
+        }
     }
 
     fn do_freecam(&mut self) {
@@ -254,9 +274,9 @@ fn debug_panel_ui(
         ui.label("Tile to place");
         ui.add(egui::DragValue::new(&mut game.tile_to_place));
         ui.label("Music volume");
-        let mut vol = res.music.volume();
+        let mut vol = res.surf_music.volume();
         ui.add(egui::DragValue::new(&mut vol));
-        res.music.set_volume(vol);
+        res.surf_music.set_volume(vol);
         ui.separator();
         egui::ScrollArea::vertical().show(ui, |ui| {
             gamedebug_core::for_each_imm(|info| match info {
