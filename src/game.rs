@@ -1,4 +1,6 @@
-use sfml::graphics::{Rect, RenderTarget, RenderWindow, Sprite, Transformable};
+mod player;
+
+use sfml::graphics::{Rect, RectangleShape, RenderTarget, RenderWindow, Sprite, Transformable};
 
 use crate::{
     graphics::{ScreenPos, ScreenPosScalar, NATIVE_RESOLUTION},
@@ -7,9 +9,12 @@ use crate::{
     world::{Tile, TilePos, World},
 };
 
+use self::player::Player;
+
 pub struct GameState {
     pub camera_offset: WorldPos,
     pub world: World,
+    pub player: Player,
 }
 impl GameState {
     pub(crate) fn draw_world(&mut self, rw: &mut RenderWindow, res: &Res) {
@@ -23,6 +28,16 @@ impl GameState {
             s.set_position(sp.to_sf_vec());
             rw.draw(&s);
         });
+    }
+    pub fn draw_entities(&mut self, rw: &mut RenderWindow) {
+        let (x, y, w, h) = self.player.col_en.en.xywh();
+        let mut rs = RectangleShape::new();
+        rs.set_position((
+            (x - self.camera_offset.x as i32) as f32,
+            (y - self.camera_offset.y as i32) as f32,
+        ));
+        rs.set_size((w as f32, h as f32));
+        rw.draw(&rs);
     }
 }
 
@@ -48,6 +63,7 @@ impl Default for GameState {
         Self {
             camera_offset: WorldPos::SURFACE_CENTER,
             world: Default::default(),
+            player: Player::new_at(WorldPos::SURFACE_CENTER),
         }
     }
 }

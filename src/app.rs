@@ -8,8 +8,9 @@ use sfml::{
 };
 
 use crate::{
+    debug::DebugState,
     game::GameState,
-    graphics,
+    graphics::{self, NATIVE_RESOLUTION},
     input::KbInput,
     math::{wp_to_tp, WorldPos},
     res::Res,
@@ -23,6 +24,7 @@ pub struct App {
     pub res: Res,
     pub sf_egui: SfEgui,
     pub kb_input: KbInput,
+    pub debug: DebugState,
 }
 
 impl App {
@@ -36,6 +38,7 @@ impl App {
             res: Res::load()?,
             sf_egui,
             kb_input: KbInput::default(),
+            debug: DebugState::default(),
         })
     }
 
@@ -61,6 +64,36 @@ impl App {
     }
 
     fn do_update(&mut self) {
+        self.debug.update(&self.kb_input);
+        if self.debug.freecam {
+            self.do_freecam();
+        } else {
+            let spd = if self.kb_input.down(Key::LShift) {
+                16.0
+            } else if self.kb_input.down(Key::LControl) {
+                256.0
+            } else {
+                4.0
+            };
+            if self.kb_input.down(Key::Left) {
+                self.game.player.col_en.move_x(-spd, |_, _| false);
+            }
+            if self.kb_input.down(Key::Right) {
+                self.game.player.col_en.move_x(spd, |_, _| false);
+            }
+            if self.kb_input.down(Key::Up) {
+                self.game.player.col_en.move_y(-spd, |_, _| false);
+            }
+            if self.kb_input.down(Key::Down) {
+                self.game.player.col_en.move_y(spd, |_, _| false);
+            }
+            let (x, y, _w, _h) = self.game.player.col_en.en.xywh();
+            self.game.camera_offset.x = (x - NATIVE_RESOLUTION.w as i32 / 2) as u32;
+            self.game.camera_offset.y = (y - NATIVE_RESOLUTION.h as i32 / 2) as u32;
+        }
+    }
+
+    fn do_freecam(&mut self) {
         let spd = if self.kb_input.down(Key::LShift) {
             100
         } else if self.kb_input.down(Key::LControl) {
@@ -80,46 +113,64 @@ impl App {
         if self.kb_input.down(Key::Down) {
             self.game.camera_offset.y = self.game.camera_offset.y.saturating_add(spd);
         }
-        let tp = self.game.camera_offset.tile_pos();
-        imm_dbg!(tp);
-        imm_dbg!(tp.to_chunk_and_local());
     }
 
     fn do_rendering(&mut self) {
         self.rw.clear(Color::rgb(55, 221, 231));
         self.game.draw_world(&mut self.rw, &self.res);
+        self.game.draw_entities(&mut self.rw);
         self.sf_egui
             .do_frame(|ctx| {
-                egui::Window::new("Debug").show(ctx, |ui| {
-                    ui.label("Cam x");
-                    ui.add(egui::DragValue::new(&mut self.game.camera_offset.x));
-                    ui.label("Cam y");
-                    ui.add(egui::DragValue::new(&mut self.game.camera_offset.y));
-                    let tile_off = self.game.camera_offset.tile_pos();
-                    ui.label(format!(
-                        "Depth: {}",
-                        LengthDisp(tile_off.y as i64 - wp_to_tp(WorldPos::SURFACE) as i64)
-                    ));
-                    ui.label(format!(
-                        "Offset from center: {}",
-                        LengthDisp(tile_off.x as i64 - wp_to_tp(WorldPos::CENTER) as i64)
-                    ));
-                    ui.separator();
-                    egui::ScrollArea::vertical().show(ui, |ui| {
-                        gamedebug_core::for_each_imm(|info| match info {
-                            gamedebug_core::Info::Msg(msg) => {
-                                ui.label(msg);
-                            }
-                            gamedebug_core::Info::Rect(_, _, _, _, _) => todo!(),
-                        });
-                    });
-                    gamedebug_core::clear_immediates();
-                });
+                if self.debug.panel {
+                    debug_panel_ui(&mut self.debug, &mut self.game, ctx);
+                }
             })
             .unwrap();
         self.sf_egui.draw(&mut self.rw, None);
         self.rw.display();
     }
+}
+
+fn debug_panel_ui(debug: &mut DebugState, game: &mut GameState, ctx: &egui::Context) {
+    egui::Window::new("Debug (F12)").show(ctx, |ui| {
+        ui.label("Cam x");
+        ui.add(egui::DragValue::new(&mut game.camera_offset.x));
+        ui.label("Cam y");
+        ui.add(egui::DragValue::new(&mut game.camera_offset.y));
+        if debug.freecam {
+            let tp = game.camera_offset.tile_pos();
+            imm_dbg!(tp);
+            ui.label(format!(
+                "Cam Depth: {}",
+                LengthDisp(tp.y as i64 - wp_to_tp(WorldPos::SURFACE) as i64)
+            ));
+            ui.label(format!(
+                "Cam offset from center: {}",
+                LengthDisp(tp.x as i64 - wp_to_tp(WorldPos::CENTER) as i64)
+            ));
+        } else {
+            let tp = game.player.center_tp();
+            imm_dbg!(tp);
+            ui.label(format!(
+                "Player Depth: {}",
+                LengthDisp(tp.y as i64 - wp_to_tp(WorldPos::SURFACE) as i64)
+            ));
+            ui.label(format!(
+                "Player offset from center: {}",
+                LengthDisp(tp.x as i64 - wp_to_tp(WorldPos::CENTER) as i64)
+            ));
+        }
+        ui.separator();
+        egui::ScrollArea::vertical().show(ui, |ui| {
+            gamedebug_core::for_each_imm(|info| match info {
+                gamedebug_core::Info::Msg(msg) => {
+                    ui.label(msg);
+                }
+                gamedebug_core::Info::Rect(_, _, _, _, _) => todo!(),
+            });
+        });
+        gamedebug_core::clear_immediates();
+    });
 }
 
 struct LengthDisp(i64);
