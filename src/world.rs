@@ -115,6 +115,12 @@ impl Chunk {
                 b.id = rng.gen_range(1..5);
             }
         }
+        // Unbreakable layer at bottom
+        if pos.y > 510 {
+            for b in &mut tiles {
+                b.id = Tile::UNBREAKANIUM;
+            }
+        }
         Self { tiles }
     }
 
@@ -132,4 +138,5 @@ pub struct Tile {
 
 impl Tile {
     pub const AIR: TileId = 0;
+    pub const UNBREAKANIUM: TileId = 5;
 }
