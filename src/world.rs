@@ -114,10 +114,19 @@ impl Chunk {
             mid: 0,
             fg: 0,
         }; CHUNK_N_TILES];
-        if pos.y > 38 {
+        if pos.y == 39 {
+            for (i, b) in tiles.iter_mut().enumerate() {
+                if i / CHUNK_EXTENT as usize == 0 {
+                    b.fg = 8;
+                }
+                b.mid = 2;
+                b.bg = 9;
+            }
+        }
+        if pos.y > 39 {
             for b in &mut tiles {
                 b.bg = 7;
-                b.mid = rng.gen_range(1..5);
+                b.mid = 1;
                 if rng.gen_bool(0.1) {
                     b.fg = 6;
                 }
