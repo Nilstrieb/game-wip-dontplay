@@ -15,6 +15,7 @@ pub struct GameState {
     pub camera_offset: WorldPos,
     pub world: World,
     pub player: Player,
+    pub gravity: f32,
 }
 impl GameState {
     pub(crate) fn draw_world(&mut self, rw: &mut RenderWindow, res: &Res) {
@@ -66,6 +67,7 @@ impl Default for GameState {
             camera_offset: spawn_point,
             world: Default::default(),
             player: Player::new_at(spawn_point),
+            gravity: 0.7,
         }
     }
 }

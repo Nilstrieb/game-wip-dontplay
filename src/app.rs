@@ -86,7 +86,12 @@ impl App {
             if self.input.pressed(Key::Up) {
                 self.game.player.vspeed = -14.0;
             }
-            self.game.player.vspeed = self.game.player.vspeed.clamp(-80., 80.);
+            let terminal_velocity = 60.0;
+            self.game.player.vspeed = self
+                .game
+                .player
+                .vspeed
+                .clamp(-terminal_velocity, terminal_velocity);
             self.game
                 .player
                 .col_en
@@ -129,7 +134,7 @@ impl App {
                     });
                     col
                 });
-            self.game.player.vspeed += 1.0;
+            self.game.player.vspeed += self.game.gravity;
             let (x, y, _w, _h) = self.game.player.col_en.en.xywh();
             self.game.camera_offset.x = (x - NATIVE_RESOLUTION.w as i32 / 2) as u32;
             self.game.camera_offset.y = (y - NATIVE_RESOLUTION.h as i32 / 2) as u32;
@@ -217,6 +222,8 @@ fn debug_panel_ui(debug: &mut DebugState, game: &mut GameState, ctx: &egui::Cont
                 LengthDisp(tp.x as i64 - wp_to_tp(WorldPos::CENTER) as i64)
             ));
             ui.label(format!("Vspeed: {}", game.player.vspeed));
+            ui.label("Gravity");
+            ui.add(egui::DragValue::new(&mut game.gravity));
         }
         ui.separator();
         egui::ScrollArea::vertical().show(ui, |ui| {
