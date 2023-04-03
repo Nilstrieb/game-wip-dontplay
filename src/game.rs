@@ -14,7 +14,7 @@ pub struct GameState {
 impl GameState {
     pub(crate) fn draw_world(&mut self, rw: &mut RenderWindow, res: &Res) {
         let mut s = Sprite::with_texture(&res.tile_atlas);
-        for_each_tile(self.camera_offset, |tp, sp| {
+        for_each_tile_on_screen(self.camera_offset, |tp, sp| {
             let tile = self.world.tile_at_mut(tp);
             s.set_texture_rect(Rect::new(tile.id as i32 * 32, 0, 32, 32));
             s.set_position(sp.to_sf_vec());
@@ -23,7 +23,7 @@ impl GameState {
     }
 }
 
-fn for_each_tile(camera_offset: WorldPos, mut f: impl FnMut(TilePos, ScreenPos)) {
+fn for_each_tile_on_screen(camera_offset: WorldPos, mut f: impl FnMut(TilePos, ScreenPos)) {
     for y in (-32..NATIVE_RESOLUTION.h + 32).step_by(32) {
         for x in (-32..NATIVE_RESOLUTION.w + 32).step_by(32) {
             f(
