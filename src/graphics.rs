@@ -22,9 +22,11 @@ impl ScreenRes {
 
 // We assume this game won't be played above 32767*32767 resolution
 pub struct ScreenPos {
-    pub x: i16,
-    pub y: i16,
+    pub x: ScreenPosScalar,
+    pub y: ScreenPosScalar,
 }
+
+pub type ScreenPosScalar = i16;
 
 impl ScreenPos {
     pub fn to_sf_vec(&self) -> Vector2f {

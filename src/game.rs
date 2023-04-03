@@ -1,7 +1,7 @@
 use sfml::graphics::{Rect, RenderTarget, RenderWindow, Sprite, Transformable};
 
 use crate::{
-    graphics::{ScreenPos, NATIVE_RESOLUTION},
+    graphics::{ScreenPos, ScreenPosScalar, NATIVE_RESOLUTION},
     math::{wp_to_tp, WorldPos, WorldPosScalar},
     res::Res,
     world::{TilePos, World},
@@ -32,8 +32,8 @@ fn for_each_tile(camera_offset: WorldPos, mut f: impl FnMut(TilePos, ScreenPos))
                     y: wp_to_tp(camera_offset.y.saturating_add(y as WorldPosScalar)),
                 },
                 ScreenPos {
-                    x: ((x as WorldPosScalar).saturating_sub(camera_offset.x % 32)) as i16,
-                    y: ((y as WorldPosScalar).saturating_sub(camera_offset.y % 32)) as i16,
+                    x: ((x as i64) - ((camera_offset.x as i64) % 32)) as ScreenPosScalar,
+                    y: ((y as i64) - ((camera_offset.y as i64) % 32)) as ScreenPosScalar,
                 },
             )
         }
