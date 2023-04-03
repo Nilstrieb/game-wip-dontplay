@@ -32,11 +32,13 @@ impl App {
     pub fn new() -> anyhow::Result<Self> {
         let rw = graphics::make_window();
         let sf_egui = SfEgui::new(&rw);
+        let mut res = Res::load()?;
+        res.music.play();
         Ok(Self {
             rw,
             should_quit: false,
             game: GameState::default(),
-            res: Res::load()?,
+            res,
             sf_egui,
             input: Input::default(),
             debug: DebugState::default(),
