@@ -85,6 +85,7 @@ impl App {
             if self.kb_input.pressed(Key::Up) {
                 self.game.player.vspeed = -14.0;
             }
+            self.game.player.vspeed = self.game.player.vspeed.clamp(-80., 80.);
             self.game
                 .player
                 .col_en
@@ -153,11 +154,11 @@ impl App {
 
 fn debug_panel_ui(debug: &mut DebugState, game: &mut GameState, ctx: &egui::Context) {
     egui::Window::new("Debug (F12)").show(ctx, |ui| {
-        ui.label("Cam x");
-        ui.add(egui::DragValue::new(&mut game.camera_offset.x));
-        ui.label("Cam y");
-        ui.add(egui::DragValue::new(&mut game.camera_offset.y));
         if debug.freecam {
+            ui.label("Cam x");
+            ui.add(egui::DragValue::new(&mut game.camera_offset.x));
+            ui.label("Cam y");
+            ui.add(egui::DragValue::new(&mut game.camera_offset.y));
             let tp = game.camera_offset.tile_pos();
             imm_dbg!(tp);
             ui.label(format!(
@@ -169,6 +170,10 @@ fn debug_panel_ui(debug: &mut DebugState, game: &mut GameState, ctx: &egui::Cont
                 LengthDisp(tp.x as i64 - wp_to_tp(WorldPos::CENTER) as i64)
             ));
         } else {
+            ui.label("Player x");
+            ui.add(egui::DragValue::new(&mut game.player.col_en.en.pos.x));
+            ui.label("Player y");
+            ui.add(egui::DragValue::new(&mut game.player.col_en.en.pos.y));
             let tp = game.player.center_tp();
             imm_dbg!(tp);
             ui.label(format!(
@@ -179,6 +184,7 @@ fn debug_panel_ui(debug: &mut DebugState, game: &mut GameState, ctx: &egui::Cont
                 "Player offset from center: {}",
                 LengthDisp(tp.x as i64 - wp_to_tp(WorldPos::CENTER) as i64)
             ));
+            ui.label(format!("Vspeed: {}", game.player.vspeed));
         }
         ui.separator();
         egui::ScrollArea::vertical().show(ui, |ui| {
