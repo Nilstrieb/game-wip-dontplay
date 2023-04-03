@@ -1,7 +1,7 @@
 use fnv::FnvHashMap;
 use rand::{thread_rng, Rng};
 
-type ChunkPosScalar = i16;
+type ChunkPosScalar = u16;
 
 #[derive(Hash, PartialEq, Eq, Debug, Clone, Copy)]
 pub struct ChunkPos {
@@ -62,7 +62,7 @@ impl TilePos {
 }
 
 fn chk_pos(tile: TilePosScalar) -> ChunkPosScalar {
-    (tile / CHUNK_EXTENT as TilePosScalar) as i16
+    (tile / CHUNK_EXTENT as TilePosScalar) as ChunkPosScalar
 }
 
 #[test]
