@@ -18,9 +18,10 @@ impl WorldPos {
         }
     }
     /// Horizontal center of the world
-    pub const CENTER: WorldPosScalar = WorldPosScalar::MAX / 2;
-    /// Vertical surface level
-    pub const SURFACE: WorldPosScalar = WorldPosScalar::MAX / 16;
+    pub const CENTER: WorldPosScalar =
+        (TilePosScalar::MAX / 2) as WorldPosScalar * TILE_SIZE as WorldPosScalar;
+    /// Vertical surface level. You can build 5,000 blocks upwards
+    pub const SURFACE: WorldPosScalar = 5000 * TILE_SIZE as WorldPosScalar;
     pub const SURFACE_CENTER: Self = Self {
         x: Self::CENTER,
         y: Self::SURFACE,
@@ -28,7 +29,7 @@ impl WorldPos {
 }
 
 pub fn wp_to_tp(wp: WorldPosScalar) -> TilePosScalar {
-    wp / TILE_SIZE as TilePosScalar
+    (wp / TILE_SIZE as WorldPosScalar) as TilePosScalar
 }
 
 #[test]

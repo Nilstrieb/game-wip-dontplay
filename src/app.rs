@@ -57,7 +57,7 @@ impl App {
 
     fn do_update(&mut self) {
         let tp = self.game.camera_offset.tile_pos();
-        self.game.camera_offset.y += 33;
+        self.game.camera_offset.y += 800;
         imm_dbg!(tp);
         imm_dbg!(tp.to_chunk_and_local());
     }

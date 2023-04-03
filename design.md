@@ -15,6 +15,8 @@
 The evil source is at about 50 km.
 The final goal is the evil source, so player is expected to mine about 50 km deep to beat the game.
 1 meter = one tile. 50 km = 50,000 tiles deep.
+There could be some post-endgame content from 50,000-60,000 blocks deep.
+Very unbreakable bottom or lava lake or whatever is at 60,000 blocks deep.
 
 ## Number of stuff
 

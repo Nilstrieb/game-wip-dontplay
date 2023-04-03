@@ -1,7 +1,7 @@
 use fnv::FnvHashMap;
 use rand::{thread_rng, Rng};
 
-type ChunkPosScalar = u32;
+type ChunkPosScalar = u16;
 
 #[derive(Hash, PartialEq, Eq, Debug, Clone, Copy)]
 pub struct ChunkPos {
@@ -95,7 +95,7 @@ fn test_to_chunk_and_local() {
 }
 
 // Need to support at least 4 million tiles long
-pub type TilePosScalar = u32;
+pub type TilePosScalar = u16;
 
 const CHUNK_EXTENT: u16 = 128;
 const CHUNK_N_TILES: usize = CHUNK_EXTENT as usize * CHUNK_EXTENT as usize;
