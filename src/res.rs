@@ -11,7 +11,7 @@ impl Res {
         Ok(Self {
             tile_atlas: Texture::from_file("res/tiles.png")?,
             surf_music: Music::from_file("res/music.ogg").unwrap(),
-            und_music: Music::from_file("res/cave.ogg").unwrap(),
+            und_music: Music::from_file("res/cave2.ogg").unwrap(),
         })
     }
 }
