@@ -12,6 +12,9 @@
 
 ## Map Size
 
+World is roughly 60000x60000 blocks large.
+I've done some measurements and I believe it's large enough that it should convey
+the scale of digging very deep, which is what the game is about.
 The evil source is at about 50 km.
 The final goal is the evil source, so player is expected to mine about 50 km deep to beat the game.
 1 meter = one tile. 50 km = 50,000 tiles deep.
