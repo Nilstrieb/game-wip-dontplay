@@ -200,16 +200,16 @@ impl App {
         } else {
             2
         };
-        if self.input.down(Key::Left) {
+        if self.input.down(Key::A) {
             self.game.camera_offset.x = self.game.camera_offset.x.saturating_sub(spd);
         }
-        if self.input.down(Key::Right) {
+        if self.input.down(Key::D) {
             self.game.camera_offset.x = self.game.camera_offset.x.saturating_add(spd);
         }
-        if self.input.down(Key::Up) {
+        if self.input.down(Key::W) {
             self.game.camera_offset.y = self.game.camera_offset.y.saturating_sub(spd);
         }
-        if self.input.down(Key::Down) {
+        if self.input.down(Key::S) {
             self.game.camera_offset.y = self.game.camera_offset.y.saturating_add(spd);
         }
     }
