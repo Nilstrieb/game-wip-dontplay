@@ -28,6 +28,21 @@ The final goal is the evil source, so player is expected to mine about 35 km dee
 There could be some post-endgame content from 35-40 kms deep.
 Very unbreakable bottom or lava lake or whatever is at 80,000 blocks (40 km) deep.
 
+## Biomes
+Only a few surface biomes
+- At center is forest biome
+- On one side:
+  - Jungle
+  - Desert
+- On other side:
+  - Longer stretch of forest biome than other side
+  - Ice biome
+
+All other biome variety should come from going deeper.
+Progressively more difficult variants of each biome as you go down.
+30 km is mantle level, at which point no ice or sand or such reaches.
+It's all mantle level specific biomes all the way horizontally.
+
 ## Number of stuff
 
 - Up to 1000 tiles (1024*1024 tile sprite sheet)
