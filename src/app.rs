@@ -13,7 +13,7 @@ use crate::{
     game::{for_each_tile_on_screen, Biome, GameState},
     graphics::{self, NATIVE_RESOLUTION},
     input::Input,
-    math::{px_per_frame_to_km_h, wp_to_tp, WorldPos, M_PER_PX, TILE_SIZE},
+    math::{px_per_frame_to_km_h, WorldPos, M_PER_PX, TILE_SIZE},
     res::Res,
     world::Tile,
 };
