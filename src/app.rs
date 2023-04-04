@@ -75,11 +75,11 @@ impl App {
             self.do_freecam();
         } else {
             let spd = if self.input.down(Key::LShift) {
-                16.0
+                8.0
             } else if self.input.down(Key::LControl) {
-                256.0
+                128.0
             } else {
-                4.0
+                3.0
             };
             self.game.player.hspeed = 0.;
             if self.input.down(Key::A) {
