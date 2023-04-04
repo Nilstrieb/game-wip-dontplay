@@ -21,11 +21,12 @@ Player character is about 3 blocks high. (slightly less so they fit comfortably)
 World is roughly 60000x60000 blocks large.
 I've done some measurements and I believe it's large enough that it should convey
 the scale of digging very deep, which is what the game is about.
-The evil source is at about 50 km.
-The final goal is the evil source, so player is expected to mine about 50 km deep to beat the game.
-1 meter = one tile. 50 km = 50,000 tiles deep.
-There could be some post-endgame content from 50,000-60,000 blocks deep.
-Very unbreakable bottom or lava lake or whatever is at 60,000 blocks deep.
+Layer below 30 km is the mantle (after which the game is named).
+The evil source is at about 35 km.
+The final goal is the evil source, so player is expected to mine about 35 km deep to beat the game.
+1 meter = two tiles. 35 km = 70,000 tiles deep.
+There could be some post-endgame content from 35-40 kms deep.
+Very unbreakable bottom or lava lake or whatever is at 80,000 blocks (40 km) deep.
 
 ## Number of stuff
 
