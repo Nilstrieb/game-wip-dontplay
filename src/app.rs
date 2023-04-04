@@ -174,7 +174,7 @@ impl App {
                 t.bg = self.game.tile_to_place;
             }
         }
-        if self.game.camera_offset.y > 134217712 {
+        if self.game.camera_offset.y > 643_000 {
             self.game.current_biome = Biome::Underground;
         } else {
             self.game.current_biome = Biome::Surface;
