@@ -25,6 +25,9 @@ pub fn px_per_frame_to_km_h(px_per_frame: f32) -> f32 {
     px_per_frame_to_m_per_s(px_per_frame) * 3.6
 }
 
+/// World extent in tiles. Roughly 50km*50km.
+pub const WORLD_EXTENT: TilePosScalar = 100_000;
+
 impl WorldPos {
     pub fn tile_pos(&self) -> TilePos {
         TilePos {
@@ -33,10 +36,10 @@ impl WorldPos {
         }
     }
     /// Horizontal center of the world
-    pub const CENTER: WorldPosScalar =
-        (TilePosScalar::MAX / 2) as WorldPosScalar * TILE_SIZE as WorldPosScalar;
-    /// Vertical surface level. You can build 5,000 blocks upwards
-    pub const SURFACE: WorldPosScalar = 5000 * TILE_SIZE as WorldPosScalar;
+    pub const CENTER: WorldPosScalar = (WORLD_EXTENT / 2) * TILE_SIZE as WorldPosScalar;
+    /// Vertical surface level.
+    /// You can build 10 km high.
+    pub const SURFACE: WorldPosScalar = 20_000 * TILE_SIZE as WorldPosScalar;
     pub const SURFACE_CENTER: Self = Self {
         x: Self::CENTER,
         y: Self::SURFACE,

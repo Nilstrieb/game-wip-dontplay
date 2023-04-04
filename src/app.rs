@@ -15,7 +15,7 @@ use crate::{
     input::Input,
     math::{px_per_frame_to_km_h, WorldPos, M_PER_PX, TILE_SIZE},
     res::Res,
-    world::Tile,
+    world::{Tile, TilePosScalar, CHUNK_EXTENT},
 };
 
 /// Application level state (includes game and ui state, etc.)
@@ -142,8 +142,10 @@ impl App {
                 });
             self.game.player.vspeed += self.game.gravity;
             let (x, y, _w, _h) = self.game.player.col_en.en.xywh();
-            self.game.camera_offset.x = (x - NATIVE_RESOLUTION.w as i32 / 2) as u32;
-            self.game.camera_offset.y = (y - NATIVE_RESOLUTION.h as i32 / 2) as u32;
+            self.game.camera_offset.x =
+                (x - NATIVE_RESOLUTION.w as i32 / 2).try_into().unwrap_or(0);
+            self.game.camera_offset.y =
+                (y - NATIVE_RESOLUTION.h as i32 / 2).try_into().unwrap_or(0);
         }
         let loc = self.input.mouse_down_loc;
         let mut wpos = self.game.camera_offset;
@@ -151,6 +153,11 @@ impl App {
         wpos.y = wpos.y.saturating_add_signed(loc.y.into());
         let mouse_tpos = wpos.tile_pos();
         imm!("Mouse @ tile {}, {}", mouse_tpos.x, mouse_tpos.y);
+        imm!(
+            "@ chunk {}, {}",
+            mouse_tpos.x / CHUNK_EXTENT as TilePosScalar,
+            mouse_tpos.y / CHUNK_EXTENT as TilePosScalar
+        );
         if self.debug.freecam && self.input.pressed(Key::P) {
             self.game.player.col_en.en.pos.x = wpos.x as i32;
             self.game.player.col_en.en.pos.y = wpos.y as i32;
@@ -167,7 +174,7 @@ impl App {
                 t.bg = self.game.tile_to_place;
             }
         }
-        if self.game.camera_offset.y > 163800 {
+        if self.game.camera_offset.y > 134217712 {
             self.game.current_biome = Biome::Underground;
         } else {
             self.game.current_biome = Biome::Surface;
@@ -301,7 +308,11 @@ impl fmt::Display for LengthDisp {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let meters = self.0 * M_PER_PX;
         if meters.abs() > 1000. {
-            let km = (meters / 1000.).floor();
+            let km = if meters.is_sign_negative() {
+                (meters / 1000.).ceil()
+            } else {
+                (meters / 1000.).floor()
+            };
             let m = meters % 1000.;
             write!(f, "{km} km, {m} m")
         } else {

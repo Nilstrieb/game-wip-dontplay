@@ -1,7 +1,7 @@
 use fnv::FnvHashMap;
 use rand::{thread_rng, Rng};
 
-type ChunkPosScalar = u16;
+pub type ChunkPosScalar = u16;
 
 #[derive(Hash, PartialEq, Eq, Debug, Clone, Copy)]
 pub struct ChunkPos {
@@ -88,9 +88,9 @@ fn test_to_chunk_and_local() {
 }
 
 // Need to support at least 4 million tiles long
-pub type TilePosScalar = u16;
+pub type TilePosScalar = u32;
 
-const CHUNK_EXTENT: u16 = 128;
+pub const CHUNK_EXTENT: u16 = 128;
 const CHUNK_N_TILES: usize = CHUNK_EXTENT as usize * CHUNK_EXTENT as usize;
 
 type ChunkTiles = [Tile; CHUNK_N_TILES];
@@ -107,7 +107,7 @@ impl Chunk {
             mid: 0,
             fg: 0,
         }; CHUNK_N_TILES];
-        if pos.y == 39 {
+        if pos.y == 157 {
             for (i, b) in tiles.iter_mut().enumerate() {
                 if i / CHUNK_EXTENT as usize == 0 {
                     b.fg = 8;
@@ -116,7 +116,7 @@ impl Chunk {
                 b.bg = 9;
             }
         }
-        if pos.y > 39 {
+        if pos.y > 157 {
             for b in &mut tiles {
                 b.bg = 7;
                 b.mid = 1;
@@ -126,7 +126,7 @@ impl Chunk {
             }
         }
         // Unbreakable layer at bottom
-        if pos.y > 510 {
+        if pos.y > 780 {
             for b in &mut tiles {
                 b.mid = Tile::UNBREAKANIUM;
             }
