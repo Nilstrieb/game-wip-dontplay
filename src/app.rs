@@ -13,7 +13,7 @@ use crate::{
     game::{for_each_tile_on_screen, Biome, GameState},
     graphics::{self, NATIVE_RESOLUTION},
     input::Input,
-    math::{wp_to_tp, WorldPos, TILE_SIZE},
+    math::{px_per_frame_to_km_h, wp_to_tp, WorldPos, TILE_SIZE},
     res::Res,
     world::Tile,
 };
@@ -264,8 +264,16 @@ fn debug_panel_ui(
                 "Player offset from center: {}",
                 LengthDisp(tp.x as i64 - wp_to_tp(WorldPos::CENTER) as i64)
             ));
-            ui.label(format!("Hspeed: {}", game.player.hspeed));
-            ui.label(format!("Vspeed: {}", game.player.vspeed));
+            ui.label(format!(
+                "Hspeed: {} ({} km/h)",
+                game.player.hspeed,
+                px_per_frame_to_km_h(game.player.hspeed)
+            ));
+            ui.label(format!(
+                "Vspeed: {} ({} km/h)",
+                game.player.vspeed,
+                px_per_frame_to_km_h(game.player.vspeed)
+            ));
             ui.label("Gravity");
             ui.add(egui::DragValue::new(&mut game.gravity));
         }

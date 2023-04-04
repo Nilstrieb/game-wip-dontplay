@@ -5,6 +5,8 @@ use sfml::{
 };
 use sfml_xt::graphics::RenderWindowExt;
 
+use crate::math::FPS_TARGET;
+
 pub struct ScreenRes {
     pub w: i16,
     pub h: i16,
@@ -44,7 +46,7 @@ pub fn make_window() -> RenderWindow {
         Style::CLOSE,
         &ContextSettings::default(),
     );
-    rw.set_framerate_limit(60);
+    rw.set_framerate_limit(FPS_TARGET.into());
     rw.center();
     rw
 }

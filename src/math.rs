@@ -9,6 +9,18 @@ pub struct WorldPos {
 }
 
 pub const TILE_SIZE: u8 = 32;
+/// Pixels per meter. One meter = one tile, so this is the same as `TILE_SIZE`.
+pub const PX_PER_M: u8 = TILE_SIZE;
+pub const FPS_TARGET: u8 = 60;
+
+pub fn px_per_frame_to_m_per_s(px_per_frame: f32) -> f32 {
+    let m_per_frame = px_per_frame / PX_PER_M as f32;
+    m_per_frame * FPS_TARGET as f32
+}
+
+pub fn px_per_frame_to_km_h(px_per_frame: f32) -> f32 {
+    px_per_frame_to_m_per_s(px_per_frame) * 3.6
+}
 
 impl WorldPos {
     pub fn tile_pos(&self) -> TilePos {
