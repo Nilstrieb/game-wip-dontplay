@@ -30,7 +30,7 @@ pub struct ScreenPos {
 pub type ScreenPosScalar = i16;
 
 impl ScreenPos {
-    pub fn to_sf_vec(&self) -> Vector2f {
+    pub fn to_sf_vec(self) -> Vector2f {
         Vector2f::new(self.x.into(), self.y.into())
     }
 }

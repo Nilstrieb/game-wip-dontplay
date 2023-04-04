@@ -9,17 +9,10 @@ pub struct ChunkPos {
     y: ChunkPosScalar,
 }
 
+#[derive(Default)]
 pub struct World {
     /// The currently loaded chunks
     chunks: FnvHashMap<ChunkPos, Chunk>,
-}
-
-impl Default for World {
-    fn default() -> Self {
-        Self {
-            chunks: Default::default(),
-        }
-    }
 }
 
 impl World {
