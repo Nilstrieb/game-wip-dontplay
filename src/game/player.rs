@@ -15,7 +15,7 @@ pub struct Player {
 impl Player {
     pub fn new_at(pos: WorldPos) -> Self {
         Self {
-            col_en: MobileEntity::from_pos_and_bb(vec2(pos.x as i32, pos.y as i32), vec2(15, 24)),
+            col_en: MobileEntity::from_pos_and_bb(vec2(pos.x as i32, pos.y as i32), vec2(20, 46)),
             vspeed: 0.0,
             hspeed: 0.0,
             jumps_left: 0,
@@ -29,5 +29,8 @@ impl Player {
     }
     pub fn can_jump(&self) -> bool {
         self.jumps_left > 0
+    }
+    pub fn feet_y(&self) -> i32 {
+        self.col_en.en.pos.y + self.col_en.en.bb.y
     }
 }

@@ -8,13 +8,16 @@ pub struct WorldPos {
     pub y: WorldPosScalar,
 }
 
+/// Tile size in pixels
 pub const TILE_SIZE: u8 = 32;
-/// Pixels per meter. One meter = one tile, so this is the same as `TILE_SIZE`.
-pub const PX_PER_M: u8 = TILE_SIZE;
+/// Pixels per meter.
+pub const PX_PER_M: f32 = TILE_SIZE as f32 * 2.;
+/// Meters per pixel
+pub const M_PER_PX: f32 = 1. / PX_PER_M;
 pub const FPS_TARGET: u8 = 60;
 
 pub fn px_per_frame_to_m_per_s(px_per_frame: f32) -> f32 {
-    let m_per_frame = px_per_frame / PX_PER_M as f32;
+    let m_per_frame = px_per_frame / PX_PER_M;
     m_per_frame * FPS_TARGET as f32
 }
 

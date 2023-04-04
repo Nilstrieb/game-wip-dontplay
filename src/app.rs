@@ -13,7 +13,7 @@ use crate::{
     game::{for_each_tile_on_screen, Biome, GameState},
     graphics::{self, NATIVE_RESOLUTION},
     input::Input,
-    math::{px_per_frame_to_km_h, wp_to_tp, WorldPos, TILE_SIZE},
+    math::{px_per_frame_to_km_h, wp_to_tp, WorldPos, M_PER_PX, TILE_SIZE},
     res::Res,
     world::Tile,
 };
@@ -239,15 +239,14 @@ fn debug_panel_ui(
             ui.add(egui::DragValue::new(&mut game.camera_offset.x));
             ui.label("Cam y");
             ui.add(egui::DragValue::new(&mut game.camera_offset.y));
-            let tp = game.camera_offset.tile_pos();
-            imm_dbg!(tp);
+            let co = game.camera_offset;
             ui.label(format!(
                 "Cam Depth: {}",
-                LengthDisp(tp.y as i64 - wp_to_tp(WorldPos::SURFACE) as i64)
+                LengthDisp(co.y as f32 - WorldPos::SURFACE as f32)
             ));
             ui.label(format!(
                 "Cam offset from center: {}",
-                LengthDisp(tp.x as i64 - wp_to_tp(WorldPos::CENTER) as i64)
+                LengthDisp(co.x as f32 - WorldPos::CENTER as f32)
             ));
         } else {
             ui.label("Player x");
@@ -258,11 +257,11 @@ fn debug_panel_ui(
             imm_dbg!(tp);
             ui.label(format!(
                 "Player Depth: {}",
-                LengthDisp(tp.y as i64 - wp_to_tp(WorldPos::SURFACE) as i64)
+                LengthDisp(game.player.feet_y() as f32 - WorldPos::SURFACE as f32)
             ));
             ui.label(format!(
                 "Player offset from center: {}",
-                LengthDisp(tp.x as i64 - wp_to_tp(WorldPos::CENTER) as i64)
+                LengthDisp(game.player.col_en.en.pos.x as f32 - WorldPos::CENTER as f32)
             ));
             ui.label(format!(
                 "Hspeed: {} ({} km/h)",
@@ -296,12 +295,17 @@ fn debug_panel_ui(
     });
 }
 
-struct LengthDisp(i64);
+struct LengthDisp(f32);
 
 impl fmt::Display for LengthDisp {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let km = self.0 / 1000;
-        let m = self.0 % 1000;
-        write!(f, "{km} km, {m} m")
+        let meters = self.0 * M_PER_PX;
+        if meters.abs() > 1000. {
+            let km = (meters / 1000.).floor();
+            let m = meters % 1000.;
+            write!(f, "{km} km, {m} m")
+        } else {
+            write!(f, "{meters} m")
+        }
     }
 }

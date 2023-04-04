@@ -10,6 +10,12 @@
 
 # Details
 
+## Scale
+Player character is slightly below 1.5 m height.
+1 meter = 2 blocks.
+1 block = 0.5 meters.
+Player character is about 3 blocks high. (slightly less so they fit comfortably)
+
 ## Map Size
 
 World is roughly 60000x60000 blocks large.

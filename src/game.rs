@@ -1,6 +1,8 @@
 mod player;
 
-use sfml::graphics::{Rect, RectangleShape, RenderTarget, RenderWindow, Sprite, Transformable};
+use sfml::graphics::{
+    Color, Rect, RectangleShape, RenderTarget, RenderWindow, Shape, Sprite, Transformable,
+};
 
 use crate::{
     graphics::{ScreenPos, ScreenPosScalar, NATIVE_RESOLUTION},
@@ -56,6 +58,13 @@ impl GameState {
         ));
         rs.set_size((w as f32, h as f32));
         rw.draw(&rs);
+        rs.set_size((2., 2.));
+        rs.set_fill_color(Color::RED);
+        rs.set_position((
+            (self.player.col_en.en.pos.x - self.camera_offset.x as i32) as f32,
+            (self.player.col_en.en.pos.y - self.camera_offset.y as i32) as f32,
+        ));
+        rw.draw(&rs);
     }
 }
 
@@ -79,7 +88,7 @@ pub fn for_each_tile_on_screen(camera_offset: WorldPos, mut f: impl FnMut(TilePo
 impl Default for GameState {
     fn default() -> Self {
         let mut spawn_point = WorldPos::SURFACE_CENTER;
-        spawn_point.y -= 300;
+        spawn_point.y -= 304;
         Self {
             camera_offset: spawn_point,
             world: Default::default(),
