@@ -88,7 +88,7 @@ pub fn for_each_tile_on_screen(camera_offset: WorldPos, mut f: impl FnMut(TilePo
 impl Default for GameState {
     fn default() -> Self {
         let mut spawn_point = WorldPos::SURFACE_CENTER;
-        spawn_point.y -= 304;
+        spawn_point.y -= 1104;
         Self {
             camera_offset: spawn_point,
             world: Default::default(),

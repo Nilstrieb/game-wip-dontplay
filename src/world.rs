@@ -107,7 +107,7 @@ impl Chunk {
             mid: 0,
             fg: 0,
         }; CHUNK_N_TILES];
-        if pos.y == 157 {
+        if pos.y == 156 {
             for (i, b) in tiles.iter_mut().enumerate() {
                 if i / CHUNK_EXTENT as usize == 0 {
                     b.fg = 8;
@@ -116,7 +116,7 @@ impl Chunk {
                 b.bg = 9;
             }
         }
-        if pos.y > 157 {
+        if pos.y > 156 {
             for b in &mut tiles {
                 b.bg = 7;
                 b.mid = 1;
