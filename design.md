@@ -27,3 +27,9 @@ Very unbreakable bottom or lava lake or whatever is at 60,000 blocks deep.
   - At least 100 ore types
   - At least 50 stone types
   - Maybe background tiles and other stuff, like different break overlay animations
+
+  # Multiplayer
+
+  Multiplayer adds a lot of complexity, so I'm going to develop the prototype of the game without
+  any multiplayer support.
+  But if people like the general idea, they can help create a multiplayer version eventually.
