@@ -264,6 +264,7 @@ fn debug_panel_ui(
                 "Player offset from center: {}",
                 LengthDisp(tp.x as i64 - wp_to_tp(WorldPos::CENTER) as i64)
             ));
+            ui.label(format!("Hspeed: {}", game.player.hspeed));
             ui.label(format!("Vspeed: {}", game.player.vspeed));
             ui.label("Gravity");
             ui.add(egui::DragValue::new(&mut game.gravity));
