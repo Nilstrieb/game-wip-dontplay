@@ -546,6 +546,7 @@ dependencies = [
  "s2dc",
  "sfml",
  "sfml-xt",
+ "worldgen",
 ]
 
 [[package]]
@@ -1159,3 +1160,9 @@ checksum = "ae8970b36c66498d8ff1d66685dc86b91b29db0c7739899012f63a63814b4b28"
 dependencies = [
  "memchr",
 ]
+
+[[package]]
+name = "worldgen"
+version = "0.5.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a9b77fba24c873b60af296c1f0c5639114186d1ac3c99f880a7bb590bdc04065"

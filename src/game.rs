@@ -9,6 +9,7 @@ use crate::{
     math::{wp_to_tp, WorldPos},
     res::Res,
     world::{Tile, TileId, TilePos, World},
+    worldgen::Worldgen,
 };
 
 use self::player::Player;
@@ -21,6 +22,7 @@ pub struct GameState {
     pub tile_to_place: TileId,
     pub current_biome: Biome,
     pub prev_biome: Biome,
+    pub worldgen: Worldgen,
 }
 
 #[derive(PartialEq, Eq, Clone, Copy)]
@@ -33,7 +35,7 @@ impl GameState {
     pub(crate) fn draw_world(&mut self, rw: &mut RenderWindow, res: &Res) {
         let mut s = Sprite::with_texture(&res.tile_atlas);
         for_each_tile_on_screen(self.camera_offset, |tp, sp| {
-            let tile = self.world.tile_at_mut(tp);
+            let tile = self.world.tile_at_mut(tp, &self.worldgen);
             s.set_position(sp.to_sf_vec());
             if tile.bg != Tile::EMPTY {
                 s.set_texture_rect(Rect::new((tile.bg - 1) as i32 * 32, 0, 32, 32));
@@ -97,6 +99,7 @@ impl Default for GameState {
             tile_to_place: 1,
             current_biome: Biome::Surface,
             prev_biome: Biome::Surface,
+            worldgen: Worldgen::default(),
         }
     }
 }

@@ -6,6 +6,7 @@ mod input;
 mod math;
 mod res;
 mod world;
+mod worldgen;
 
 use app::App;
 

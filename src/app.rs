@@ -100,7 +100,7 @@ impl App {
                 .clamp(-terminal_velocity, terminal_velocity);
             let mut on_screen_tile_ents = Vec::new();
             for_each_tile_on_screen(self.game.camera_offset, |tp, _sp| {
-                let tid = self.game.world.tile_at_mut(tp).mid;
+                let tid = self.game.world.tile_at_mut(tp, &self.game.worldgen).mid;
                 if tid == Tile::EMPTY {
                     return;
                 }
@@ -163,11 +163,11 @@ impl App {
             self.game.player.col_en.en.pos.y = wpos.y as i32;
         }
         if self.input.lmb_down {
-            let t = self.game.world.tile_at_mut(mouse_tpos);
+            let t = self.game.world.tile_at_mut(mouse_tpos, &self.game.worldgen);
             t.mid = 0;
             t.fg = 0;
         } else if self.input.rmb_down {
-            let t = self.game.world.tile_at_mut(mouse_tpos);
+            let t = self.game.world.tile_at_mut(mouse_tpos, &self.game.worldgen);
             if self.game.tile_to_place != 7 {
                 t.mid = self.game.tile_to_place;
             } else {

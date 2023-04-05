@@ -1,12 +1,13 @@
 use fnv::FnvHashMap;
-use rand::{thread_rng, Rng};
+
+use crate::worldgen::Worldgen;
 
 pub type ChunkPosScalar = u16;
 
 #[derive(Hash, PartialEq, Eq, Debug, Clone, Copy)]
 pub struct ChunkPos {
-    x: ChunkPosScalar,
-    y: ChunkPosScalar,
+    pub x: ChunkPosScalar,
+    pub y: ChunkPosScalar,
 }
 
 #[derive(Default)]
@@ -19,9 +20,12 @@ impl World {
     /// Get mutable access to the tile at `pos`.
     ///
     /// Loads or generates the containing chunk if necessary.
-    pub fn tile_at_mut(&mut self, pos: TilePos) -> &mut Tile {
+    pub fn tile_at_mut(&mut self, pos: TilePos, worldgen: &Worldgen) -> &mut Tile {
         let (chk, local) = pos.to_chunk_and_local();
-        let chk = self.chunks.entry(chk).or_insert_with(|| Chunk::gen(chk));
+        let chk = self
+            .chunks
+            .entry(chk)
+            .or_insert_with(|| Chunk::gen(chk, worldgen));
         chk.at_mut(local)
     }
 }
@@ -100,29 +104,19 @@ pub struct Chunk {
 }
 
 impl Chunk {
-    pub fn gen(pos: ChunkPos) -> Self {
-        let mut rng = thread_rng();
+    pub fn gen(pos: ChunkPos, worldgen: &Worldgen) -> Self {
         let mut tiles = [Tile {
             bg: 0,
             mid: 0,
             fg: 0,
         }; CHUNK_N_TILES];
-        if pos.y == 156 {
-            for (i, b) in tiles.iter_mut().enumerate() {
-                if i / CHUNK_EXTENT as usize == 0 {
-                    b.fg = 8;
-                }
-                b.mid = 2;
-                b.bg = 9;
-            }
-        }
-        if pos.y > 156 {
-            for b in &mut tiles {
-                b.bg = 7;
-                b.mid = 1;
-                if rng.gen_bool(0.1) {
-                    b.fg = 6;
-                }
+        let noise = worldgen.chunk_noise(pos);
+        if pos.y >= 156 {
+            for (i, t) in tiles.iter_mut().enumerate() {
+                let x = i % CHUNK_EXTENT as usize;
+                let y = i / CHUNK_EXTENT as usize;
+                let noise = noise[x][y];
+                *t = noise;
             }
         }
         // Unbreakable layer at bottom

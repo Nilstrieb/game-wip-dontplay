@@ -13,6 +13,7 @@ hecs = "0.10.1"
 rand = "0.8.5"
 rfd = "0.11.3"
 sfml = "0.20.0"
+worldgen = "0.5.3"
 
 [dependencies.s2dc]
 git = "https://github.com/crumblingstatue/s2dc.git"
