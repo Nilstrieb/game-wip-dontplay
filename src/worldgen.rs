@@ -57,7 +57,7 @@ impl Default for Worldgen {
                     mid: 1,
                     fg: 0,
                 })
-                .when(constraint!(nm.clone(), < 0.45)),
+                .when(constraint!(nm, < 0.45)),
             )
             // Dirt wall
             .add(Tile::new(Tl {
