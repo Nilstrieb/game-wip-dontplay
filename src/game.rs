@@ -3,7 +3,7 @@ mod player;
 use sfml::{
     graphics::{
         glsl::{Vec2, Vec4},
-        Color, Rect, RectangleShape, RenderStates, RenderTarget, RenderWindow, Shape, Sprite,
+        Color, Rect, RectangleShape, RenderStates, RenderTarget, RenderTexture, Shape, Sprite,
         Transformable,
     },
     system::Clock,
@@ -40,7 +40,7 @@ pub enum Biome {
 }
 
 impl GameState {
-    pub(crate) fn draw_world(&mut self, rw: &mut RenderWindow, res: &mut Res) {
+    pub(crate) fn draw_world(&mut self, rw: &mut RenderTexture, res: &mut Res) {
         let mut rs = RenderStates::default();
         res.lighting_shader.set_uniform_bool("has_texture", true);
         rs.set_shader(Some(&res.lighting_shader));
@@ -62,7 +62,7 @@ impl GameState {
             }
         });
     }
-    pub fn draw_entities(&mut self, rw: &mut RenderWindow, res: &mut Res) {
+    pub fn draw_entities(&mut self, rw: &mut RenderTexture, res: &mut Res) {
         let mut rend_st = RenderStates::default();
         res.lighting_shader.set_uniform_bool("has_texture", false);
         rend_st.set_shader(Some(&res.lighting_shader));
@@ -120,8 +120,8 @@ impl GameState {
 }
 
 pub fn for_each_tile_on_screen(camera_offset: WorldPos, mut f: impl FnMut(TilePos, ScreenPos)) {
-    for y in (-32..NATIVE_RESOLUTION.h + 32).step_by(32) {
-        for x in (-32..NATIVE_RESOLUTION.w + 32).step_by(32) {
+    for y in (-32..(NATIVE_RESOLUTION.h as i16) + 32).step_by(32) {
+        for x in (-32..(NATIVE_RESOLUTION.w as i16) + 32).step_by(32) {
             f(
                 TilePos {
                     x: wp_to_tp(camera_offset.x.saturating_add(x.try_into().unwrap_or(0))),

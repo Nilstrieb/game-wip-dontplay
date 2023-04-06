@@ -1,17 +1,20 @@
 use std::fmt::{self};
 
+use anyhow::Context;
 use egui_sfml::{egui, SfEgui};
 use gamedebug_core::{imm, imm_dbg};
 use sfml::{
     audio::SoundSource,
-    graphics::{Color, RenderTarget, RenderWindow},
+    graphics::{
+        Color, Rect, RenderTarget, RenderTexture, RenderWindow, Sprite, Transformable, View,
+    },
     window::{Event, Key},
 };
 
 use crate::{
     debug::DebugState,
     game::{for_each_tile_on_screen, Biome, GameState},
-    graphics::{self, NATIVE_RESOLUTION},
+    graphics::{self, ScreenPosScalar, NATIVE_RESOLUTION},
     input::Input,
     math::{px_per_frame_to_km_h, WorldPos, M_PER_PX, TILE_SIZE},
     res::Res,
@@ -27,6 +30,10 @@ pub struct App {
     pub sf_egui: SfEgui,
     pub input: Input,
     pub debug: DebugState,
+    /// Integer scale for rendering the game
+    pub scale: u8,
+    /// RenderTexture for rendering the game at its native resolution
+    pub rt: RenderTexture,
 }
 
 impl App {
@@ -37,6 +44,8 @@ impl App {
         res.surf_music.set_looping(true);
         res.surf_music.set_volume(10.0);
         res.surf_music.play();
+        let rt = RenderTexture::new(NATIVE_RESOLUTION.w.into(), NATIVE_RESOLUTION.h.into())
+            .context("Failed to create render texture")?;
         Ok(Self {
             rw,
             should_quit: false,
@@ -45,6 +54,8 @@ impl App {
             sf_egui,
             input: Input::default(),
             debug: DebugState::default(),
+            scale: 1,
+            rt,
         })
     }
 
@@ -64,6 +75,10 @@ impl App {
             self.input.update_from_event(&ev);
             match ev {
                 Event::Closed => self.should_quit = true,
+                Event::Resized { width, height } => {
+                    let view = View::from_rect(Rect::new(0., 0., width as f32, height as f32));
+                    self.rw.set_view(&view);
+                }
                 _ => {}
             }
         }
@@ -147,7 +162,9 @@ impl App {
             self.game.camera_offset.y =
                 (y - NATIVE_RESOLUTION.h as i32 / 2).try_into().unwrap_or(0);
         }
-        let loc = self.input.mouse_down_loc;
+        let mut loc = self.input.mouse_down_loc;
+        loc.x /= self.scale as ScreenPosScalar;
+        loc.y /= self.scale as ScreenPosScalar;
         let mut wpos = self.game.camera_offset;
         wpos.x = wpos.x.saturating_add_signed(loc.x.into());
         wpos.y = wpos.y.saturating_add_signed(loc.y.into());
@@ -219,14 +236,24 @@ impl App {
     }
 
     fn do_rendering(&mut self) {
-        self.rw.clear(Color::rgb(55, 221, 231));
+        self.rt.clear(Color::rgb(55, 221, 231));
         self.game.render_pre_step(&mut self.res);
-        self.game.draw_world(&mut self.rw, &mut self.res);
-        self.game.draw_entities(&mut self.rw, &mut self.res);
+        self.game.draw_world(&mut self.rt, &mut self.res);
+        self.game.draw_entities(&mut self.rt, &mut self.res);
+        self.rt.display();
+        let mut spr = Sprite::with_texture(self.rt.texture());
+        spr.set_scale((self.scale as f32, self.scale as f32));
+        self.rw.draw(&spr);
         self.sf_egui
             .do_frame(|ctx| {
                 if self.debug.panel {
-                    debug_panel_ui(&mut self.debug, &mut self.game, ctx, &mut self.res);
+                    debug_panel_ui(
+                        &mut self.debug,
+                        &mut self.game,
+                        ctx,
+                        &mut self.res,
+                        &mut self.scale,
+                    );
                 }
             })
             .unwrap();
@@ -240,6 +267,7 @@ fn debug_panel_ui(
     game: &mut GameState,
     ctx: &egui::Context,
     res: &mut Res,
+    scale: &mut u8,
 ) {
     egui::Window::new("Debug (F12)").show(ctx, |ui| {
         if debug.freecam {
@@ -293,6 +321,8 @@ fn debug_panel_ui(
         ui.separator();
         ui.label("Ambient light");
         ui.add(egui::DragValue::new(&mut game.ambient_light).speed(0.01));
+        ui.label("Scale");
+        ui.add(egui::DragValue::new(scale));
         egui::ScrollArea::vertical().show(ui, |ui| {
             gamedebug_core::for_each_imm(|info| match info {
                 gamedebug_core::Info::Msg(msg) => {

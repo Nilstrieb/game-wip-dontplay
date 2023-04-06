@@ -8,8 +8,8 @@ use sfml_xt::graphics::RenderWindowExt;
 use crate::math::FPS_TARGET;
 
 pub struct ScreenRes {
-    pub w: i16,
-    pub h: i16,
+    pub w: u16,
+    pub h: u16,
 }
 
 impl ScreenRes {
@@ -43,7 +43,7 @@ pub fn make_window() -> RenderWindow {
     let mut rw = RenderWindow::new(
         NATIVE_RESOLUTION.to_sf(),
         "Mantle Diver",
-        Style::CLOSE,
+        Style::DEFAULT,
         &ContextSettings::default(),
     );
     rw.set_framerate_limit(FPS_TARGET.into());
