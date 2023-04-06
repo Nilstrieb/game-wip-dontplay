@@ -6,12 +6,12 @@ use sfml::{
         Color, Rect, RectangleShape, RenderStates, RenderTarget, RenderTexture, Shape, Sprite,
         Transformable,
     },
-    system::Clock,
+    system::{Clock, Vector2u},
     SfBox,
 };
 
 use crate::{
-    graphics::{ScreenPos, ScreenPosScalar, NATIVE_RESOLUTION},
+    graphics::{ScreenPos, ScreenPosScalar},
     math::{wp_to_tp, WorldPos},
     res::Res,
     world::{Tile, TileId, TilePos, World},
@@ -45,7 +45,7 @@ impl GameState {
         res.lighting_shader.set_uniform_bool("has_texture", true);
         rs.set_shader(Some(&res.lighting_shader));
         let mut s = Sprite::with_texture(&res.tile_atlas);
-        for_each_tile_on_screen(self.camera_offset, |tp, sp| {
+        for_each_tile_on_screen(self.camera_offset, rw.size(), |tp, sp| {
             let tile = self.world.tile_at_mut(tp, &self.worldgen);
             s.set_position(sp.to_sf_vec());
             if tile.bg != Tile::EMPTY {
@@ -82,21 +82,16 @@ impl GameState {
         ));
         rw.draw(&rect_sh);
     }
-    pub fn render_pre_step(&mut self, res: &mut Res) {
+    pub fn render_pre_step(&mut self, res: &mut Res, rt_size: Vector2u) {
         res.lighting_shader.set_uniform_current_texture("texture");
         res.lighting_shader
             .set_uniform_float("time", self.clock.elapsed_time().as_seconds() * 10.0);
         res.lighting_shader.set_uniform_vec2(
             "mouse",
-            Vec2::new(
-                NATIVE_RESOLUTION.w as f32 / 2.0,
-                NATIVE_RESOLUTION.h as f32 / 2.0,
-            ),
+            Vec2::new(rt_size.x as f32 / 2.0, rt_size.y as f32 / 2.0),
         );
-        res.lighting_shader.set_uniform_vec2(
-            "resolution",
-            Vec2::new(NATIVE_RESOLUTION.w as f32, NATIVE_RESOLUTION.h as f32),
-        );
+        res.lighting_shader
+            .set_uniform_vec2("resolution", Vec2::new(rt_size.x as f32, rt_size.y as f32));
         res.lighting_shader.set_uniform_vec4(
             "lightData",
             Vec4 {
@@ -119,9 +114,13 @@ impl GameState {
     }
 }
 
-pub fn for_each_tile_on_screen(camera_offset: WorldPos, mut f: impl FnMut(TilePos, ScreenPos)) {
-    for y in (-32..(NATIVE_RESOLUTION.h as i16) + 32).step_by(32) {
-        for x in (-32..(NATIVE_RESOLUTION.w as i16) + 32).step_by(32) {
+pub fn for_each_tile_on_screen(
+    camera_offset: WorldPos,
+    rt_size: Vector2u,
+    mut f: impl FnMut(TilePos, ScreenPos),
+) {
+    for y in (-32..(rt_size.y as i16) + 32).step_by(32) {
+        for x in (-32..(rt_size.x as i16) + 32).step_by(32) {
             f(
                 TilePos {
                     x: wp_to_tp(camera_offset.x.saturating_add(x.try_into().unwrap_or(0))),

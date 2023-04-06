@@ -15,7 +15,7 @@ use sfml::{
 use crate::{
     debug::DebugState,
     game::{for_each_tile_on_screen, Biome, GameState},
-    graphics::{self, ScreenPos, ScreenPosScalar, NATIVE_RESOLUTION},
+    graphics::{self, ScreenPos, ScreenPosScalar},
     input::Input,
     math::{center_offset, px_per_frame_to_km_h, WorldPos, M_PER_PX, TILE_SIZE},
     res::Res,
@@ -45,8 +45,9 @@ impl App {
         res.surf_music.set_looping(true);
         res.surf_music.set_volume(10.0);
         res.surf_music.play();
-        let rt = RenderTexture::new(NATIVE_RESOLUTION.w.into(), NATIVE_RESOLUTION.h.into())
-            .context("Failed to create render texture")?;
+        let rw_size = rw.size();
+        let rt =
+            RenderTexture::new(rw_size.x, rw_size.y).context("Failed to create render texture")?;
         Ok(Self {
             rw,
             should_quit: false,
@@ -77,6 +78,7 @@ impl App {
             match ev {
                 Event::Closed => self.should_quit = true,
                 Event::Resized { width, height } => {
+                    self.rt = RenderTexture::new(width, height).unwrap();
                     let view = View::from_rect(Rect::new(0., 0., width as f32, height as f32));
                     self.rw.set_view(&view);
                 }
@@ -87,6 +89,7 @@ impl App {
 
     fn do_update(&mut self) {
         self.debug.update(&self.input);
+        let rt_size = self.rt.size();
         if self.debug.freecam {
             self.do_freecam();
         } else {
@@ -115,7 +118,7 @@ impl App {
                 .vspeed
                 .clamp(-terminal_velocity, terminal_velocity);
             let mut on_screen_tile_ents = Vec::new();
-            for_each_tile_on_screen(self.game.camera_offset, |tp, _sp| {
+            for_each_tile_on_screen(self.game.camera_offset, self.rt.size(), |tp, _sp| {
                 let tid = self.game.world.tile_at_mut(tp, &self.game.worldgen).mid;
                 if tid == Tile::EMPTY {
                     return;
@@ -158,13 +161,11 @@ impl App {
                 });
             self.game.player.vspeed += self.game.gravity;
             let (x, y, _w, _h) = self.game.player.col_en.en.xywh();
-            self.game.camera_offset.x =
-                (x - NATIVE_RESOLUTION.w as i32 / 2).try_into().unwrap_or(0);
-            self.game.camera_offset.y =
-                (y - NATIVE_RESOLUTION.h as i32 / 2).try_into().unwrap_or(0);
+            self.game.camera_offset.x = (x - rt_size.x as i32 / 2).try_into().unwrap_or(0);
+            self.game.camera_offset.y = (y - rt_size.y as i32 / 2).try_into().unwrap_or(0);
         }
         let mut loc = self.input.mouse_down_loc;
-        let vco = viewport_center_offset(self.rw.size(), self.rt.size(), self.scale);
+        let vco = viewport_center_offset(self.rw.size(), rt_size, self.scale);
         loc.x -= vco.x;
         loc.y -= vco.y;
         loc.x /= self.scale as ScreenPosScalar;
@@ -241,7 +242,7 @@ impl App {
 
     fn do_rendering(&mut self) {
         self.rt.clear(Color::rgb(55, 221, 231));
-        self.game.render_pre_step(&mut self.res);
+        self.game.render_pre_step(&mut self.res, self.rt.size());
         self.game.draw_world(&mut self.rt, &mut self.res);
         self.game.draw_entities(&mut self.rt, &mut self.res);
         self.rt.display();

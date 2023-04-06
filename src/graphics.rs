@@ -37,11 +37,11 @@ impl ScreenPos {
     }
 }
 
-pub const NATIVE_RESOLUTION: ScreenRes = ScreenRes { w: 960, h: 540 };
+const DEFAULT_RES: ScreenRes = ScreenRes { w: 960, h: 540 };
 
 pub fn make_window() -> RenderWindow {
     let mut rw = RenderWindow::new(
-        NATIVE_RESOLUTION.to_sf(),
+        DEFAULT_RES.to_sf(),
         "Mantle Diver",
         Style::DEFAULT,
         &ContextSettings::default(),
