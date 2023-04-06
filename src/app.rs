@@ -243,6 +243,7 @@ impl App {
         self.rt.display();
         let mut spr = Sprite::with_texture(self.rt.texture());
         spr.set_scale((self.scale as f32, self.scale as f32));
+        self.rw.clear(Color::rgb(40, 10, 70));
         self.rw.draw(&spr);
         self.sf_egui
             .do_frame(|ctx| {
