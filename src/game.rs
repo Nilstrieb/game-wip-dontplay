@@ -1,8 +1,13 @@
 mod player;
 
-use sfml::graphics::{
-    Color, Rect, RectangleShape, RenderStates, RenderTarget, RenderWindow, Shape, Sprite,
-    Transformable,
+use sfml::{
+    graphics::{
+        glsl::{Vec2, Vec4},
+        Color, Rect, RectangleShape, RenderStates, RenderTarget, RenderWindow, Shape, Sprite,
+        Transformable,
+    },
+    system::Clock,
+    SfBox,
 };
 
 use crate::{
@@ -25,6 +30,7 @@ pub struct GameState {
     pub prev_biome: Biome,
     pub worldgen: Worldgen,
     pub ambient_light: f32,
+    pub clock: SfBox<Clock>,
 }
 
 #[derive(PartialEq, Eq, Clone, Copy)]
@@ -77,8 +83,39 @@ impl GameState {
         rw.draw(&rect_sh);
     }
     pub fn render_pre_step(&mut self, res: &mut Res) {
+        res.lighting_shader.set_uniform_current_texture("texture");
         res.lighting_shader
-            .set_uniform_float("ambient", self.ambient_light);
+            .set_uniform_float("time", self.clock.elapsed_time().as_seconds() * 10.0);
+        res.lighting_shader.set_uniform_vec2(
+            "mouse",
+            Vec2::new(
+                NATIVE_RESOLUTION.w as f32 / 2.0,
+                NATIVE_RESOLUTION.h as f32 / 2.0,
+            ),
+        );
+        res.lighting_shader.set_uniform_vec2(
+            "resolution",
+            Vec2::new(NATIVE_RESOLUTION.w as f32, NATIVE_RESOLUTION.h as f32),
+        );
+        res.lighting_shader.set_uniform_vec4(
+            "lightData",
+            Vec4 {
+                x: 1.0,
+                y: 0.8,
+                z: 0.2,
+                w: 2.0,
+            },
+        );
+        res.lighting_shader.set_uniform_vec4(
+            "ambientData",
+            Vec4 {
+                x: 0.3,
+                y: 0.3,
+                z: 0.8,
+                w: 0.3,
+            },
+        );
+        res.lighting_shader.set_uniform_float("lightSize", 0.3);
     }
 }
 
@@ -113,6 +150,7 @@ impl Default for GameState {
             prev_biome: Biome::Surface,
             worldgen: Worldgen::default(),
             ambient_light: 1.0,
+            clock: Clock::start(),
         }
     }
 }
