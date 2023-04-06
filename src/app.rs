@@ -1,7 +1,7 @@
 use std::fmt::{self};
 
 use anyhow::Context;
-use egui_inspect::UiExt;
+use egui_inspect::inspect;
 use egui_sfml::{egui, SfEgui};
 use gamedebug_core::{imm, imm_dbg};
 use sfml::{
@@ -286,10 +286,10 @@ fn viewport_center_offset(rw_size: Vector2u, rt_size: Vector2u, scale: u8) -> Sc
 
 fn debug_panel_ui(
     debug: &mut DebugState,
-    game: &mut GameState,
+    mut game: &mut GameState,
     ctx: &egui::Context,
     res: &mut Res,
-    scale: &mut u8,
+    mut scale: &mut u8,
 ) {
     egui::Window::new("Debug (F12)").show(ctx, |ui| {
         if debug.freecam {
@@ -337,9 +337,16 @@ fn debug_panel_ui(
         ui.add(egui::DragValue::new(&mut vol));
         res.surf_music.set_volume(vol);
         ui.separator();
-        ui.label("Scale");
-        ui.add(egui::DragValue::new(scale));
-        ui.inspect_mut(game, &mut 0);
+        egui::ScrollArea::vertical()
+            .id_source("insp_scroll")
+            .max_height(240.)
+            .show(ui, |ui| {
+                inspect! {
+                    ui,
+                    scale, game
+                }
+            });
+        ui.separator();
         egui::ScrollArea::vertical().show(ui, |ui| {
             gamedebug_core::for_each_imm(|info| match info {
                 gamedebug_core::Info::Msg(msg) => {
