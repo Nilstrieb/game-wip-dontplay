@@ -541,6 +541,7 @@ dependencies = [
  "fnv",
  "gamedebug_core",
  "hecs",
+ "num-traits",
  "rand",
  "rfd",
  "s2dc",

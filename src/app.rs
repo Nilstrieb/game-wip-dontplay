@@ -16,7 +16,7 @@ use crate::{
     game::{for_each_tile_on_screen, Biome, GameState},
     graphics::{self, ScreenPosScalar, NATIVE_RESOLUTION},
     input::Input,
-    math::{px_per_frame_to_km_h, WorldPos, M_PER_PX, TILE_SIZE},
+    math::{center_offset, px_per_frame_to_km_h, WorldPos, M_PER_PX, TILE_SIZE},
     res::Res,
     world::{Tile, TilePosScalar, CHUNK_EXTENT},
 };
@@ -243,6 +243,11 @@ impl App {
         self.rt.display();
         let mut spr = Sprite::with_texture(self.rt.texture());
         spr.set_scale((self.scale as f32, self.scale as f32));
+        let rw_size = self.rw.size();
+        let rt_size = self.rt.size() * self.scale as u32;
+        let x = center_offset(rt_size.x as i32, rw_size.x as i32);
+        let y = center_offset(rt_size.y as i32, rw_size.y as i32);
+        spr.set_position((x as f32, y as f32));
         self.rw.clear(Color::rgb(40, 10, 70));
         self.rw.draw(&spr);
         self.sf_egui
