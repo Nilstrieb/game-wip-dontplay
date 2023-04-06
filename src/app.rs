@@ -220,8 +220,9 @@ impl App {
 
     fn do_rendering(&mut self) {
         self.rw.clear(Color::rgb(55, 221, 231));
-        self.game.draw_world(&mut self.rw, &self.res);
-        self.game.draw_entities(&mut self.rw);
+        self.game.render_pre_step(&mut self.res);
+        self.game.draw_world(&mut self.rw, &mut self.res);
+        self.game.draw_entities(&mut self.rw, &mut self.res);
         self.sf_egui
             .do_frame(|ctx| {
                 if self.debug.panel {
@@ -290,6 +291,8 @@ fn debug_panel_ui(
         ui.add(egui::DragValue::new(&mut vol));
         res.surf_music.set_volume(vol);
         ui.separator();
+        ui.label("Ambient light");
+        ui.add(egui::DragValue::new(&mut game.ambient_light).speed(0.01));
         egui::ScrollArea::vertical().show(ui, |ui| {
             gamedebug_core::for_each_imm(|info| match info {
                 gamedebug_core::Info::Msg(msg) => {

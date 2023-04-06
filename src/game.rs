@@ -1,7 +1,8 @@
 mod player;
 
 use sfml::graphics::{
-    Color, Rect, RectangleShape, RenderTarget, RenderWindow, Shape, Sprite, Transformable,
+    Color, Rect, RectangleShape, RenderStates, RenderTarget, RenderWindow, Shape, Sprite,
+    Transformable,
 };
 
 use crate::{
@@ -23,6 +24,7 @@ pub struct GameState {
     pub current_biome: Biome,
     pub prev_biome: Biome,
     pub worldgen: Worldgen,
+    pub ambient_light: f32,
 }
 
 #[derive(PartialEq, Eq, Clone, Copy)]
@@ -32,41 +34,51 @@ pub enum Biome {
 }
 
 impl GameState {
-    pub(crate) fn draw_world(&mut self, rw: &mut RenderWindow, res: &Res) {
+    pub(crate) fn draw_world(&mut self, rw: &mut RenderWindow, res: &mut Res) {
+        let mut rs = RenderStates::default();
+        res.lighting_shader.set_uniform_bool("has_texture", true);
+        rs.set_shader(Some(&res.lighting_shader));
         let mut s = Sprite::with_texture(&res.tile_atlas);
         for_each_tile_on_screen(self.camera_offset, |tp, sp| {
             let tile = self.world.tile_at_mut(tp, &self.worldgen);
             s.set_position(sp.to_sf_vec());
             if tile.bg != Tile::EMPTY {
                 s.set_texture_rect(Rect::new((tile.bg - 1) as i32 * 32, 0, 32, 32));
-                rw.draw(&s);
+                rw.draw_with_renderstates(&s, &rs);
             }
             if tile.mid != Tile::EMPTY {
                 s.set_texture_rect(Rect::new((tile.mid - 1) as i32 * 32, 0, 32, 32));
-                rw.draw(&s);
+                rw.draw_with_renderstates(&s, &rs);
             }
             if tile.fg != Tile::EMPTY {
                 s.set_texture_rect(Rect::new((tile.fg - 1) as i32 * 32, 0, 32, 32));
-                rw.draw(&s);
+                rw.draw_with_renderstates(&s, &rs);
             }
         });
     }
-    pub fn draw_entities(&mut self, rw: &mut RenderWindow) {
+    pub fn draw_entities(&mut self, rw: &mut RenderWindow, res: &mut Res) {
+        let mut rend_st = RenderStates::default();
+        res.lighting_shader.set_uniform_bool("has_texture", false);
+        rend_st.set_shader(Some(&res.lighting_shader));
         let (x, y, w, h) = self.player.col_en.en.xywh();
-        let mut rs = RectangleShape::new();
-        rs.set_position((
+        let mut rect_sh = RectangleShape::new();
+        rect_sh.set_position((
             (x - self.camera_offset.x as i32) as f32,
             (y - self.camera_offset.y as i32) as f32,
         ));
-        rs.set_size((w as f32, h as f32));
-        rw.draw(&rs);
-        rs.set_size((2., 2.));
-        rs.set_fill_color(Color::RED);
-        rs.set_position((
+        rect_sh.set_size((w as f32, h as f32));
+        rw.draw_with_renderstates(&rect_sh, &rend_st);
+        rect_sh.set_size((2., 2.));
+        rect_sh.set_fill_color(Color::RED);
+        rect_sh.set_position((
             (self.player.col_en.en.pos.x - self.camera_offset.x as i32) as f32,
             (self.player.col_en.en.pos.y - self.camera_offset.y as i32) as f32,
         ));
-        rw.draw(&rs);
+        rw.draw(&rect_sh);
+    }
+    pub fn render_pre_step(&mut self, res: &mut Res) {
+        res.lighting_shader
+            .set_uniform_float("ambient", self.ambient_light);
     }
 }
 
@@ -100,6 +112,7 @@ impl Default for GameState {
             current_biome: Biome::Surface,
             prev_biome: Biome::Surface,
             worldgen: Worldgen::default(),
+            ambient_light: 1.0,
         }
     }
 }
