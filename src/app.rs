@@ -307,10 +307,6 @@ fn debug_panel_ui(
                 LengthDisp(co.x as f32 - WorldPos::CENTER as f32)
             ));
         } else {
-            ui.label("Player x");
-            ui.add(egui::DragValue::new(&mut game.player.col_en.en.pos.x));
-            ui.label("Player y");
-            ui.add(egui::DragValue::new(&mut game.player.col_en.en.pos.y));
             let tp = game.player.center_tp();
             imm_dbg!(tp);
             ui.label(format!(
@@ -337,9 +333,10 @@ fn debug_panel_ui(
         ui.add(egui::DragValue::new(&mut vol));
         res.surf_music.set_volume(vol);
         ui.separator();
-        egui::ScrollArea::vertical()
+        egui::ScrollArea::both()
             .id_source("insp_scroll")
             .max_height(240.)
+            .max_width(340.0)
             .show(ui, |ui| {
                 inspect! {
                     ui,

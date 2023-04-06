@@ -1,4 +1,4 @@
-use egui_inspect::derive::Inspect;
+use egui_inspect::{derive::Inspect, inspect};
 use s2dc::{vec2, MobileEntity};
 
 use crate::{
@@ -8,11 +8,21 @@ use crate::{
 
 #[derive(Debug, Inspect)]
 pub struct Player {
-    #[opaque]
+    #[inspect_with(inspect_mobile_entity)]
     pub col_en: MobileEntity,
     pub vspeed: f32,
     pub hspeed: f32,
     pub jumps_left: u8,
+}
+
+fn inspect_mobile_entity(en: &mut MobileEntity, ui: &mut egui::Ui, _id_src: u64) {
+    inspect! {
+        ui,
+        en.en.pos.x,
+        en.en.pos.y,
+        en.en.bb.x,
+        en.en.bb.y
+    }
 }
 
 impl Player {
