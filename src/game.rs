@@ -26,7 +26,6 @@ use self::player::Player;
 #[derivative(Debug)]
 pub struct GameState {
     pub camera_offset: WorldPos,
-    #[opaque]
     pub world: World,
     pub player: Player,
     pub gravity: f32,

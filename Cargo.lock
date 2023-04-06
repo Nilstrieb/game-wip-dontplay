@@ -192,7 +192,7 @@ dependencies = [
 [[package]]
 name = "egui-inspect"
 version = "0.1.0"
-source = "git+https://github.com/crumblingstatue/egui-inspect.git#135c81eb0264ddbec69f98b0a9d5c7ec22867736"
+source = "git+https://github.com/crumblingstatue/egui-inspect.git#5cf1f05c0f4f6625eb9a46ee0faebdb27919f9bf"
 dependencies = [
  "egui",
  "egui-inspect-derive",
@@ -201,7 +201,7 @@ dependencies = [
 [[package]]
 name = "egui-inspect-derive"
 version = "0.1.0"
-source = "git+https://github.com/crumblingstatue/egui-inspect.git#135c81eb0264ddbec69f98b0a9d5c7ec22867736"
+source = "git+https://github.com/crumblingstatue/egui-inspect.git#5cf1f05c0f4f6625eb9a46ee0faebdb27919f9bf"
 dependencies = [
  "proc-macro2",
  "quote",

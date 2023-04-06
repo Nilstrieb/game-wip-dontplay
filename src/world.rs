@@ -1,16 +1,17 @@
+use egui_inspect::derive::Inspect;
 use fnv::FnvHashMap;
 
 use crate::worldgen::Worldgen;
 
 pub type ChunkPosScalar = u16;
 
-#[derive(Hash, PartialEq, Eq, Debug, Clone, Copy)]
+#[derive(Hash, PartialEq, Eq, Debug, Clone, Copy, Inspect)]
 pub struct ChunkPos {
     pub x: ChunkPosScalar,
     pub y: ChunkPosScalar,
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Inspect)]
 pub struct World {
     /// The currently loaded chunks
     chunks: FnvHashMap<ChunkPos, Chunk>,
@@ -99,7 +100,7 @@ const CHUNK_N_TILES: usize = CHUNK_EXTENT as usize * CHUNK_EXTENT as usize;
 
 type ChunkTiles = [Tile; CHUNK_N_TILES];
 
-#[derive(Debug)]
+#[derive(Debug, Inspect)]
 pub struct Chunk {
     tiles: ChunkTiles,
 }
@@ -136,7 +137,7 @@ impl Chunk {
 
 pub type TileId = u16;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Inspect)]
 pub struct Tile {
     /// Background wall behind entities
     pub bg: TileId,
