@@ -1,7 +1,7 @@
 mod player;
 
 use derivative::Derivative;
-use egui_inspect::derive::Inspect;
+use egui_inspect::{derive::Inspect, inspect};
 use sfml::{
     graphics::{
         glsl::{Vec2, Vec4},
@@ -38,6 +38,7 @@ pub struct GameState {
     pub ambient_light: f32,
     #[opaque]
     pub clock: SfBox<Clock>,
+    lighting_params: LightingData,
 }
 
 #[derive(PartialEq, Eq, Clone, Copy, Debug, Inspect)]
@@ -99,25 +100,47 @@ impl GameState {
         );
         res.lighting_shader
             .set_uniform_vec2("resolution", Vec2::new(rt_size.x as f32, rt_size.y as f32));
-        res.lighting_shader.set_uniform_vec4(
-            "lightData",
-            Vec4 {
+        res.lighting_shader
+            .set_uniform_vec4("lightData", self.lighting_params.light);
+        res.lighting_shader
+            .set_uniform_vec4("ambientData", self.lighting_params.ambient);
+        res.lighting_shader
+            .set_uniform_float("lightSize", self.lighting_params.size);
+    }
+}
+
+#[derive(Debug, Inspect)]
+struct LightingData {
+    #[inspect_with(inspect_vec4)]
+    light: Vec4,
+    #[inspect_with(inspect_vec4)]
+    ambient: Vec4,
+    size: f32,
+}
+
+fn inspect_vec4(val: &mut Vec4, ui: &mut egui::Ui, _id: u64) {
+    inspect! {
+        ui, val.x, val.y, val.z, val.w
+    }
+}
+
+impl Default for LightingData {
+    fn default() -> Self {
+        Self {
+            light: Vec4 {
                 x: 1.0,
                 y: 0.8,
                 z: 0.2,
                 w: 2.0,
             },
-        );
-        res.lighting_shader.set_uniform_vec4(
-            "ambientData",
-            Vec4 {
+            ambient: Vec4 {
                 x: 0.3,
                 y: 0.3,
                 z: 0.8,
                 w: 0.3,
             },
-        );
-        res.lighting_shader.set_uniform_float("lightSize", 0.3);
+            size: 0.3,
+        }
     }
 }
 
@@ -157,6 +180,7 @@ impl Default for GameState {
             worldgen: Worldgen::default(),
             ambient_light: 1.0,
             clock: Clock::start(),
+            lighting_params: Default::default(),
         }
     }
 }
