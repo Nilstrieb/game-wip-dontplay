@@ -8,13 +8,14 @@ use sfml::{
     graphics::{
         Color, Rect, RenderTarget, RenderTexture, RenderWindow, Sprite, Transformable, View,
     },
+    system::Vector2u,
     window::{Event, Key},
 };
 
 use crate::{
     debug::DebugState,
     game::{for_each_tile_on_screen, Biome, GameState},
-    graphics::{self, ScreenPosScalar, NATIVE_RESOLUTION},
+    graphics::{self, ScreenPos, ScreenPosScalar, NATIVE_RESOLUTION},
     input::Input,
     math::{center_offset, px_per_frame_to_km_h, WorldPos, M_PER_PX, TILE_SIZE},
     res::Res,
@@ -163,6 +164,9 @@ impl App {
                 (y - NATIVE_RESOLUTION.h as i32 / 2).try_into().unwrap_or(0);
         }
         let mut loc = self.input.mouse_down_loc;
+        let vco = viewport_center_offset(self.rw.size(), self.rt.size(), self.scale);
+        loc.x -= vco.x;
+        loc.y -= vco.y;
         loc.x /= self.scale as ScreenPosScalar;
         loc.y /= self.scale as ScreenPosScalar;
         let mut wpos = self.game.camera_offset;
@@ -243,11 +247,8 @@ impl App {
         self.rt.display();
         let mut spr = Sprite::with_texture(self.rt.texture());
         spr.set_scale((self.scale as f32, self.scale as f32));
-        let rw_size = self.rw.size();
-        let rt_size = self.rt.size() * self.scale as u32;
-        let x = center_offset(rt_size.x as i32, rw_size.x as i32);
-        let y = center_offset(rt_size.y as i32, rw_size.y as i32);
-        spr.set_position((x as f32, y as f32));
+        let vco = viewport_center_offset(self.rw.size(), self.rt.size(), self.scale);
+        spr.set_position((vco.x as f32, vco.y as f32));
         self.rw.clear(Color::rgb(40, 10, 70));
         self.rw.draw(&spr);
         self.sf_egui
@@ -265,6 +266,17 @@ impl App {
             .unwrap();
         self.sf_egui.draw(&mut self.rw, None);
         self.rw.display();
+    }
+}
+
+fn viewport_center_offset(rw_size: Vector2u, rt_size: Vector2u, scale: u8) -> ScreenPos {
+    let rw_size = rw_size;
+    let rt_size = rt_size * scale as u32;
+    let x = center_offset(rt_size.x as i32, rw_size.x as i32);
+    let y = center_offset(rt_size.y as i32, rw_size.y as i32);
+    ScreenPos {
+        x: x as ScreenPosScalar,
+        y: y as ScreenPosScalar,
     }
 }
 
