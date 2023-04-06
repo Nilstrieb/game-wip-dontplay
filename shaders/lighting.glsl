@@ -1,3 +1,5 @@
+// Based on https://github.com/romrz/Basic-2D-lighting
+
 uniform sampler2D texture;
 uniform vec2 resolution;
 uniform vec2 mouse;
@@ -38,7 +40,7 @@ void main() {
 
   // Applies the light to the pixel
   vec3 intensity = ambient + light;
-  vec3 final = pixel.rgb * intensity;
+  vec4 final = pixel * vec4(intensity.r, intensity.g, intensity.b, 1.0);
 
-  gl_FragColor = vec4(final, 1.0);
+  gl_FragColor = final;
 }
