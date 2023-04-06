@@ -78,7 +78,9 @@ impl App {
             match ev {
                 Event::Closed => self.should_quit = true,
                 Event::Resized { width, height } => {
-                    self.rt = RenderTexture::new(width, height).unwrap();
+                    self.rt =
+                        RenderTexture::new(width / self.scale as u32, height / self.scale as u32)
+                            .unwrap();
                     let view = View::from_rect(Rect::new(0., 0., width as f32, height as f32));
                     self.rw.set_view(&view);
                 }
