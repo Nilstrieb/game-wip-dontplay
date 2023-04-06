@@ -2,7 +2,7 @@ use sfml::window::Key;
 
 use crate::input::Input;
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct DebugState {
     pub panel: bool,
     pub freecam: bool,

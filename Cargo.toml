@@ -7,7 +7,9 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.70"
+derivative = "2.2.0"
 egui-sfml = "0.4.0"
+egui = "0.21.0"
 fnv = "1.0.7"
 hecs = "0.10.1"
 num-traits = "0.2.15"
@@ -24,3 +26,6 @@ git = "https://github.com/crumblingstatue/sfml-xt.git"
 
 [dependencies.gamedebug_core]
 git = "https://github.com/crumblingstatue/gamedebug_core.git"
+
+[dependencies.egui-inspect]
+git = "https://github.com/crumblingstatue/egui-inspect.git"

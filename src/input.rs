@@ -3,7 +3,7 @@ use sfml::window::{mouse, Event, Key};
 
 use crate::graphics::ScreenPos;
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct Input {
     down: FnvHashSet<Key>,
     pressed: FnvHashSet<Key>,

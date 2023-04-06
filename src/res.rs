@@ -4,6 +4,7 @@ use sfml::{
     SfBox,
 };
 
+#[derive(Debug)]
 pub struct Res {
     pub tile_atlas: SfBox<Texture>,
     pub surf_music: Music<'static>,

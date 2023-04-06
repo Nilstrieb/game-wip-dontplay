@@ -1,3 +1,4 @@
+use egui_inspect::derive::Inspect;
 use s2dc::{vec2, MobileEntity};
 
 use crate::{
@@ -5,7 +6,9 @@ use crate::{
     world::{TilePos, TilePosScalar},
 };
 
+#[derive(Debug, Inspect)]
 pub struct Player {
+    #[opaque]
     pub col_en: MobileEntity,
     pub vspeed: f32,
     pub hspeed: f32,

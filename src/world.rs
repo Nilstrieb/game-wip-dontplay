@@ -10,7 +10,7 @@ pub struct ChunkPos {
     pub y: ChunkPosScalar,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct World {
     /// The currently loaded chunks
     chunks: FnvHashMap<ChunkPos, Chunk>,
@@ -99,6 +99,7 @@ const CHUNK_N_TILES: usize = CHUNK_EXTENT as usize * CHUNK_EXTENT as usize;
 
 type ChunkTiles = [Tile; CHUNK_N_TILES];
 
+#[derive(Debug)]
 pub struct Chunk {
     tiles: ChunkTiles,
 }
@@ -135,7 +136,7 @@ impl Chunk {
 
 pub type TileId = u16;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Tile {
     /// Background wall behind entities
     pub bg: TileId,

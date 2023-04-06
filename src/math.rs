@@ -1,10 +1,11 @@
+use egui_inspect::derive::Inspect;
 use num_traits::Signed;
 
 use crate::world::{TilePos, TilePosScalar};
 
 pub type WorldPosScalar = u32;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug, Inspect)]
 pub struct WorldPos {
     pub x: WorldPosScalar,
     pub y: WorldPosScalar,

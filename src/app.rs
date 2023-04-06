@@ -1,6 +1,7 @@
 use std::fmt::{self};
 
 use anyhow::Context;
+use egui_inspect::UiExt;
 use egui_sfml::{egui, SfEgui};
 use gamedebug_core::{imm, imm_dbg};
 use sfml::{
@@ -330,20 +331,15 @@ fn debug_panel_ui(
                 game.player.vspeed,
                 px_per_frame_to_km_h(game.player.vspeed)
             ));
-            ui.label("Gravity");
-            ui.add(egui::DragValue::new(&mut game.gravity));
         }
-        ui.label("Tile to place");
-        ui.add(egui::DragValue::new(&mut game.tile_to_place));
         ui.label("Music volume");
         let mut vol = res.surf_music.volume();
         ui.add(egui::DragValue::new(&mut vol));
         res.surf_music.set_volume(vol);
         ui.separator();
-        ui.label("Ambient light");
-        ui.add(egui::DragValue::new(&mut game.ambient_light).speed(0.01));
         ui.label("Scale");
         ui.add(egui::DragValue::new(scale));
+        ui.inspect_mut(game, &mut 0);
         egui::ScrollArea::vertical().show(ui, |ui| {
             gamedebug_core::for_each_imm(|info| match info {
                 gamedebug_core::Info::Msg(msg) => {

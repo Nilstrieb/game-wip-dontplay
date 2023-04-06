@@ -1,5 +1,7 @@
 mod player;
 
+use derivative::Derivative;
+use egui_inspect::derive::Inspect;
 use sfml::{
     graphics::{
         glsl::{Vec2, Vec4},
@@ -20,20 +22,26 @@ use crate::{
 
 use self::player::Player;
 
+#[derive(Derivative, Inspect)]
+#[derivative(Debug)]
 pub struct GameState {
     pub camera_offset: WorldPos,
+    #[opaque]
     pub world: World,
     pub player: Player,
     pub gravity: f32,
     pub tile_to_place: TileId,
     pub current_biome: Biome,
     pub prev_biome: Biome,
+    #[derivative(Debug = "ignore")]
+    #[opaque]
     pub worldgen: Worldgen,
     pub ambient_light: f32,
+    #[opaque]
     pub clock: SfBox<Clock>,
 }
 
-#[derive(PartialEq, Eq, Clone, Copy)]
+#[derive(PartialEq, Eq, Clone, Copy, Debug, Inspect)]
 pub enum Biome {
     Surface,
     Underground,
