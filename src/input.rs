@@ -10,6 +10,7 @@ pub struct Input {
     pub lmb_down: bool,
     pub rmb_down: bool,
     pub mouse_down_loc: ScreenPos,
+    pub mid_pressed: bool,
 }
 
 impl Input {
@@ -33,6 +34,9 @@ impl Input {
                 if button == mouse::Button::Right {
                     self.rmb_down = true;
                 }
+                if button == mouse::Button::Middle {
+                    self.mid_pressed = true;
+                }
             }
             &Event::MouseButtonReleased { button, .. } => {
                 if button == mouse::Button::Left {
@@ -51,6 +55,7 @@ impl Input {
     }
     /// Pressed event should be cleared every frame
     pub fn clear_pressed(&mut self) {
+        self.mid_pressed = false;
         self.pressed.clear();
     }
     pub fn down(&self, key: Key) -> bool {

@@ -7,7 +7,8 @@ use gamedebug_core::{imm, imm_dbg};
 use sfml::{
     audio::SoundSource,
     graphics::{
-        Color, Rect, RenderTarget, RenderTexture, RenderWindow, Sprite, Transformable, View,
+        BlendMode, Color, Rect, RenderStates, RenderTarget, RenderTexture, RenderWindow, Sprite,
+        Transformable, View,
     },
     system::Vector2u,
     window::{Event, Key},
@@ -15,7 +16,7 @@ use sfml::{
 
 use crate::{
     debug::DebugState,
-    game::{for_each_tile_on_screen, Biome, GameState},
+    game::{for_each_tile_on_screen, Biome, GameState, LightSource},
     graphics::{self, ScreenPos, ScreenPosScalar},
     input::Input,
     math::{center_offset, px_per_frame_to_km_h, WorldPos, M_PER_PX, TILE_SIZE},
@@ -36,6 +37,8 @@ pub struct App {
     pub scale: u8,
     /// RenderTexture for rendering the game at its native resolution
     pub rt: RenderTexture,
+    /// Light map overlay, blended together with the non-lighted version of the scene
+    pub light_map: RenderTexture,
 }
 
 impl App {
@@ -49,6 +52,8 @@ impl App {
         let rw_size = rw.size();
         let rt =
             RenderTexture::new(rw_size.x, rw_size.y).context("Failed to create render texture")?;
+        let light_map = RenderTexture::new(rw_size.x, rw_size.y)
+            .context("Failed to create lightmap texture")?;
         Ok(Self {
             rw,
             should_quit: false,
@@ -59,6 +64,7 @@ impl App {
             debug: DebugState::default(),
             scale: 1,
             rt,
+            light_map,
         })
     }
 
@@ -198,6 +204,8 @@ impl App {
             } else {
                 t.bg = self.game.tile_to_place;
             }
+        } else if self.input.mid_pressed {
+            self.game.light_sources.push(LightSource { pos: wpos });
         }
         if self.game.camera_offset.y > 643_000 {
             self.game.current_biome = Biome::Underground;
@@ -244,10 +252,10 @@ impl App {
     }
 
     fn do_rendering(&mut self) {
+        self.game.light_pass(&mut self.light_map, &self.res);
         self.rt.clear(Color::rgb(55, 221, 231));
-        self.game.render_pre_step(&mut self.res, self.rt.size());
         self.game.draw_world(&mut self.rt, &mut self.res);
-        self.game.draw_entities(&mut self.rt, &mut self.res);
+        self.game.draw_entities(&mut self.rt);
         self.rt.display();
         let mut spr = Sprite::with_texture(self.rt.texture());
         spr.set_scale((self.scale as f32, self.scale as f32));
@@ -255,6 +263,12 @@ impl App {
         spr.set_position((vco.x as f32, vco.y as f32));
         self.rw.clear(Color::rgb(40, 10, 70));
         self.rw.draw(&spr);
+        // Draw light overlay with multiply blending
+        let mut rst = RenderStates::default();
+        rst.blend_mode = BlendMode::MULTIPLY;
+        self.light_map.display();
+        spr.set_texture(self.light_map.texture(), false);
+        self.rw.draw_with_renderstates(&spr, &rst);
         self.sf_egui
             .do_frame(|ctx| {
                 if self.debug.panel {

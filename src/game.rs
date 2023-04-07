@@ -1,12 +1,10 @@
 mod player;
 
 use derivative::Derivative;
-use egui_inspect::{derive::Inspect, inspect};
+use egui_inspect::derive::Inspect;
 use sfml::{
     graphics::{
-        glsl::{Vec2, Vec4},
-        Color, Rect, RectangleShape, RenderStates, RenderTarget, RenderTexture, Shape, Sprite,
-        Transformable,
+        Color, Rect, RectangleShape, RenderTarget, RenderTexture, Shape, Sprite, Transformable,
     },
     system::{Clock, Vector2u},
     SfBox,
@@ -38,7 +36,12 @@ pub struct GameState {
     pub ambient_light: f32,
     #[opaque]
     pub clock: SfBox<Clock>,
-    lighting_params: LightingData,
+    pub light_sources: Vec<LightSource>,
+}
+
+#[derive(Debug, Inspect)]
+pub struct LightSource {
+    pub pos: WorldPos,
 }
 
 #[derive(PartialEq, Eq, Clone, Copy, Debug, Inspect)]
@@ -48,32 +51,26 @@ pub enum Biome {
 }
 
 impl GameState {
-    pub(crate) fn draw_world(&mut self, rw: &mut RenderTexture, res: &mut Res) {
-        let mut rs = RenderStates::default();
-        res.lighting_shader.set_uniform_bool("has_texture", true);
-        rs.set_shader(Some(&res.lighting_shader));
+    pub(crate) fn draw_world(&mut self, rt: &mut RenderTexture, res: &mut Res) {
         let mut s = Sprite::with_texture(&res.tile_atlas);
-        for_each_tile_on_screen(self.camera_offset, rw.size(), |tp, sp| {
+        for_each_tile_on_screen(self.camera_offset, rt.size(), |tp, sp| {
             let tile = self.world.tile_at_mut(tp, &self.worldgen);
             s.set_position(sp.to_sf_vec());
             if tile.bg != Tile::EMPTY {
                 s.set_texture_rect(Rect::new((tile.bg - 1) as i32 * 32, 0, 32, 32));
-                rw.draw_with_renderstates(&s, &rs);
+                rt.draw(&s);
             }
             if tile.mid != Tile::EMPTY {
                 s.set_texture_rect(Rect::new((tile.mid - 1) as i32 * 32, 0, 32, 32));
-                rw.draw_with_renderstates(&s, &rs);
+                rt.draw(&s);
             }
             if tile.fg != Tile::EMPTY {
                 s.set_texture_rect(Rect::new((tile.fg - 1) as i32 * 32, 0, 32, 32));
-                rw.draw_with_renderstates(&s, &rs);
+                rt.draw(&s);
             }
         });
     }
-    pub fn draw_entities(&mut self, rw: &mut RenderTexture, res: &mut Res) {
-        let mut rend_st = RenderStates::default();
-        res.lighting_shader.set_uniform_bool("has_texture", false);
-        rend_st.set_shader(Some(&res.lighting_shader));
+    pub fn draw_entities(&mut self, rw: &mut RenderTexture) {
         let (x, y, w, h) = self.player.col_en.en.xywh();
         let mut rect_sh = RectangleShape::new();
         rect_sh.set_position((
@@ -81,7 +78,7 @@ impl GameState {
             (y - self.camera_offset.y as i32) as f32,
         ));
         rect_sh.set_size((w as f32, h as f32));
-        rw.draw_with_renderstates(&rect_sh, &rend_st);
+        rw.draw(&rect_sh);
         rect_sh.set_size((2., 2.));
         rect_sh.set_fill_color(Color::RED);
         rect_sh.set_position((
@@ -90,56 +87,21 @@ impl GameState {
         ));
         rw.draw(&rect_sh);
     }
-    pub fn render_pre_step(&mut self, res: &mut Res, rt_size: Vector2u) {
-        res.lighting_shader.set_uniform_current_texture("texture");
-        res.lighting_shader
-            .set_uniform_float("time", self.clock.elapsed_time().as_seconds() * 10.0);
-        res.lighting_shader.set_uniform_vec2(
-            "mouse",
-            Vec2::new(rt_size.x as f32 / 2.0, rt_size.y as f32 / 2.0),
-        );
-        res.lighting_shader
-            .set_uniform_vec2("resolution", Vec2::new(rt_size.x as f32, rt_size.y as f32));
-        res.lighting_shader
-            .set_uniform_vec4("lightData", self.lighting_params.light);
-        res.lighting_shader
-            .set_uniform_vec4("ambientData", self.lighting_params.ambient);
-        res.lighting_shader
-            .set_uniform_float("lightSize", self.lighting_params.size);
-    }
-}
 
-#[derive(Debug, Inspect)]
-struct LightingData {
-    #[inspect_with(inspect_vec4)]
-    light: Vec4,
-    #[inspect_with(inspect_vec4)]
-    ambient: Vec4,
-    size: f32,
-}
-
-fn inspect_vec4(val: &mut Vec4, ui: &mut egui::Ui, _id: u64) {
-    inspect! {
-        ui, val.x, val.y, val.z, val.w
-    }
-}
-
-impl Default for LightingData {
-    fn default() -> Self {
-        Self {
-            light: Vec4 {
-                x: 1.0,
-                y: 0.8,
-                z: 0.2,
-                w: 2.0,
-            },
-            ambient: Vec4 {
-                x: 0.3,
-                y: 0.3,
-                z: 0.8,
-                w: 0.3,
-            },
-            size: 0.3,
+    pub(crate) fn light_pass(&mut self, lightmap: &mut RenderTexture, res: &Res) {
+        // Clear light map
+        // You can clear to a brighter color to increase ambient light level
+        lightmap.clear(Color::rgba(0, 0, 0, 255));
+        for ls in &self.light_sources {
+            let (x, y) = (
+                ls.pos.x as i32 - self.camera_offset.x as i32,
+                ls.pos.y as i32 - self.camera_offset.y as i32,
+            );
+            let mut s = Sprite::with_texture(&res.light_texture);
+            s.set_scale((3.0, 3.0));
+            s.set_origin((32., 32.));
+            s.set_position((x as f32, y as f32));
+            lightmap.draw(&s);
         }
     }
 }
@@ -180,7 +142,7 @@ impl Default for GameState {
             worldgen: Worldgen::default(),
             ambient_light: 1.0,
             clock: Clock::start(),
-            lighting_params: Default::default(),
+            light_sources: Vec::new(),
         }
     }
 }
