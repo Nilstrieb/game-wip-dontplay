@@ -98,8 +98,8 @@ impl GameState {
                 ls.pos.y as i32 - self.camera_offset.y as i32,
             );
             let mut s = Sprite::with_texture(&res.light_texture);
-            s.set_scale((3.0, 3.0));
-            s.set_origin((32., 32.));
+            s.set_scale((4., 4.));
+            s.set_origin((128., 128.));
             s.set_position((x as f32, y as f32));
             lightmap.draw(&s);
         }
