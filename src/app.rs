@@ -1,8 +1,5 @@
-use std::fmt::{self};
-
 use anyhow::Context;
-use egui_inspect::inspect;
-use egui_sfml::{egui, SfEgui};
+use egui_sfml::SfEgui;
 use gamedebug_core::{imm, imm_dbg};
 use sfml::{
     audio::SoundSource,
@@ -15,13 +12,13 @@ use sfml::{
 };
 
 use crate::{
-    debug::DebugState,
-    game::{for_each_tile_on_screen, Biome, GameState, LightSource},
+    debug::{self, DebugState},
+    game::{for_each_tile_on_screen, Biome, GameState},
     graphics::{self, ScreenPos, ScreenPosScalar},
     input::Input,
-    math::{center_offset, px_per_frame_to_km_h, WorldPos, M_PER_PX, TILE_SIZE},
+    math::{center_offset, TILE_SIZE},
     res::Res,
-    world::{Tile, TilePosScalar, CHUNK_EXTENT},
+    world::{TilePosScalar, CHUNK_EXTENT},
 };
 
 /// Application level state (includes game and ui state, etc.)
@@ -76,6 +73,7 @@ impl App {
             self.input.clear_pressed();
             gamedebug_core::inc_frame();
         }
+        self.game.tile_db.try_save();
     }
 
     fn do_event_handling(&mut self) {
@@ -132,7 +130,7 @@ impl App {
             let mut on_screen_tile_ents = Vec::new();
             for_each_tile_on_screen(self.game.camera_offset, self.rt.size(), |tp, _sp| {
                 let tid = self.game.world.tile_at_mut(tp, &self.game.worldgen).mid;
-                if tid == Tile::EMPTY {
+                if !self.game.tile_db[tid].solid {
                     return;
                 }
                 let tsize = TILE_SIZE as i32;
@@ -186,7 +184,12 @@ impl App {
         wpos.x = wpos.x.saturating_add_signed(loc.x.into());
         wpos.y = wpos.y.saturating_add_signed(loc.y.into());
         let mouse_tpos = wpos.tile_pos();
-        imm!("Mouse @ tile {}, {}", mouse_tpos.x, mouse_tpos.y);
+        imm!(
+            "Mouse @ tile {}, {} ({:?})",
+            mouse_tpos.x,
+            mouse_tpos.y,
+            self.game.world.tile_at_mut(mouse_tpos, &self.game.worldgen)
+        );
         imm!(
             "@ chunk {}, {}",
             mouse_tpos.x / CHUNK_EXTENT as TilePosScalar,
@@ -207,8 +210,6 @@ impl App {
             } else {
                 t.bg = self.game.tile_to_place;
             }
-        } else if self.input.mid_pressed {
-            self.game.light_sources.push(LightSource { pos: wpos });
         }
         if self.game.camera_offset.y > 643_000 {
             self.game.current_biome = Biome::Underground;
@@ -274,15 +275,13 @@ impl App {
         self.rw.draw_with_renderstates(&spr, &rst);
         self.sf_egui
             .do_frame(|ctx| {
-                if self.debug.panel {
-                    debug_panel_ui(
-                        &mut self.debug,
-                        &mut self.game,
-                        ctx,
-                        &mut self.res,
-                        &mut self.scale,
-                    );
-                }
+                debug::do_debug_ui(
+                    ctx,
+                    &mut self.debug,
+                    &mut self.game,
+                    &mut self.res,
+                    &mut self.scale,
+                );
             })
             .unwrap();
         self.sf_egui.draw(&mut self.rw, None);
@@ -298,96 +297,5 @@ fn viewport_center_offset(rw_size: Vector2u, rt_size: Vector2u, scale: u8) -> Sc
     ScreenPos {
         x: x as ScreenPosScalar,
         y: y as ScreenPosScalar,
-    }
-}
-
-fn debug_panel_ui(
-    debug: &mut DebugState,
-    mut game: &mut GameState,
-    ctx: &egui::Context,
-    res: &mut Res,
-    mut scale: &mut u8,
-) {
-    egui::Window::new("Debug (F12)").show(ctx, |ui| {
-        if debug.freecam {
-            ui.label("Cam x");
-            ui.add(egui::DragValue::new(&mut game.camera_offset.x));
-            ui.label("Cam y");
-            ui.add(egui::DragValue::new(&mut game.camera_offset.y));
-            let co = game.camera_offset;
-            ui.label(format!(
-                "Cam Depth: {}",
-                LengthDisp(co.y as f32 - WorldPos::SURFACE as f32)
-            ));
-            ui.label(format!(
-                "Cam offset from center: {}",
-                LengthDisp(co.x as f32 - WorldPos::CENTER as f32)
-            ));
-        } else {
-            let tp = game.player.center_tp();
-            imm_dbg!(tp);
-            ui.label(format!(
-                "Player Depth: {}",
-                LengthDisp(game.player.feet_y() as f32 - WorldPos::SURFACE as f32)
-            ));
-            ui.label(format!(
-                "Player offset from center: {}",
-                LengthDisp(game.player.col_en.en.pos.x as f32 - WorldPos::CENTER as f32)
-            ));
-            ui.label(format!(
-                "Hspeed: {} ({} km/h)",
-                game.player.hspeed,
-                px_per_frame_to_km_h(game.player.hspeed)
-            ));
-            ui.label(format!(
-                "Vspeed: {} ({} km/h)",
-                game.player.vspeed,
-                px_per_frame_to_km_h(game.player.vspeed)
-            ));
-        }
-        ui.label("Music volume");
-        let mut vol = res.surf_music.volume();
-        ui.add(egui::DragValue::new(&mut vol));
-        res.surf_music.set_volume(vol);
-        ui.separator();
-        egui::ScrollArea::both()
-            .id_source("insp_scroll")
-            .max_height(240.)
-            .max_width(340.0)
-            .show(ui, |ui| {
-                inspect! {
-                    ui,
-                    scale, game
-                }
-            });
-        ui.separator();
-        egui::ScrollArea::vertical().show(ui, |ui| {
-            gamedebug_core::for_each_imm(|info| match info {
-                gamedebug_core::Info::Msg(msg) => {
-                    ui.label(msg);
-                }
-                gamedebug_core::Info::Rect(_, _, _, _, _) => todo!(),
-            });
-        });
-        gamedebug_core::clear_immediates();
-    });
-}
-
-struct LengthDisp(f32);
-
-impl fmt::Display for LengthDisp {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let meters = self.0 * M_PER_PX;
-        if meters.abs() > 1000. {
-            let km = if meters.is_sign_negative() {
-                (meters / 1000.).ceil()
-            } else {
-                (meters / 1000.).floor()
-            };
-            let m = meters % 1000.;
-            write!(f, "{km} km, {m} m")
-        } else {
-            write!(f, "{meters} m")
-        }
     }
 }

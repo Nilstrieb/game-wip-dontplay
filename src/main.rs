@@ -5,6 +5,8 @@ mod graphics;
 mod input;
 mod math;
 mod res;
+mod stringfmt;
+mod tiles;
 mod world;
 mod worldgen;
 
@@ -18,6 +20,9 @@ fn try_main() -> anyhow::Result<()> {
 }
 
 fn main() {
+    env_logger::builder()
+        .filter_level(log::LevelFilter::Info)
+        .init();
     if let Err(e) = try_main() {
         rfd::MessageDialog::new()
             .set_title("Fatal error")

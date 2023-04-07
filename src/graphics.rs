@@ -1,3 +1,4 @@
+use egui_inspect::derive::Inspect;
 use sfml::{
     graphics::RenderWindow,
     system::Vector2f,
@@ -23,7 +24,7 @@ impl ScreenRes {
 }
 
 // We assume this game won't be played above 32767*32767 resolution
-#[derive(Default, Clone, Copy, Debug)]
+#[derive(Default, Clone, Copy, Debug, Inspect)]
 pub struct ScreenPos {
     pub x: ScreenPosScalar,
     pub y: ScreenPosScalar,

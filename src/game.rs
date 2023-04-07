@@ -3,17 +3,16 @@ mod player;
 use derivative::Derivative;
 use egui_inspect::derive::Inspect;
 use sfml::{
-    graphics::{
-        Color, Rect, RectangleShape, RenderTarget, RenderTexture, Shape, Sprite, Transformable,
-    },
+    graphics::{Color, RectangleShape, RenderTarget, RenderTexture, Shape, Sprite, Transformable},
     system::{Clock, Vector2u},
     SfBox,
 };
 
 use crate::{
     graphics::{ScreenPos, ScreenPosScalar},
-    math::{wp_to_tp, WorldPos},
+    math::{wp_to_tp, WorldPos, TILE_SIZE},
     res::Res,
+    tiles::TileDb,
     world::{Tile, TileId, TilePos, World},
     worldgen::Worldgen,
 };
@@ -37,11 +36,12 @@ pub struct GameState {
     #[opaque]
     pub clock: SfBox<Clock>,
     pub light_sources: Vec<LightSource>,
+    pub tile_db: TileDb,
 }
 
 #[derive(Debug, Inspect)]
 pub struct LightSource {
-    pub pos: WorldPos,
+    pub pos: ScreenPos,
 }
 
 #[derive(PartialEq, Eq, Clone, Copy, Debug, Inspect)]
@@ -52,20 +52,27 @@ pub enum Biome {
 
 impl GameState {
     pub(crate) fn draw_world(&mut self, rt: &mut RenderTexture, res: &mut Res) {
+        self.light_sources.clear();
         let mut s = Sprite::with_texture(&res.tile_atlas);
         for_each_tile_on_screen(self.camera_offset, rt.size(), |tp, sp| {
             let tile = self.world.tile_at_mut(tp, &self.worldgen);
             s.set_position(sp.to_sf_vec());
             if tile.bg != Tile::EMPTY {
-                s.set_texture_rect(Rect::new((tile.bg - 1) as i32 * 32, 0, 32, 32));
+                s.set_texture_rect(self.tile_db[tile.bg].atlas_offset.to_sf_rect());
                 rt.draw(&s);
             }
             if tile.mid != Tile::EMPTY {
-                s.set_texture_rect(Rect::new((tile.mid - 1) as i32 * 32, 0, 32, 32));
+                s.set_texture_rect(self.tile_db[tile.mid].atlas_offset.to_sf_rect());
+                if self.tile_db[tile.mid].emits_light {
+                    let mut pos = sp;
+                    pos.x += (TILE_SIZE / 2) as i16;
+                    pos.y += (TILE_SIZE / 2) as i16;
+                    self.light_sources.push(LightSource { pos: sp });
+                }
                 rt.draw(&s);
             }
             if tile.fg != Tile::EMPTY {
-                s.set_texture_rect(Rect::new((tile.fg - 1) as i32 * 32, 0, 32, 32));
+                s.set_texture_rect(self.tile_db[tile.fg].atlas_offset.to_sf_rect());
                 rt.draw(&s);
             }
         });
@@ -102,14 +109,10 @@ impl GameState {
             255,
         ));
         for ls in &self.light_sources {
-            let (x, y) = (
-                ls.pos.x as i32 - self.camera_offset.x as i32,
-                ls.pos.y as i32 - self.camera_offset.y as i32,
-            );
             let mut s = Sprite::with_texture(&res.light_texture);
             s.set_scale((4., 4.));
             s.set_origin((128., 128.));
-            s.set_position((x as f32, y as f32));
+            s.set_position((ls.pos.x.into(), ls.pos.y.into()));
             lightmap.draw(&s);
         }
     }
@@ -152,6 +155,7 @@ impl Default for GameState {
             ambient_light: 0,
             clock: Clock::start(),
             light_sources: Vec::new(),
+            tile_db: TileDb::load_or_default(),
         }
     }
 }

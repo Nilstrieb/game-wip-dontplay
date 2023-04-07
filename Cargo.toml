@@ -17,6 +17,10 @@ rand = "0.8.5"
 rfd = "0.11.3"
 sfml = "0.20.0"
 worldgen = "0.5.3"
+rmp-serde = "1.1.1"
+serde = { version = "1.0.159", features = ["derive"] }
+log = "0.4.17"
+env_logger = "0.10.0"
 
 [dependencies.s2dc]
 git = "https://github.com/crumblingstatue/s2dc.git"

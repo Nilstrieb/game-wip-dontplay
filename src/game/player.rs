@@ -34,6 +34,7 @@ impl Player {
             jumps_left: 0,
         }
     }
+    #[allow(dead_code)]
     pub fn center_tp(&self) -> TilePos {
         TilePos {
             x: (self.col_en.en.pos.x / TILE_SIZE as i32) as TilePosScalar,
