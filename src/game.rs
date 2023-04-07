@@ -33,7 +33,7 @@ pub struct GameState {
     #[derivative(Debug = "ignore")]
     #[opaque]
     pub worldgen: Worldgen,
-    pub ambient_light: f32,
+    pub ambient_light: u8,
     #[opaque]
     pub clock: SfBox<Clock>,
     pub light_sources: Vec<LightSource>,
@@ -89,9 +89,18 @@ impl GameState {
     }
 
     pub(crate) fn light_pass(&mut self, lightmap: &mut RenderTexture, res: &Res) {
+        let how_much_below_surface = self.camera_offset.y.saturating_sub(WorldPos::SURFACE);
+        let light_dropoff = (how_much_below_surface / 8).min(255) as u8;
+        let daylight = 255u8;
+        self.ambient_light = daylight.saturating_sub(light_dropoff);
         // Clear light map
         // You can clear to a brighter color to increase ambient light level
-        lightmap.clear(Color::rgba(0, 0, 0, 255));
+        lightmap.clear(Color::rgba(
+            self.ambient_light,
+            self.ambient_light,
+            self.ambient_light,
+            255,
+        ));
         for ls in &self.light_sources {
             let (x, y) = (
                 ls.pos.x as i32 - self.camera_offset.x as i32,
@@ -140,7 +149,7 @@ impl Default for GameState {
             current_biome: Biome::Surface,
             prev_biome: Biome::Surface,
             worldgen: Worldgen::default(),
-            ambient_light: 1.0,
+            ambient_light: 0,
             clock: Clock::start(),
             light_sources: Vec::new(),
         }
