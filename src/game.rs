@@ -155,7 +155,7 @@ impl Default for GameState {
             camera_offset: spawn_point,
             world: Default::default(),
             player: Player::new_at(spawn_point),
-            gravity: 0.7,
+            gravity: 0.55,
             tile_to_place: 1,
             current_biome: Biome::Surface,
             prev_biome: Biome::Surface,
