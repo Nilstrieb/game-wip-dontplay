@@ -166,3 +166,5 @@ impl Tile {
     pub const EMPTY: TileId = 0;
     pub const UNBREAKANIUM: TileId = 5;
 }
+
+pub const REGION_CHUNK_EXTENT: u8 = 8;

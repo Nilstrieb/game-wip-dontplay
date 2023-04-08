@@ -18,7 +18,7 @@ use crate::{
     input::Input,
     math::{center_offset, TILE_SIZE},
     res::Res,
-    world::{TPosSc, CHUNK_EXTENT},
+    world::{ChkPosSc, TPosSc, CHUNK_EXTENT, REGION_CHUNK_EXTENT},
 };
 
 /// Application level state (includes game and ui state, etc.)
@@ -215,10 +215,13 @@ impl App {
             mouse_tpos.y,
             self.game.world.tile_at_mut(mouse_tpos, &self.game.worldgen)
         );
+        let m_chk_x = (mouse_tpos.x / CHUNK_EXTENT as TPosSc) as ChkPosSc;
+        let m_chk_y = (mouse_tpos.y / CHUNK_EXTENT as TPosSc) as ChkPosSc;
+        imm!("@ chunk {m_chk_x}, {m_chk_y}");
         imm!(
-            "@ chunk {}, {}",
-            mouse_tpos.x / CHUNK_EXTENT as TPosSc,
-            mouse_tpos.y / CHUNK_EXTENT as TPosSc
+            "@ region {}, {}",
+            m_chk_x / REGION_CHUNK_EXTENT as ChkPosSc,
+            m_chk_y / REGION_CHUNK_EXTENT as ChkPosSc
         );
         if self.debug.freecam && self.input.pressed(Key::P) {
             self.game.world.player.col_en.en.pos.x = wpos.x as i32;
