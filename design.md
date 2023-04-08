@@ -57,6 +57,16 @@ Multiplayer adds a lot of complexity, so I'm going to develop the prototype of t
 any multiplayer support.
 But if people like the general idea, they can help create a multiplayer version eventually.
 
+# Crafting
+
+- You need a workstation to be able to craft anything.
+  This incentivizes building bases and retreating to them, instead of the "nomad"
+  lifetyle many games of this kind allow.
+
+- Most stations don't have inventory items that can be pre-crafted and placed.
+  Instead, they have to be constructed on the spot, taking construction time.
+  This discourages building makeshift crafting areas in the middle of nowhere.
+
 # Supported platforms
 - Windows
 - Linux
