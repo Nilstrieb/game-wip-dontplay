@@ -57,6 +57,7 @@ pub struct ChunkLocalTilePos {
     pub y: ChkLocalTPosSc,
 }
 
+/// Chunk-local tile position scalar. Supports up to 256 tiles per chunk.
 type ChkLocalTPosSc = u8;
 
 impl TilePos {
