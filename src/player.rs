@@ -3,7 +3,7 @@ use s2dc::{vec2, MobileEntity};
 
 use crate::{
     math::{WorldPos, TILE_SIZE},
-    world::{TilePos, TilePosScalar},
+    world::{TPosSc, TilePos},
 };
 
 #[derive(Debug, Inspect)]
@@ -40,8 +40,8 @@ impl Player {
     #[allow(dead_code)]
     pub fn center_tp(&self) -> TilePos {
         TilePos {
-            x: (self.col_en.en.pos.x / TILE_SIZE as i32) as TilePosScalar,
-            y: (self.col_en.en.pos.y / TILE_SIZE as i32) as TilePosScalar,
+            x: (self.col_en.en.pos.x / TILE_SIZE as i32) as TPosSc,
+            y: (self.col_en.en.pos.y / TILE_SIZE as i32) as TPosSc,
         }
     }
     pub fn can_jump(&self) -> bool {

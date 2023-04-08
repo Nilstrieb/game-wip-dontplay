@@ -1,14 +1,14 @@
 use egui_inspect::derive::Inspect;
 use num_traits::{Num, Signed};
 
-use crate::world::{TilePos, TilePosScalar};
+use crate::world::{TPosSc, TilePos};
 
-pub type WorldPosScalar = u32;
+pub type WPosSc = u32;
 
 #[derive(Clone, Copy, Debug, Inspect)]
 pub struct WorldPos {
-    pub x: WorldPosScalar,
-    pub y: WorldPosScalar,
+    pub x: WPosSc,
+    pub y: WPosSc,
 }
 
 /// Tile size in pixels
@@ -29,7 +29,7 @@ pub fn px_per_frame_to_km_h(px_per_frame: f32) -> f32 {
 }
 
 /// World extent in tiles. Roughly 50km*50km.
-pub const WORLD_EXTENT: TilePosScalar = 100_000;
+pub const WORLD_EXTENT: TPosSc = 100_000;
 
 impl WorldPos {
     pub fn tile_pos(&self) -> TilePos {
@@ -39,18 +39,18 @@ impl WorldPos {
         }
     }
     /// Horizontal center of the world
-    pub const CENTER: WorldPosScalar = (WORLD_EXTENT / 2) * TILE_SIZE as WorldPosScalar;
+    pub const CENTER: WPosSc = (WORLD_EXTENT / 2) * TILE_SIZE as WPosSc;
     /// Vertical surface level.
     /// You can build 10 km high.
-    pub const SURFACE: WorldPosScalar = 20_000 * TILE_SIZE as WorldPosScalar;
+    pub const SURFACE: WPosSc = 20_000 * TILE_SIZE as WPosSc;
     pub const SURFACE_CENTER: Self = Self {
         x: Self::CENTER,
         y: Self::SURFACE,
     };
 }
 
-pub fn wp_to_tp(wp: WorldPosScalar) -> TilePosScalar {
-    (wp / TILE_SIZE as WorldPosScalar) as TilePosScalar
+pub fn wp_to_tp(wp: WPosSc) -> TPosSc {
+    (wp / TILE_SIZE as WPosSc) as TPosSc
 }
 
 // Get the offset required to center an object of `xw` width inside an object of `yw` width.

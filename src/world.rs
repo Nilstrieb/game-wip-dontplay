@@ -3,12 +3,12 @@ use fnv::FnvHashMap;
 
 use crate::{math::WorldPos, player::Player, worldgen::Worldgen};
 
-pub type ChunkPosScalar = u16;
+pub type ChkPosSc = u16;
 
 #[derive(Hash, PartialEq, Eq, Debug, Clone, Copy, Inspect)]
 pub struct ChunkPos {
-    pub x: ChunkPosScalar,
-    pub y: ChunkPosScalar,
+    pub x: ChkPosSc,
+    pub y: ChkPosSc,
 }
 
 #[derive(Debug, Inspect)]
@@ -47,17 +47,17 @@ impl World {
 
 #[derive(Debug, Clone, Copy)]
 pub struct TilePos {
-    pub x: TilePosScalar,
-    pub y: TilePosScalar,
+    pub x: TPosSc,
+    pub y: TPosSc,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct ChunkLocalTilePos {
-    pub x: ChunkLocalTilePosScalar,
-    pub y: ChunkLocalTilePosScalar,
+    pub x: ChkLocalTPosSc,
+    pub y: ChkLocalTPosSc,
 }
 
-type ChunkLocalTilePosScalar = u8;
+type ChkLocalTPosSc = u8;
 
 impl TilePos {
     pub fn to_chunk_and_local(self) -> (ChunkPos, ChunkLocalTilePos) {
@@ -73,8 +73,8 @@ impl TilePos {
     }
 }
 
-fn chk_pos(tile: TilePosScalar) -> ChunkPosScalar {
-    (tile / CHUNK_EXTENT as TilePosScalar) as ChunkPosScalar
+fn chk_pos(tile: TPosSc) -> ChkPosSc {
+    (tile / CHUNK_EXTENT as TPosSc) as ChkPosSc
 }
 
 #[test]
@@ -85,8 +85,8 @@ fn test_chk_pos() {
     assert_eq!(chk_pos(128), 1);
 }
 
-fn chunk_local(global: TilePosScalar) -> ChunkLocalTilePosScalar {
-    (global % CHUNK_EXTENT as TilePosScalar) as ChunkLocalTilePosScalar
+fn chunk_local(global: TPosSc) -> ChkLocalTPosSc {
+    (global % CHUNK_EXTENT as TPosSc) as ChkLocalTPosSc
 }
 
 #[test]
@@ -107,7 +107,7 @@ fn test_to_chunk_and_local() {
 }
 
 // Need to support at least 4 million tiles long
-pub type TilePosScalar = u32;
+pub type TPosSc = u32;
 
 pub const CHUNK_EXTENT: u16 = 128;
 const CHUNK_N_TILES: usize = CHUNK_EXTENT as usize * CHUNK_EXTENT as usize;

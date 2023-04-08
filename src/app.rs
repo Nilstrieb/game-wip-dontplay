@@ -18,7 +18,7 @@ use crate::{
     input::Input,
     math::{center_offset, TILE_SIZE},
     res::Res,
-    world::{TilePosScalar, CHUNK_EXTENT},
+    world::{TPosSc, CHUNK_EXTENT},
 };
 
 /// Application level state (includes game and ui state, etc.)
@@ -217,8 +217,8 @@ impl App {
         );
         imm!(
             "@ chunk {}, {}",
-            mouse_tpos.x / CHUNK_EXTENT as TilePosScalar,
-            mouse_tpos.y / CHUNK_EXTENT as TilePosScalar
+            mouse_tpos.x / CHUNK_EXTENT as TPosSc,
+            mouse_tpos.y / CHUNK_EXTENT as TPosSc
         );
         if self.debug.freecam && self.input.pressed(Key::P) {
             self.game.world.player.col_en.en.pos.x = wpos.x as i32;
