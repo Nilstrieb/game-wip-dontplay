@@ -11,3 +11,5 @@ Various random ideas that aren't (yet) part of the design
 
 - No world hopping.
   Characters are worlds are linked together, like in Minecraft.
+
+- No respawn after quit&save. Player character continues where it left off.
