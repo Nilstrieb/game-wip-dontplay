@@ -1,5 +1,5 @@
 use egui_inspect::derive::Inspect;
-use num_traits::Signed;
+use num_traits::{Num, Signed};
 
 use crate::world::{TilePos, TilePosScalar};
 
@@ -68,6 +68,29 @@ pub fn wp_to_tp(wp: WorldPosScalar) -> TilePosScalar {
 pub fn center_offset<N: From<u8> + Copy + Signed>(xw: N, yw: N) -> N {
     let diff = yw - xw;
     diff / N::from(2)
+}
+
+/// A smooth triangle-wave like transform of the input value, oscillating between 0 and the ceiling.
+pub fn smoothwave<T: Num + From<u8> + PartialOrd + Copy>(input: T, max: T) -> T {
+    let period = max * T::from(2);
+    let value = input % period;
+    if value < max {
+        value
+    } else {
+        period - value
+    }
+}
+
+#[test]
+fn test_smooth_wave() {
+    assert_eq!(smoothwave(0, 100), 0);
+    assert_eq!(smoothwave(50, 100), 50);
+    assert_eq!(smoothwave(125, 100), 75);
+    assert_eq!(smoothwave(150, 100), 50);
+    assert_eq!(smoothwave(175, 100), 25);
+    assert_eq!(smoothwave(199, 100), 1);
+    assert_eq!(smoothwave(200, 100), 0);
+    assert_eq!(smoothwave(201, 100), 1);
 }
 
 #[test]

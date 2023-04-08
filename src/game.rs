@@ -10,7 +10,7 @@ use sfml::{
 
 use crate::{
     graphics::{ScreenSc, ScreenVec},
-    math::{wp_to_tp, WorldPos},
+    math::{smoothwave, wp_to_tp, WorldPos},
     res::Res,
     tiles::TileDb,
     world::{Tile, TileId, TilePos, World},
@@ -37,6 +37,9 @@ pub struct GameState {
     pub clock: SfBox<Clock>,
     pub light_sources: Vec<LightSource>,
     pub tile_db: TileDb,
+    /// This is the number of ticks since the world has started.
+    /// In other words, the age of the world.
+    pub ticks: u64,
 }
 
 #[derive(Debug, Inspect)]
@@ -51,6 +54,9 @@ pub enum Biome {
 }
 
 impl GameState {
+    pub fn update(&mut self) {
+        self.ticks += 1;
+    }
     pub(crate) fn draw_world(&mut self, rt: &mut RenderTexture, res: &mut Res) {
         self.light_sources.clear();
         let mut s = Sprite::with_texture(&res.tile_atlas);
@@ -111,7 +117,8 @@ impl GameState {
         ));
         for ls in &self.light_sources {
             let mut s = Sprite::with_texture(&res.light_texture);
-            s.set_scale((4., 4.));
+            let flicker = smoothwave(self.ticks, 40) as f32 / 64.0;
+            s.set_scale((4. + flicker, 4. + flicker));
             s.set_origin((128., 128.));
             s.set_position((ls.pos.x.into(), ls.pos.y.into()));
             lightmap.draw(&s);
@@ -157,6 +164,7 @@ impl Default for GameState {
             clock: Clock::start(),
             light_sources: Vec::new(),
             tile_db: TileDb::load_or_default(),
+            ticks: 0,
         }
     }
 }

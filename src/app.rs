@@ -231,6 +231,7 @@ impl App {
                 }
             }
         }
+        self.game.update();
     }
 
     fn do_freecam(&mut self) {
