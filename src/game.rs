@@ -1,5 +1,3 @@
-mod player;
-
 use derivative::Derivative;
 use egui_inspect::derive::Inspect;
 use sfml::{
@@ -16,14 +14,11 @@ use crate::{
     worldgen::Worldgen,
 };
 
-use self::player::Player;
-
 #[derive(Derivative, Inspect)]
 #[derivative(Debug)]
 pub struct GameState {
     pub camera_offset: WorldPos,
     pub world: World,
-    pub player: Player,
     pub gravity: f32,
     pub tile_to_place: TileId,
     pub current_biome: Biome,
@@ -79,7 +74,7 @@ impl GameState {
         });
     }
     pub fn draw_entities(&mut self, rw: &mut RenderTexture) {
-        let (x, y, w, h) = self.player.col_en.en.xywh();
+        let (x, y, w, h) = self.world.player.col_en.en.xywh();
         let mut rect_sh = RectangleShape::new();
         rect_sh.set_position((
             (x - self.camera_offset.x as i32) as f32,
@@ -90,8 +85,8 @@ impl GameState {
         rect_sh.set_size((2., 2.));
         rect_sh.set_fill_color(Color::RED);
         rect_sh.set_position((
-            (self.player.col_en.en.pos.x - self.camera_offset.x as i32) as f32,
-            (self.player.col_en.en.pos.y - self.camera_offset.y as i32) as f32,
+            (self.world.player.col_en.en.pos.x - self.camera_offset.x as i32) as f32,
+            (self.world.player.col_en.en.pos.y - self.camera_offset.y as i32) as f32,
         ));
         rw.draw(&rect_sh);
     }
@@ -147,8 +142,7 @@ impl Default for GameState {
         spawn_point.y -= 1104;
         Self {
             camera_offset: spawn_point,
-            world: Default::default(),
-            player: Player::new_at(spawn_point),
+            world: World::new(spawn_point),
             gravity: 0.55,
             tile_to_place: 1,
             current_biome: Biome::Surface,

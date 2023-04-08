@@ -53,21 +53,21 @@ fn debug_panel_ui(
         } else {
             ui.label(format!(
                 "Player Depth: {}",
-                LengthDisp(game.player.feet_y() as f32 - WorldPos::SURFACE as f32)
+                LengthDisp(game.world.player.feet_y() as f32 - WorldPos::SURFACE as f32)
             ));
             ui.label(format!(
                 "Player offset from center: {}",
-                LengthDisp(game.player.col_en.en.pos.x as f32 - WorldPos::CENTER as f32)
+                LengthDisp(game.world.player.col_en.en.pos.x as f32 - WorldPos::CENTER as f32)
             ));
             ui.label(format!(
                 "Hspeed: {} ({} km/h)",
-                game.player.hspeed,
-                px_per_frame_to_km_h(game.player.hspeed)
+                game.world.player.hspeed,
+                px_per_frame_to_km_h(game.world.player.hspeed)
             ));
             ui.label(format!(
                 "Vspeed: {} ({} km/h)",
-                game.player.vspeed,
-                px_per_frame_to_km_h(game.player.vspeed)
+                game.world.player.vspeed,
+                px_per_frame_to_km_h(game.world.player.vspeed)
             ));
         }
         ui.label("Music volume");

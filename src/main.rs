@@ -4,6 +4,7 @@ mod game;
 mod graphics;
 mod input;
 mod math;
+mod player;
 mod res;
 mod stringfmt;
 mod tiles;

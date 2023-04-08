@@ -1,7 +1,7 @@
 use egui_inspect::derive::Inspect;
 use fnv::FnvHashMap;
 
-use crate::worldgen::Worldgen;
+use crate::{math::WorldPos, player::Player, worldgen::Worldgen};
 
 pub type ChunkPosScalar = u16;
 
@@ -11,13 +11,24 @@ pub struct ChunkPos {
     pub y: ChunkPosScalar,
 }
 
-#[derive(Default, Debug, Inspect)]
+#[derive(Debug, Inspect)]
 pub struct World {
     /// The currently loaded chunks
     chunks: FnvHashMap<ChunkPos, Chunk>,
     /// This is the number of ticks since the world has started.
     /// In other words, the age of the world.
     pub ticks: u64,
+    pub player: Player,
+}
+
+impl World {
+    pub fn new(spawn_point: WorldPos) -> Self {
+        Self {
+            chunks: Default::default(),
+            ticks: Default::default(),
+            player: Player::new_at(spawn_point),
+        }
+    }
 }
 
 impl World {

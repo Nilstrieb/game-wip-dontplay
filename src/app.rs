@@ -110,21 +110,22 @@ impl App {
             } else {
                 3.0
             };
-            self.game.player.hspeed = 0.;
+            self.game.world.player.hspeed = 0.;
             if self.input.down(Key::A) {
-                self.game.player.hspeed = -spd;
+                self.game.world.player.hspeed = -spd;
             }
             if self.input.down(Key::D) {
-                self.game.player.hspeed = spd;
+                self.game.world.player.hspeed = spd;
             }
-            if self.input.down(Key::W) && self.game.player.can_jump() {
-                self.game.player.vspeed = -10.0;
-                self.game.player.jumps_left = 0;
+            if self.input.down(Key::W) && self.game.world.player.can_jump() {
+                self.game.world.player.vspeed = -10.0;
+                self.game.world.player.jumps_left = 0;
             }
-            self.game.player.down_intent = self.input.down(Key::S);
+            self.game.world.player.down_intent = self.input.down(Key::S);
             let terminal_velocity = 60.0;
-            self.game.player.vspeed = self
+            self.game.world.player.vspeed = self
                 .game
+                .world
                 .player
                 .vspeed
                 .clamp(-terminal_velocity, terminal_velocity);
@@ -149,37 +150,37 @@ impl App {
                 });
             });
             imm_dbg!(on_screen_tile_ents.len());
-            self.game
-                .player
-                .col_en
-                .move_y(self.game.player.vspeed, |player_en, off| {
+            self.game.world.player.col_en.move_y(
+                self.game.world.player.vspeed,
+                |player_en, off| {
                     let mut col = false;
                     for en in &on_screen_tile_ents {
                         if player_en.would_collide(&en.col, off) {
                             if en.platform {
-                                if self.game.player.vspeed < 0. {
+                                if self.game.world.player.vspeed < 0. {
                                     continue;
                                 }
                                 // If the player's feet are below the top of the platform,
                                 // collision shouldn't happen
                                 let player_feet = player_en.pos.y + player_en.bb.y;
-                                if player_feet > en.col.pos.y || self.game.player.down_intent {
+                                if player_feet > en.col.pos.y || self.game.world.player.down_intent
+                                {
                                     continue;
                                 }
                             }
                             col = true;
-                            if self.game.player.vspeed > 0. {
-                                self.game.player.jumps_left = 1;
+                            if self.game.world.player.vspeed > 0. {
+                                self.game.world.player.jumps_left = 1;
                             }
-                            self.game.player.vspeed = 0.;
+                            self.game.world.player.vspeed = 0.;
                         }
                     }
                     col
-                });
-            self.game
-                .player
-                .col_en
-                .move_x(self.game.player.hspeed, |player_en, off| {
+                },
+            );
+            self.game.world.player.col_en.move_x(
+                self.game.world.player.hspeed,
+                |player_en, off| {
                     let mut col = false;
                     for en in &on_screen_tile_ents {
                         if en.platform {
@@ -187,13 +188,14 @@ impl App {
                         }
                         if player_en.would_collide(&en.col, off) {
                             col = true;
-                            self.game.player.hspeed = 0.;
+                            self.game.world.player.hspeed = 0.;
                         }
                     }
                     col
-                });
-            self.game.player.vspeed += self.game.gravity;
-            let (x, y, _w, _h) = self.game.player.col_en.en.xywh();
+                },
+            );
+            self.game.world.player.vspeed += self.game.gravity;
+            let (x, y, _w, _h) = self.game.world.player.col_en.en.xywh();
             self.game.camera_offset.x = (x - rt_size.x as i32 / 2).try_into().unwrap_or(0);
             self.game.camera_offset.y = (y - rt_size.y as i32 / 2).try_into().unwrap_or(0);
         }
@@ -219,8 +221,8 @@ impl App {
             mouse_tpos.y / CHUNK_EXTENT as TilePosScalar
         );
         if self.debug.freecam && self.input.pressed(Key::P) {
-            self.game.player.col_en.en.pos.x = wpos.x as i32;
-            self.game.player.col_en.en.pos.y = wpos.y as i32;
+            self.game.world.player.col_en.en.pos.x = wpos.x as i32;
+            self.game.world.player.col_en.en.pos.y = wpos.y as i32;
         }
         if self.input.lmb_down {
             let t = self.game.world.tile_at_mut(mouse_tpos, &self.game.worldgen);
