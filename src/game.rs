@@ -9,8 +9,8 @@ use sfml::{
 };
 
 use crate::{
-    graphics::{ScreenPos, ScreenPosScalar},
-    math::{wp_to_tp, WorldPos, TILE_SIZE},
+    graphics::{ScreenSc, ScreenVec},
+    math::{wp_to_tp, WorldPos},
     res::Res,
     tiles::TileDb,
     world::{Tile, TileId, TilePos, World},
@@ -41,7 +41,7 @@ pub struct GameState {
 
 #[derive(Debug, Inspect)]
 pub struct LightSource {
-    pub pos: ScreenPos,
+    pub pos: ScreenVec,
 }
 
 #[derive(PartialEq, Eq, Clone, Copy, Debug, Inspect)]
@@ -63,11 +63,12 @@ impl GameState {
             }
             if tile.mid != Tile::EMPTY {
                 s.set_texture_rect(self.tile_db[tile.mid].atlas_offset.to_sf_rect());
-                if self.tile_db[tile.mid].emits_light {
-                    let mut pos = sp;
-                    pos.x += (TILE_SIZE / 2) as i16;
-                    pos.y += (TILE_SIZE / 2) as i16;
-                    self.light_sources.push(LightSource { pos: sp });
+                if let Some(light) = self.tile_db[tile.mid].light {
+                    let pos = ScreenVec {
+                        x: sp.x + light.x,
+                        y: sp.y + light.y,
+                    };
+                    self.light_sources.push(LightSource { pos });
                 }
                 rt.draw(&s);
             }
@@ -121,7 +122,7 @@ impl GameState {
 pub fn for_each_tile_on_screen(
     camera_offset: WorldPos,
     rt_size: Vector2u,
-    mut f: impl FnMut(TilePos, ScreenPos),
+    mut f: impl FnMut(TilePos, ScreenVec),
 ) {
     for y in (-32..(rt_size.y as i16) + 32).step_by(32) {
         for x in (-32..(rt_size.x as i16) + 32).step_by(32) {
@@ -130,9 +131,9 @@ pub fn for_each_tile_on_screen(
                     x: wp_to_tp(camera_offset.x.saturating_add(x.try_into().unwrap_or(0))),
                     y: wp_to_tp(camera_offset.y.saturating_add(y.try_into().unwrap_or(0))),
                 },
-                ScreenPos {
-                    x: ((x as i64) - ((camera_offset.x as i64) % 32)) as ScreenPosScalar,
-                    y: ((y as i64) - ((camera_offset.y as i64) % 32)) as ScreenPosScalar,
+                ScreenVec {
+                    x: ((x as i64) - ((camera_offset.x as i64) % 32)) as ScreenSc,
+                    y: ((y as i64) - ((camera_offset.y as i64) % 32)) as ScreenSc,
                 },
             )
         }

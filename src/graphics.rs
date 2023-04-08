@@ -1,4 +1,5 @@
 use egui_inspect::derive::Inspect;
+use serde::{Deserialize, Serialize};
 use sfml::{
     graphics::RenderWindow,
     system::Vector2f,
@@ -23,16 +24,17 @@ impl ScreenRes {
     }
 }
 
-// We assume this game won't be played above 32767*32767 resolution
-#[derive(Default, Clone, Copy, Debug, Inspect)]
-pub struct ScreenPos {
-    pub x: ScreenPosScalar,
-    pub y: ScreenPosScalar,
+#[derive(Default, Clone, Copy, Debug, Inspect, Serialize, Deserialize)]
+pub struct ScreenVec {
+    pub x: ScreenSc,
+    pub y: ScreenSc,
 }
 
-pub type ScreenPosScalar = i16;
+/// Screen position/offset scalar
+/// We assume this game won't be played above 32767*32767 resolution
+pub type ScreenSc = i16;
 
-impl ScreenPos {
+impl ScreenVec {
     pub fn to_sf_vec(self) -> Vector2f {
         Vector2f::new(self.x.into(), self.y.into())
     }

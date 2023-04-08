@@ -14,7 +14,7 @@ use sfml::{
 use crate::{
     debug::{self, DebugState},
     game::{for_each_tile_on_screen, Biome, GameState},
-    graphics::{self, ScreenPos, ScreenPosScalar},
+    graphics::{self, ScreenSc, ScreenVec},
     input::Input,
     math::{center_offset, TILE_SIZE},
     res::Res,
@@ -178,8 +178,8 @@ impl App {
         let vco = viewport_center_offset(self.rw.size(), rt_size, self.scale);
         loc.x -= vco.x;
         loc.y -= vco.y;
-        loc.x /= self.scale as ScreenPosScalar;
-        loc.y /= self.scale as ScreenPosScalar;
+        loc.x /= self.scale as ScreenSc;
+        loc.y /= self.scale as ScreenSc;
         let mut wpos = self.game.camera_offset;
         wpos.x = wpos.x.saturating_add_signed(loc.x.into());
         wpos.y = wpos.y.saturating_add_signed(loc.y.into());
@@ -289,13 +289,13 @@ impl App {
     }
 }
 
-fn viewport_center_offset(rw_size: Vector2u, rt_size: Vector2u, scale: u8) -> ScreenPos {
+fn viewport_center_offset(rw_size: Vector2u, rt_size: Vector2u, scale: u8) -> ScreenVec {
     let rw_size = rw_size;
     let rt_size = rt_size * scale as u32;
     let x = center_offset(rt_size.x as i32, rw_size.x as i32);
     let y = center_offset(rt_size.y as i32, rw_size.y as i32);
-    ScreenPos {
-        x: x as ScreenPosScalar,
-        y: y as ScreenPosScalar,
+    ScreenVec {
+        x: x as ScreenSc,
+        y: y as ScreenSc,
     }
 }

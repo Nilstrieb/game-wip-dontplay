@@ -7,12 +7,17 @@ use log::warn;
 use serde::{Deserialize, Serialize};
 use sfml::graphics::IntRect;
 
-use crate::{math::TILE_SIZE, world::TileId};
+use crate::{
+    graphics::{ScreenSc, ScreenVec},
+    math::TILE_SIZE,
+    world::TileId,
+};
 
 #[derive(Serialize, Deserialize, Default, Debug, Inspect)]
 pub struct TileDef {
     pub solid: bool,
-    pub emits_light: bool,
+    /// Whether the tile emits light, and the light source offset
+    pub light: Option<ScreenVec>,
     pub atlas_offset: AtlasOffset,
 }
 
@@ -32,7 +37,7 @@ impl Default for TileDb {
 
 const EMPTY: TileDef = TileDef {
     solid: false,
-    emits_light: false,
+    light: None,
     // Rendering empty tile is actually special cased, and no rendering is done.
     // But just in case, put the offset to UNKNOWN
     atlas_offset: UNKNOWN_ATLAS_OFF,
@@ -72,7 +77,10 @@ const UNKNOWN_ATLAS_OFF: AtlasOffset = AtlasOffset { x: 320, y: 0 };
 
 static UNKNOWN_TILE: TileDef = TileDef {
     solid: true,
-    emits_light: true,
+    light: Some(ScreenVec {
+        x: TILE_SIZE as ScreenSc / 2,
+        y: TILE_SIZE as ScreenSc / 2,
+    }),
     atlas_offset: UNKNOWN_ATLAS_OFF,
 };
 

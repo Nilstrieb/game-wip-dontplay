@@ -1,7 +1,7 @@
 use fnv::FnvHashSet;
 use sfml::window::{mouse, Event, Key};
 
-use crate::graphics::ScreenPos;
+use crate::graphics::ScreenVec;
 
 #[derive(Default, Debug)]
 pub struct Input {
@@ -9,7 +9,7 @@ pub struct Input {
     pressed: FnvHashSet<Key>,
     pub lmb_down: bool,
     pub rmb_down: bool,
-    pub mouse_down_loc: ScreenPos,
+    pub mouse_down_loc: ScreenVec,
     pub mid_pressed: bool,
 }
 
@@ -24,7 +24,7 @@ impl Input {
                 self.down.remove(code);
             }
             &Event::MouseButtonPressed { button, x, y } => {
-                self.mouse_down_loc = ScreenPos {
+                self.mouse_down_loc = ScreenVec {
                     x: x as i16,
                     y: y as i16,
                 };
