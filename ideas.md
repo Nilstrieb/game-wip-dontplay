@@ -8,3 +8,6 @@ Various random ideas that aren't (yet) part of the design
     - Back layer
     - Wall layer
     - Ore/misc insert layer
+
+- No world hopping.
+  Characters are worlds are linked together, like in Minecraft.
