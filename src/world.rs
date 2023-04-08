@@ -1,5 +1,8 @@
+use std::path::Path;
+
 use egui_inspect::derive::Inspect;
 use fnv::FnvHashMap;
+use serde::{Deserialize, Serialize};
 
 use crate::{math::WorldPos, player::Player, worldgen::Worldgen};
 
@@ -11,6 +14,23 @@ pub struct ChunkPos {
     pub y: ChkPosSc,
 }
 
+impl ChunkPos {
+    /// Returns the region this chunk position belongs to
+    pub fn region(&self) -> (u8, u8) {
+        (
+            (self.x / REGION_CHUNK_EXTENT as ChkPosSc) as u8,
+            (self.y / REGION_CHUNK_EXTENT as ChkPosSc) as u8,
+        )
+    }
+    /// Returns the local position in the region (0-7)
+    pub fn local(&self) -> (u8, u8) {
+        (
+            (self.x % REGION_CHUNK_EXTENT as ChkPosSc) as u8,
+            (self.y % REGION_CHUNK_EXTENT as ChkPosSc) as u8,
+        )
+    }
+}
+
 #[derive(Debug, Inspect)]
 pub struct World {
     /// The currently loaded chunks
@@ -19,16 +39,79 @@ pub struct World {
     /// In other words, the age of the world.
     pub ticks: u64,
     pub player: Player,
+    pub name: String,
 }
 
 impl World {
-    pub fn new(spawn_point: WorldPos) -> Self {
+    pub fn new(spawn_point: WorldPos, name: &str) -> Self {
         Self {
             chunks: Default::default(),
             ticks: Default::default(),
             player: Player::new_at(spawn_point),
+            name: name.to_string(),
         }
     }
+    pub fn save(&self) {
+        log::info!("{:?}", std::fs::create_dir(&self.name));
+        std::env::set_current_dir(&self.name).unwrap();
+        self.save_meta();
+        self.player.save();
+        self.save_chunks();
+    }
+    pub fn save_meta(&self) {
+        let meta = WorldMetaSave {
+            name: self.name.clone(),
+            ticks: self.ticks,
+        };
+        log::info!(
+            "{:?}",
+            std::fs::write("world.dat", rmp_serde::to_vec(&meta).unwrap())
+        );
+    }
+    pub fn save_chunks(&self) {
+        for (pos, chk) in self.chunks.iter() {
+            let (reg_x, reg_y) = pos.region();
+            let reg_file_name = format!("{reg_x}.{reg_y}.rgn");
+            dbg!(&reg_file_name);
+            if !Path::new(&reg_file_name).exists() {
+                log::info!(
+                    "{:?}",
+                    std::fs::write(&reg_file_name, zstd::encode_all(&[][..], 0).unwrap())
+                );
+            }
+            let mut decomp = zstd::decode_all(&std::fs::read(&reg_file_name).unwrap()[..]).unwrap();
+            let (loc_x, loc_y) = pos.local();
+            dbg!(loc_x, loc_y);
+            let loc_idx = (loc_y * REGION_CHUNK_EXTENT) + loc_x;
+            dbg!(loc_idx);
+            let byte_idx = loc_idx as usize * CHUNK_BYTES;
+            dbg!(byte_idx);
+            let end_idx = byte_idx + CHUNK_BYTES;
+            dbg!(end_idx);
+            if decomp.len() < end_idx + 1 {
+                decomp.resize(end_idx + 1, 0);
+            }
+            for (i, tile) in chk.tiles.iter().enumerate() {
+                let off = byte_idx + (i * TILE_BYTES);
+                decomp[off..off + 2].copy_from_slice(&tile.bg.to_le_bytes());
+                decomp[off + 2..off + 4].copy_from_slice(&tile.mid.to_le_bytes());
+                decomp[off + 4..off + 6].copy_from_slice(&tile.fg.to_le_bytes());
+            }
+            log::info!(
+                "{:?}",
+                std::fs::write(&reg_file_name, zstd::encode_all(&decomp[..], 0).unwrap())
+            );
+        }
+    }
+}
+
+const CHUNK_BYTES: usize = CHUNK_N_TILES * TILE_BYTES;
+const TILE_BYTES: usize = 3 * 2;
+
+#[derive(Serialize, Deserialize)]
+struct WorldMetaSave {
+    name: String,
+    ticks: u64,
 }
 
 impl World {
@@ -71,6 +154,10 @@ impl TilePos {
             y: chunk_local(self.y),
         };
         (chk, local)
+    }
+
+    pub(crate) fn to_chunk(self) -> ChunkPos {
+        self.to_chunk_and_local().0
     }
 }
 

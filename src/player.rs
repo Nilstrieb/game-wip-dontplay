@@ -1,12 +1,13 @@
 use egui_inspect::{derive::Inspect, inspect};
 use s2dc::{vec2, MobileEntity};
+use serde::{Deserialize, Serialize};
 
 use crate::{
     math::{WorldPos, TILE_SIZE},
     world::{TPosSc, TilePos},
 };
 
-#[derive(Debug, Inspect)]
+#[derive(Debug, Inspect, Serialize, Deserialize)]
 pub struct Player {
     #[inspect_with(inspect_mobile_entity)]
     pub col_en: MobileEntity,
@@ -49,5 +50,12 @@ impl Player {
     }
     pub fn feet_y(&self) -> i32 {
         self.col_en.en.pos.y + self.col_en.en.bb.y
+    }
+
+    pub(crate) fn save(&self) {
+        log::info!(
+            "{:?}",
+            std::fs::write("player.dat", rmp_serde::to_vec(self).unwrap())
+        );
     }
 }

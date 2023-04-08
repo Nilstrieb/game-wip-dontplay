@@ -5,7 +5,7 @@ Each folder has:
     - Subfolder for regions (regions/)
 
 Each region subfolder has:
-r.x.y.dat files for each chunk, where x and y are the region coordinates.
+x.y.rgn files for each chunk, where x and y are the region coordinates.
 
 # Regions
 A region stores multiple chunks in a single file for more optimized storage.

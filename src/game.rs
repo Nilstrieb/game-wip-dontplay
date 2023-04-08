@@ -142,7 +142,7 @@ impl Default for GameState {
         spawn_point.y -= 1104;
         Self {
             camera_offset: spawn_point,
-            world: World::new(spawn_point),
+            world: World::new(spawn_point, "TestWorld"),
             gravity: 0.55,
             tile_to_place: 1,
             current_biome: Biome::Surface,

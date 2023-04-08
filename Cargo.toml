@@ -21,9 +21,12 @@ rmp-serde = "1.1.1"
 serde = { version = "1.0.159", features = ["derive"] }
 log = "0.4.17"
 env_logger = "0.10.0"
+zstd = "0.12.3"
 
 [dependencies.s2dc]
-git = "https://github.com/crumblingstatue/s2dc.git"
+#git = "https://github.com/crumblingstatue/s2dc.git"
+path = "/home/dew/projects/github/s2dc"
+features = ["serde"]
 
 [dependencies.sfml-xt]
 git = "https://github.com/crumblingstatue/sfml-xt.git"
