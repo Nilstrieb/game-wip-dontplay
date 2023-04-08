@@ -15,6 +15,9 @@ pub struct ChunkPos {
 pub struct World {
     /// The currently loaded chunks
     chunks: FnvHashMap<ChunkPos, Chunk>,
+    /// This is the number of ticks since the world has started.
+    /// In other words, the age of the world.
+    pub ticks: u64,
 }
 
 impl World {

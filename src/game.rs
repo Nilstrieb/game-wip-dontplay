@@ -34,9 +34,6 @@ pub struct GameState {
     pub ambient_light: u8,
     pub light_sources: Vec<LightSource>,
     pub tile_db: TileDb,
-    /// This is the number of ticks since the world has started.
-    /// In other words, the age of the world.
-    pub ticks: u64,
 }
 
 #[derive(Debug, Inspect)]
@@ -52,7 +49,7 @@ pub enum Biome {
 
 impl GameState {
     pub fn update(&mut self) {
-        self.ticks += 1;
+        self.world.ticks += 1;
     }
     pub(crate) fn draw_world(&mut self, rt: &mut RenderTexture, res: &mut Res) {
         self.light_sources.clear();
@@ -114,7 +111,7 @@ impl GameState {
         ));
         for ls in &self.light_sources {
             let mut s = Sprite::with_texture(&res.light_texture);
-            let flicker = smoothwave(self.ticks, 40) as f32 / 64.0;
+            let flicker = smoothwave(self.world.ticks, 40) as f32 / 64.0;
             s.set_scale((4. + flicker, 4. + flicker));
             s.set_origin((128., 128.));
             s.set_position((ls.pos.x.into(), ls.pos.y.into()));
@@ -160,7 +157,6 @@ impl Default for GameState {
             ambient_light: 0,
             light_sources: Vec::new(),
             tile_db: TileDb::load_or_default(),
-            ticks: 0,
         }
     }
 }
