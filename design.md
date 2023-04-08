@@ -10,6 +10,11 @@
 
 # Details
 
+## Timing
+Timing is tick based.
+Every frame is considered a tick.
+The game is locked at 60 fps to simplify implementation.
+
 ## Scale
 Player character is slightly below 1.5 m height.
 1 meter = 2 blocks.
