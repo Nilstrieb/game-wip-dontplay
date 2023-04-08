@@ -121,6 +121,7 @@ impl App {
                 self.game.player.vspeed = -10.0;
                 self.game.player.jumps_left = 0;
             }
+            self.game.player.down_intent = self.input.down(Key::S);
             let terminal_velocity = 60.0;
             self.game.player.vspeed = self
                 .game
@@ -130,14 +131,22 @@ impl App {
             let mut on_screen_tile_ents = Vec::new();
             for_each_tile_on_screen(self.game.camera_offset, self.rt.size(), |tp, _sp| {
                 let tid = self.game.world.tile_at_mut(tp, &self.game.worldgen).mid;
-                if !self.game.tile_db[tid].solid {
+                let tdef = &self.game.tile_db[tid];
+                let Some(bb) = tdef.bb else {
                     return;
-                }
-                let tsize = TILE_SIZE as i32;
+                };
                 let x = tp.x as i32 * TILE_SIZE as i32;
                 let y = tp.y as i32 * TILE_SIZE as i32;
-                let en = s2dc::Entity::from_rect_corners(x, y, x + tsize, y + tsize);
-                on_screen_tile_ents.push(en);
+                let en = s2dc::Entity::from_rect_corners(
+                    x + bb.x as i32,
+                    y + bb.y as i32,
+                    x + bb.w as i32,
+                    y + bb.h as i32,
+                );
+                on_screen_tile_ents.push(TileColEn {
+                    col: en,
+                    platform: tdef.platform,
+                });
             });
             imm_dbg!(on_screen_tile_ents.len());
             self.game
@@ -146,7 +155,18 @@ impl App {
                 .move_y(self.game.player.vspeed, |player_en, off| {
                     let mut col = false;
                     for en in &on_screen_tile_ents {
-                        if player_en.would_collide(en, off) {
+                        if player_en.would_collide(&en.col, off) {
+                            if en.platform {
+                                if self.game.player.vspeed < 0. {
+                                    continue;
+                                }
+                                // If the player's feet are below the top of the platform,
+                                // collision shouldn't happen
+                                let player_feet = player_en.pos.y + player_en.bb.y;
+                                if player_feet > en.col.pos.y || self.game.player.down_intent {
+                                    continue;
+                                }
+                            }
                             col = true;
                             if self.game.player.vspeed > 0. {
                                 self.game.player.jumps_left = 1;
@@ -162,7 +182,10 @@ impl App {
                 .move_x(self.game.player.hspeed, |player_en, off| {
                     let mut col = false;
                     for en in &on_screen_tile_ents {
-                        if player_en.would_collide(en, off) {
+                        if en.platform {
+                            continue;
+                        }
+                        if player_en.would_collide(&en.col, off) {
                             col = true;
                             self.game.player.hspeed = 0.;
                         }
@@ -288,6 +311,12 @@ impl App {
         self.sf_egui.draw(&mut self.rw, None);
         self.rw.display();
     }
+}
+
+/// Tile collision entity for doing physics
+struct TileColEn {
+    col: s2dc::Entity,
+    platform: bool,
 }
 
 fn viewport_center_offset(rw_size: Vector2u, rt_size: Vector2u, scale: u8) -> ScreenVec {

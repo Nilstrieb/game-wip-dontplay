@@ -3,7 +3,7 @@ use crate::{
     math::TILE_SIZE,
 };
 
-use super::TileDb;
+use super::{TileDb, DEFAULT_TILE_BB};
 
 pub fn tiledb_edit_ui(ctx: &egui::Context, tile_db: &mut TileDb) {
     egui::Window::new("Tiledb editor").show(ctx, |ui| {
@@ -27,6 +27,23 @@ pub fn tiledb_edit_ui(ctx: &egui::Context, tile_db: &mut TileDb) {
                                     x: TILE_SIZE as ScreenSc / 2,
                                     y: TILE_SIZE as ScreenSc / 2,
                                 });
+                            }
+                        }
+                    }
+                    match &mut def.bb {
+                        Some(bb) => {
+                            ui.label("x");
+                            ui.add(egui::DragValue::new(&mut bb.x));
+                            ui.label("y");
+                            ui.add(egui::DragValue::new(&mut bb.y));
+                            ui.label("w");
+                            ui.add(egui::DragValue::new(&mut bb.w));
+                            ui.label("h");
+                            ui.add(egui::DragValue::new(&mut bb.h));
+                        }
+                        None => {
+                            if ui.button("Insert bb").clicked() {
+                                def.bb = Some(DEFAULT_TILE_BB);
                             }
                         }
                     }

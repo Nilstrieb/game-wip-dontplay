@@ -15,10 +15,27 @@ use crate::{
 
 #[derive(Serialize, Deserialize, Default, Debug, Inspect)]
 pub struct TileDef {
-    pub solid: bool,
+    pub bb: Option<TileBb>,
     /// Whether the tile emits light, and the light source offset
     pub light: Option<ScreenVec>,
     pub atlas_offset: AtlasOffset,
+    /// Platform behavior: Horizontally passable, vertically passable upwards
+    pub platform: bool,
+}
+
+const DEFAULT_TILE_BB: TileBb = TileBb {
+    x: 0,
+    y: 0,
+    w: TILE_SIZE,
+    h: TILE_SIZE,
+};
+
+#[derive(Serialize, Deserialize, Debug, Inspect, Clone, Copy)]
+pub struct TileBb {
+    pub x: u8,
+    pub y: u8,
+    pub w: u8,
+    pub h: u8,
 }
 
 #[derive(Serialize, Deserialize, Debug, Inspect)]
@@ -36,11 +53,12 @@ impl Default for TileDb {
 }
 
 const EMPTY: TileDef = TileDef {
-    solid: false,
+    bb: None,
     light: None,
     // Rendering empty tile is actually special cased, and no rendering is done.
     // But just in case, put the offset to UNKNOWN
     atlas_offset: UNKNOWN_ATLAS_OFF,
+    platform: false,
 };
 
 impl Index<TileId> for TileDb {
@@ -76,12 +94,13 @@ impl Default for AtlasOffset {
 const UNKNOWN_ATLAS_OFF: AtlasOffset = AtlasOffset { x: 320, y: 0 };
 
 static UNKNOWN_TILE: TileDef = TileDef {
-    solid: true,
+    bb: None,
     light: Some(ScreenVec {
         x: TILE_SIZE as ScreenSc / 2,
         y: TILE_SIZE as ScreenSc / 2,
     }),
     atlas_offset: UNKNOWN_ATLAS_OFF,
+    platform: false,
 };
 
 const PATH: &str = "tiles.dat";

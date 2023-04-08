@@ -13,6 +13,8 @@ pub struct Player {
     pub vspeed: f32,
     pub hspeed: f32,
     pub jumps_left: u8,
+    /// true if the player wants to jump down from a platform
+    pub down_intent: bool,
 }
 
 fn inspect_mobile_entity(en: &mut MobileEntity, ui: &mut egui::Ui, _id_src: u64) {
@@ -32,6 +34,7 @@ impl Player {
             vspeed: 0.0,
             hspeed: 0.0,
             jumps_left: 0,
+            down_intent: false,
         }
     }
     #[allow(dead_code)]
