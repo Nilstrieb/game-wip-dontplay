@@ -4,8 +4,7 @@ use derivative::Derivative;
 use egui_inspect::derive::Inspect;
 use sfml::{
     graphics::{Color, RectangleShape, RenderTarget, RenderTexture, Shape, Sprite, Transformable},
-    system::{Clock, Vector2u},
-    SfBox,
+    system::Vector2u,
 };
 
 use crate::{
@@ -33,8 +32,6 @@ pub struct GameState {
     #[opaque]
     pub worldgen: Worldgen,
     pub ambient_light: u8,
-    #[opaque]
-    pub clock: SfBox<Clock>,
     pub light_sources: Vec<LightSource>,
     pub tile_db: TileDb,
     /// This is the number of ticks since the world has started.
@@ -161,7 +158,6 @@ impl Default for GameState {
             prev_biome: Biome::Surface,
             worldgen: Worldgen::default(),
             ambient_light: 0,
-            clock: Clock::start(),
             light_sources: Vec::new(),
             tile_db: TileDb::load_or_default(),
             ticks: 0,
