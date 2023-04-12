@@ -113,6 +113,23 @@ impl GameState {
             lightmap.draw(&s);
         }
     }
+
+    pub(crate) fn new(world_name: String) -> GameState {
+        let mut spawn_point = WorldPos::SURFACE_CENTER;
+        spawn_point.y -= 1104;
+        Self {
+            camera_offset: spawn_point,
+            world: World::new(spawn_point, &world_name),
+            gravity: 0.55,
+            tile_to_place: 1,
+            current_biome: Biome::Surface,
+            prev_biome: Biome::Surface,
+            worldgen: Worldgen::default(),
+            ambient_light: 0,
+            light_sources: Vec::new(),
+            tile_db: TileDb::load_or_default(),
+        }
+    }
 }
 
 pub fn for_each_tile_on_screen(
@@ -132,25 +149,6 @@ pub fn for_each_tile_on_screen(
                     y: ((y as i64) - ((camera_offset.y as i64) % 32)) as ScreenSc,
                 },
             )
-        }
-    }
-}
-
-impl Default for GameState {
-    fn default() -> Self {
-        let mut spawn_point = WorldPos::SURFACE_CENTER;
-        spawn_point.y -= 1104;
-        Self {
-            camera_offset: spawn_point,
-            world: World::new(spawn_point, "TestWorld"),
-            gravity: 0.55,
-            tile_to_place: 1,
-            current_biome: Biome::Surface,
-            prev_biome: Biome::Surface,
-            worldgen: Worldgen::default(),
-            ambient_light: 0,
-            light_sources: Vec::new(),
-            tile_db: TileDb::load_or_default(),
         }
     }
 }

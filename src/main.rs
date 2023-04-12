@@ -13,10 +13,18 @@ mod world;
 mod worldgen;
 
 use app::App;
+use clap::Parser;
+
+#[derive(Parser)]
+pub struct CliArgs {
+    #[arg(default_value = "TestWorld")]
+    world_name: String,
+}
 
 fn try_main() -> anyhow::Result<()> {
     gamedebug_core::set_enabled(true);
-    let mut app = App::new()?;
+    let cli_args = CliArgs::parse();
+    let mut app = App::new(cli_args)?;
     app.do_game_loop();
     Ok(())
 }

@@ -22,6 +22,7 @@ serde = { version = "1.0.159", features = ["derive"] }
 log = "0.4.17"
 env_logger = "0.10.0"
 zstd = "0.12.3"
+clap = { version = "4.2.1", features = ["derive"] }
 
 [dependencies.s2dc]
 #git = "https://github.com/crumblingstatue/s2dc.git"

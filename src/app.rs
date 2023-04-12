@@ -18,6 +18,7 @@ use crate::{
     input::Input,
     math::{center_offset, TILE_SIZE},
     res::Res,
+    CliArgs,
 };
 
 /// Application level state (includes game and ui state, etc.)
@@ -38,7 +39,7 @@ pub struct App {
 }
 
 impl App {
-    pub fn new() -> anyhow::Result<Self> {
+    pub fn new(args: CliArgs) -> anyhow::Result<Self> {
         let rw = graphics::make_window();
         let sf_egui = SfEgui::new(&rw);
         let mut res = Res::load()?;
@@ -53,7 +54,7 @@ impl App {
         Ok(Self {
             rw,
             should_quit: false,
-            game: GameState::default(),
+            game: GameState::new(args.world_name),
             res,
             sf_egui,
             input: Input::default(),
