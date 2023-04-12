@@ -1,4 +1,8 @@
-use std::path::Path;
+use std::{
+    fs::{File, OpenOptions},
+    io::{Read, Seek, SeekFrom, Write},
+    path::Path,
+};
 
 use egui_inspect::derive::Inspect;
 use fnv::FnvHashMap;
@@ -70,21 +74,29 @@ impl World {
     }
     pub fn save_chunks(&self) {
         for (pos, chk) in self.chunks.iter() {
-            let (reg_x, reg_y) = pos.region();
-            let reg_file_name = format!("{reg_x}.{reg_y}.rgn");
+            let reg_file_name = format_reg_file_name(pos.region());
             dbg!(&reg_file_name);
             if !Path::new(&reg_file_name).exists() {
-                log::info!(
-                    "{:?}",
-                    std::fs::write(&reg_file_name, zstd::encode_all(&[][..], 0).unwrap())
-                );
+                log::warn!("Region file doesn't exist, creating.");
+                let mut f = File::create(&reg_file_name).unwrap();
+                // Write an empty existence bitset
+                f.write_all(&[0; 8]).unwrap();
+                log::info!("{:?}", f.write_all(&zstd::encode_all(&[][..], 0).unwrap()));
             }
-            let mut decomp = zstd::decode_all(&std::fs::read(&reg_file_name).unwrap()[..]).unwrap();
+            let mut f = OpenOptions::new()
+                .read(true)
+                .write(true)
+                .open(&reg_file_name)
+                .unwrap();
+            let mut existence_bitset = read_existence_bitset_file(&mut f);
+            dbg!(existence_bitset);
+            dbg!(f.stream_position());
+            let mut decomp = zstd::decode_all(&mut f).unwrap();
             let (loc_x, loc_y) = pos.local();
             dbg!(loc_x, loc_y);
-            let loc_idx = (loc_y * REGION_CHUNK_EXTENT) + loc_x;
-            dbg!(loc_idx);
-            let byte_idx = loc_idx as usize * CHUNK_BYTES;
+            let loc_idx = loc_idx(loc_y, loc_x);
+            crate::bitmanip::set_nth_bit(&mut existence_bitset, loc_idx as usize, true);
+            let byte_idx = loc_byte_idx(loc_idx);
             dbg!(byte_idx);
             let end_idx = byte_idx + CHUNK_BYTES;
             dbg!(end_idx);
@@ -97,12 +109,37 @@ impl World {
                 decomp[off + 2..off + 4].copy_from_slice(&tile.mid.to_le_bytes());
                 decomp[off + 4..off + 6].copy_from_slice(&tile.fg.to_le_bytes());
             }
+            f.seek(SeekFrom::Start(0)).unwrap();
+            f.write_all(&u64::to_le_bytes(existence_bitset)[..])
+                .unwrap();
             log::info!(
                 "{:?}",
-                std::fs::write(&reg_file_name, zstd::encode_all(&decomp[..], 0).unwrap())
+                f.write_all(&zstd::encode_all(&decomp[..], 0).unwrap())
             );
         }
     }
+}
+
+fn read_existence_bitset_file(f: &mut File) -> u64 {
+    let mut buf = [0; 8];
+    f.read_exact(&mut buf).unwrap();
+    u64::from_le_bytes(buf)
+}
+
+fn loc_byte_idx_xy(x: u8, y: u8) -> usize {
+    loc_byte_idx(loc_idx(y, x))
+}
+
+fn loc_byte_idx(loc_idx: u8) -> usize {
+    loc_idx as usize * CHUNK_BYTES
+}
+
+fn loc_idx(loc_y: u8, loc_x: u8) -> u8 {
+    (loc_y * REGION_CHUNK_EXTENT) + loc_x
+}
+
+fn format_reg_file_name((x, y): (u8, u8)) -> String {
+    format!("{x}.{y}.rgn")
 }
 
 const CHUNK_BYTES: usize = CHUNK_N_TILES * TILE_BYTES;
@@ -123,7 +160,7 @@ impl World {
         let chk = self
             .chunks
             .entry(chk)
-            .or_insert_with(|| Chunk::gen(chk, worldgen));
+            .or_insert_with(|| Chunk::load_or_gen(chk, worldgen, &self.name));
         chk.at_mut(local)
     }
 }
@@ -202,6 +239,14 @@ const CHUNK_N_TILES: usize = CHUNK_EXTENT as usize * CHUNK_EXTENT as usize;
 
 type ChunkTiles = [Tile; CHUNK_N_TILES];
 
+fn default_chunk_tiles() -> ChunkTiles {
+    [Tile {
+        bg: 0,
+        mid: 0,
+        fg: 0,
+    }; CHUNK_N_TILES]
+}
+
 #[derive(Debug, Inspect)]
 pub struct Chunk {
     tiles: ChunkTiles,
@@ -209,11 +254,7 @@ pub struct Chunk {
 
 impl Chunk {
     pub fn gen(pos: ChunkPos, worldgen: &Worldgen) -> Self {
-        let mut tiles = [Tile {
-            bg: 0,
-            mid: 0,
-            fg: 0,
-        }; CHUNK_N_TILES];
+        let mut tiles = default_chunk_tiles();
         let noise = worldgen.chunk_noise(pos);
         if pos.y >= 156 {
             for (i, t) in tiles.iter_mut().enumerate() {
@@ -232,9 +273,56 @@ impl Chunk {
         Self { tiles }
     }
 
+    pub fn load_or_gen(chk: ChunkPos, worldgen: &Worldgen, world_name: &str) -> Chunk {
+        log::info!("Loading chunk {chk:?} (reg: {:?})", chk.region());
+        let prev_dir = std::env::current_dir().unwrap();
+        log::info!("{:?}", std::env::set_current_dir(world_name));
+        let reg_filename = format_reg_file_name(chk.region());
+        let chunk = if chunk_exists(&reg_filename, chk) {
+            log::info!("Chunk exists, loading");
+            let mut f = File::open(&reg_filename).unwrap();
+            log::info!("Existence bitset: {:b}", read_existence_bitset_file(&mut f));
+            let decomp_data = zstd::decode_all(f).unwrap();
+            let local_pos = chk.local();
+            Chunk::load_from_region(&decomp_data, local_pos.0, local_pos.1)
+        } else {
+            log::warn!("Chunk at {:?} doesn't exist, generating.", chk);
+            Chunk::gen(chk, worldgen)
+        };
+        log::info!("{:?}", std::env::set_current_dir(prev_dir));
+        chunk
+    }
+
     fn at_mut(&mut self, local: ChunkLocalTilePos) -> &mut Tile {
         &mut self.tiles[CHUNK_EXTENT as usize * local.y as usize + local.x as usize]
     }
+
+    fn load_from_region(data: &[u8], x: u8, y: u8) -> Self {
+        let byte_idx = loc_byte_idx_xy(x, y);
+        let mut tiles = default_chunk_tiles();
+        for (i, t) in tiles.iter_mut().enumerate() {
+            let off = byte_idx + (i * TILE_BYTES);
+            t.bg = u16::from_le_bytes(data[off..off + 2].try_into().unwrap());
+            t.mid = u16::from_le_bytes(data[off + 2..off + 4].try_into().unwrap());
+            t.fg = u16::from_le_bytes(data[off + 4..off + 6].try_into().unwrap());
+        }
+        Self { tiles }
+    }
+}
+
+fn read_existence_bitset(reg_filename: &str) -> u64 {
+    let mut f = File::open(reg_filename).unwrap();
+    read_existence_bitset_file(&mut f)
+}
+
+fn chunk_exists(reg_filename: &str, pos: ChunkPos) -> bool {
+    if !Path::new(&reg_filename).exists() {
+        return false;
+    }
+    let bitset = read_existence_bitset(reg_filename);
+    let local = pos.local();
+    let idx = loc_idx(local.1, local.0);
+    crate::bitmanip::nth_bit_set(bitset, idx as usize)
 }
 
 pub type TileId = u16;
@@ -255,3 +343,7 @@ impl Tile {
 }
 
 pub const REGION_CHUNK_EXTENT: u8 = 8;
+const _: () = assert!(
+    REGION_CHUNK_EXTENT * REGION_CHUNK_EXTENT <= 64,
+    "A region file uses an existence bitset that's a 64 bit integer"
+);

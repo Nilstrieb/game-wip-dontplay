@@ -1,4 +1,5 @@
 mod app;
+mod bitmanip;
 mod debug;
 mod game;
 mod graphics;
