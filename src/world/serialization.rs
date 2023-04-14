@@ -1,6 +1,6 @@
 use std::{
     fs::OpenOptions,
-    io::{Seek, SeekFrom, Write},
+    io::{Seek, Write},
     path::Path,
 };
 
@@ -50,12 +50,14 @@ pub(super) fn save_chunk(pos: &ChunkPos, chk: &Chunk) {
         region_tile_data[off + 2..off + 4].copy_from_slice(&tile.mid.to_le_bytes());
         region_tile_data[off + 4..off + 6].copy_from_slice(&tile.fg.to_le_bytes());
     }
-    f.seek(SeekFrom::Start(0)).unwrap();
+    f.rewind().unwrap();
     f.write_all(&u64::to_le_bytes(existence_bitset.0)[..])
         .unwrap();
     assert_eq!(f.stream_position().unwrap(), 8);
     assert_eq!(region_tile_data.len(), REGION_BYTES);
     let result = f.write_all(&zstd::encode_all(&region_tile_data[..], COMP_LEVEL).unwrap());
+    let cursor = f.stream_position().unwrap();
+    f.set_len(cursor).unwrap();
     log::info!("{result:?}");
 }
 
