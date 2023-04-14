@@ -3,7 +3,6 @@ pub mod tiledb_edit_ui;
 use std::ops::Index;
 
 use egui_inspect::derive::Inspect;
-use log::warn;
 use serde::{Deserialize, Serialize};
 use sfml::graphics::IntRect;
 
@@ -111,12 +110,12 @@ impl TileDb {
             Ok(data) => match rmp_serde::from_slice(&data) {
                 Ok(db) => db,
                 Err(e) => {
-                    warn!("Failed to load tile database: {e}\nCreating default.");
+                    log::warn!("Failed to load tile database: {e}\nCreating default.");
                     Default::default()
                 }
             },
             Err(e) => {
-                warn!("Failed to load tile database: {e}\nCreating default.");
+                log::warn!("Failed to load tile database: {e}\nCreating default.");
                 Default::default()
             }
         }
@@ -125,9 +124,9 @@ impl TileDb {
         match rmp_serde::to_vec(self) {
             Ok(vec) => match std::fs::write(PATH, vec) {
                 Ok(()) => {}
-                Err(e) => warn!("Failed to save tile db: {e}"),
+                Err(e) => log::warn!("Failed to save tile db: {e}"),
             },
-            Err(e) => warn!("Failed to save tile db: {e}"),
+            Err(e) => log::warn!("Failed to save tile db: {e}"),
         }
     }
 }

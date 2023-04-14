@@ -63,7 +63,8 @@ impl World {
         }
     }
     pub fn save(&self) {
-        log::info!("{:?}", std::fs::create_dir(&self.name));
+        let result = std::fs::create_dir(&self.name);
+        log::info!("{result:?}");
         std::env::set_current_dir(&self.name).unwrap();
         self.save_meta();
         self.player.save();
@@ -74,10 +75,8 @@ impl World {
             name: self.name.clone(),
             ticks: self.ticks,
         };
-        log::info!(
-            "{:?}",
-            std::fs::write("world.dat", rmp_serde::to_vec(&meta).unwrap())
-        );
+        let result = std::fs::write("world.dat", rmp_serde::to_vec(&meta).unwrap());
+        log::info!("{result:?}");
     }
     pub fn save_chunks(&self) {
         for (pos, chk) in self.chunks.iter() {
@@ -126,10 +125,8 @@ impl World {
                 .unwrap();
             assert_eq!(f.stream_position().unwrap(), 8);
             assert_eq!(region_tile_data.len(), REGION_BYTES);
-            log::info!(
-                "{:?}",
-                f.write_all(&zstd::encode_all(&region_tile_data[..], COMP_LEVEL).unwrap())
-            );
+            let result = f.write_all(&zstd::encode_all(&region_tile_data[..], COMP_LEVEL).unwrap());
+            log::info!("{result:?}");
         }
     }
 }
@@ -284,15 +281,14 @@ impl Chunk {
     pub fn load_or_gen(chk: ChunkPos, worldgen: &Worldgen, world_name: &str) -> Chunk {
         log::info!("Loading chunk {chk:?} (reg: {:?})", chk.region());
         let prev_dir = std::env::current_dir().unwrap();
-        log::info!("{:?}", std::env::set_current_dir(world_name));
+        let result = std::env::set_current_dir(world_name);
+        log::info!("{result:?}");
         let reg_filename = format_reg_file_name(chk.region());
         let chunk = if chunk_exists(&reg_filename, chk) {
             log::info!("Chunk exists, loading");
             let mut f = File::open(&reg_filename).unwrap();
-            log::info!(
-                "Existence bitset: {:?}",
-                ExistenceBitset::read_from_file(&mut f)
-            );
+            let bitset = ExistenceBitset::read_from_file(&mut f);
+            log::info!("Existence bitset: {bitset:?}");
             assert_eq!(f.stream_position().unwrap(), 8);
             let decomp_data = zstd::decode_all(f).unwrap();
             assert_eq!(decomp_data.len(), REGION_BYTES);
@@ -302,7 +298,8 @@ impl Chunk {
             log::warn!("Chunk at {:?} doesn't exist, generating.", chk);
             Chunk::gen(chk, worldgen)
         };
-        log::info!("{:?}", std::env::set_current_dir(prev_dir));
+        let result = std::env::set_current_dir(prev_dir);
+        log::info!("{result:?}");
         chunk
     }
 

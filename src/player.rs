@@ -53,9 +53,7 @@ impl Player {
     }
 
     pub(crate) fn save(&self) {
-        log::info!(
-            "{:?}",
-            std::fs::write("player.dat", rmp_serde::to_vec(self).unwrap())
-        );
+        let result = std::fs::write("player.dat", rmp_serde::to_vec(self).unwrap());
+        log::info!("{result:?}");
     }
 }
