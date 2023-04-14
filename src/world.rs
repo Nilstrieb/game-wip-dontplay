@@ -374,7 +374,7 @@ fn test_chunk_seri() {
         t.bg = 1;
         t.fg = 1;
     }
-    for x in 0..5 {
-        save_chunk(&ChunkPos { x, y: 0 }, &chk);
-    }
+    save_chunk(&ChunkPos { x: 2, y: 0 }, &chk);
+    save_chunk(&ChunkPos { x: 3, y: 0 }, &chk);
+    save_chunk(&ChunkPos { x: 0, y: 0 }, &chk);
 }
