@@ -30,8 +30,8 @@ pub(super) fn save_chunk(pos: &ChunkPos, chk: &Chunk) {
         ExistenceBitset::EMPTY
     };
     dbg!(existence_bitset);
-    let _ = dbg!(f.stream_position());
     let mut region_tile_data = if reg_file_exists {
+        assert_eq!(f.stream_position().unwrap(), 8);
         zstd::decode_all(&mut f).unwrap()
     } else {
         vec![0; REGION_BYTES]
