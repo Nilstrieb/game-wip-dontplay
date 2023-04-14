@@ -78,25 +78,30 @@ impl World {
         for (pos, chk) in self.chunks.iter() {
             let reg_file_name = format_reg_file_name(pos.region());
             dbg!(&reg_file_name);
-            if !Path::new(&reg_file_name).exists() {
-                log::warn!("Region file doesn't exist, creating.");
-                let mut f = File::create(&reg_file_name).unwrap();
-                // Write an empty existence bitset
-                f.write_all(&[0; 8]).unwrap();
-                log::info!(
-                    "{:?}",
-                    f.write_all(&zstd::encode_all(&[][..], COMP_LEVEL).unwrap())
-                );
+            let reg_file_exists = Path::new(&reg_file_name).exists();
+            if !reg_file_exists {
+                log::warn!("Region file doesn't exist. Going to create one.");
             }
             let mut f = OpenOptions::new()
                 .read(true)
                 .write(true)
+                .create(true)
                 .open(&reg_file_name)
                 .unwrap();
-            let mut existence_bitset = read_existence_bitset_file(&mut f);
+            let mut existence_bitset = if reg_file_exists {
+                read_existence_bitset_file(&mut f)
+            } else {
+                0
+            };
             dbg!(existence_bitset);
             let _ = dbg!(f.stream_position());
-            let mut decomp = zstd::decode_all(&mut f).unwrap();
+            let mut region_tile_data = if reg_file_exists {
+                zstd::decode_all(&mut f).unwrap()
+            } else {
+                vec![0; REGION_BYTES]
+            };
+            // Even the zstd decompressed data should be exactly REGION_BYTES size
+            assert_eq!(region_tile_data.len(), REGION_BYTES);
             let (loc_x, loc_y) = pos.local();
             dbg!(loc_x, loc_y);
             let loc_idx = loc_idx(loc_y, loc_x);
@@ -105,21 +110,21 @@ impl World {
             dbg!(byte_idx);
             let end_idx = byte_idx + CHUNK_BYTES;
             dbg!(end_idx);
-            if decomp.len() < end_idx + 1 {
-                decomp.resize(end_idx + 1, 0);
+            if region_tile_data.len() < end_idx + 1 {
+                region_tile_data.resize(end_idx + 1, 0);
             }
             for (i, tile) in chk.tiles.iter().enumerate() {
                 let off = byte_idx + (i * TILE_BYTES);
-                decomp[off..off + 2].copy_from_slice(&tile.bg.to_le_bytes());
-                decomp[off + 2..off + 4].copy_from_slice(&tile.mid.to_le_bytes());
-                decomp[off + 4..off + 6].copy_from_slice(&tile.fg.to_le_bytes());
+                region_tile_data[off..off + 2].copy_from_slice(&tile.bg.to_le_bytes());
+                region_tile_data[off + 2..off + 4].copy_from_slice(&tile.mid.to_le_bytes());
+                region_tile_data[off + 4..off + 6].copy_from_slice(&tile.fg.to_le_bytes());
             }
             f.seek(SeekFrom::Start(0)).unwrap();
             f.write_all(&u64::to_le_bytes(existence_bitset)[..])
                 .unwrap();
             log::info!(
                 "{:?}",
-                f.write_all(&zstd::encode_all(&decomp[..], COMP_LEVEL).unwrap())
+                f.write_all(&zstd::encode_all(&region_tile_data[..], COMP_LEVEL).unwrap())
             );
         }
     }
@@ -348,9 +353,12 @@ impl Tile {
 }
 
 pub const REGION_CHUNK_EXTENT: u8 = 8;
+pub const REGION_N_CHUNKS: u8 = REGION_CHUNK_EXTENT * REGION_CHUNK_EXTENT;
+/// This is the uncompressed byte length of a region
+pub const REGION_BYTES: usize = REGION_N_CHUNKS as usize * CHUNK_BYTES;
 
 #[allow(clippy::assertions_on_constants)]
 const _: () = assert!(
-    REGION_CHUNK_EXTENT * REGION_CHUNK_EXTENT <= 64,
+    REGION_N_CHUNKS <= 64,
     "A region file uses an existence bitset that's a 64 bit integer"
 );
