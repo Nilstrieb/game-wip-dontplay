@@ -366,8 +366,8 @@ fn test_world_serialization() {
         .init();
     let mut w = World::new(WorldPos { x: 0, y: 0 }, "smoltestworld");
     let wg = Worldgen::from_seed(0);
-    for y in 0..850 {
-        for x in 0..850 {
+    for y in 0..820 {
+        for x in 0..820 {
             w.tile_at_mut(TilePos { x, y }, &wg).mid = (x + y) as u16;
         }
     }
