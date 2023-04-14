@@ -124,6 +124,8 @@ impl World {
             f.seek(SeekFrom::Start(0)).unwrap();
             f.write_all(&u64::to_le_bytes(existence_bitset.0)[..])
                 .unwrap();
+            assert_eq!(f.stream_position().unwrap(), 8);
+            assert_eq!(region_tile_data.len(), REGION_BYTES);
             log::info!(
                 "{:?}",
                 f.write_all(&zstd::encode_all(&region_tile_data[..], COMP_LEVEL).unwrap())
@@ -291,6 +293,7 @@ impl Chunk {
                 "Existence bitset: {:?}",
                 ExistenceBitset::read_from_file(&mut f)
             );
+            assert_eq!(f.stream_position().unwrap(), 8);
             let decomp_data = zstd::decode_all(f).unwrap();
             assert_eq!(decomp_data.len(), REGION_BYTES);
             let local_pos = chk.local();
