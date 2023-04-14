@@ -357,3 +357,19 @@ const _: () = assert!(
     REGION_N_CHUNKS <= 64,
     "A region file uses an existence bitset that's a 64 bit integer"
 );
+
+/// Test that world serialization doesn't panic
+#[test]
+fn test_world_serialization() {
+    env_logger::builder()
+        .filter_level(log::LevelFilter::Info)
+        .init();
+    let mut w = World::new(WorldPos { x: 0, y: 0 }, "smoltestworld");
+    let wg = Worldgen::from_seed(0);
+    for y in 0..900 {
+        for x in 0..900 {
+            w.tile_at_mut(TilePos { x, y }, &wg).mid = (x + y) as u16;
+        }
+    }
+    w.save();
+}
