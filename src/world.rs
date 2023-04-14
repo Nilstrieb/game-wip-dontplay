@@ -62,6 +62,17 @@ impl World {
             name: name.to_string(),
         }
     }
+    /// Get mutable access to the tile at `pos`.
+    ///
+    /// Loads or generates the containing chunk if necessary.
+    pub fn tile_at_mut(&mut self, pos: TilePos, worldgen: &Worldgen) -> &mut Tile {
+        let (chk, local) = pos.to_chunk_and_local();
+        let chk = self
+            .chunks
+            .entry(chk)
+            .or_insert_with(|| Chunk::load_or_gen(chk, worldgen, &self.name));
+        chk.at_mut(local)
+    }
     pub fn save(&self) {
         let result = std::fs::create_dir(&self.name);
         log::info!("{result:?}");
@@ -154,20 +165,6 @@ const TILE_BYTES: usize = 3 * 2;
 struct WorldMetaSave {
     name: String,
     ticks: u64,
-}
-
-impl World {
-    /// Get mutable access to the tile at `pos`.
-    ///
-    /// Loads or generates the containing chunk if necessary.
-    pub fn tile_at_mut(&mut self, pos: TilePos, worldgen: &Worldgen) -> &mut Tile {
-        let (chk, local) = pos.to_chunk_and_local();
-        let chk = self
-            .chunks
-            .entry(chk)
-            .or_insert_with(|| Chunk::load_or_gen(chk, worldgen, &self.name));
-        chk.at_mut(local)
-    }
 }
 
 #[derive(Debug, Clone, Copy)]
