@@ -9,7 +9,7 @@ use crate::world::{
     REGION_BYTES, TILE_BYTES,
 };
 
-use super::{Chunk, ChunkPos};
+use super::{default_chunk_tiles, loc_byte_idx_xy, Chunk, ChunkPos};
 
 pub(super) fn save_chunk(pos: &ChunkPos, chk: &Chunk) {
     let reg_file_name = format_reg_file_name(pos.region());
@@ -60,6 +60,20 @@ pub(super) fn save_chunk(pos: &ChunkPos, chk: &Chunk) {
 }
 
 const COMP_LEVEL: i32 = 9;
+
+impl Chunk {
+    pub fn load_from_region(data: &[u8], x: u8, y: u8) -> Self {
+        let byte_idx = loc_byte_idx_xy(x, y);
+        let mut tiles = default_chunk_tiles();
+        for (i, t) in tiles.iter_mut().enumerate() {
+            let off = byte_idx + (i * TILE_BYTES);
+            t.bg = u16::from_le_bytes(data[off..off + 2].try_into().unwrap());
+            t.mid = u16::from_le_bytes(data[off + 2..off + 4].try_into().unwrap());
+            t.fg = u16::from_le_bytes(data[off + 4..off + 6].try_into().unwrap());
+        }
+        Self { tiles }
+    }
+}
 
 #[test]
 fn test_chunk_seri() {

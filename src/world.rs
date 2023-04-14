@@ -253,18 +253,6 @@ impl Chunk {
     fn at_mut(&mut self, local: ChunkLocalTilePos) -> &mut Tile {
         &mut self.tiles[CHUNK_EXTENT as usize * local.y as usize + local.x as usize]
     }
-
-    fn load_from_region(data: &[u8], x: u8, y: u8) -> Self {
-        let byte_idx = loc_byte_idx_xy(x, y);
-        let mut tiles = default_chunk_tiles();
-        for (i, t) in tiles.iter_mut().enumerate() {
-            let off = byte_idx + (i * TILE_BYTES);
-            t.bg = u16::from_le_bytes(data[off..off + 2].try_into().unwrap());
-            t.mid = u16::from_le_bytes(data[off + 2..off + 4].try_into().unwrap());
-            t.fg = u16::from_le_bytes(data[off + 4..off + 6].try_into().unwrap());
-        }
-        Self { tiles }
-    }
 }
 
 fn chunk_exists(reg_filename: &str, pos: ChunkPos) -> bool {
