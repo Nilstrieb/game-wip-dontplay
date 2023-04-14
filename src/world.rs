@@ -46,6 +46,8 @@ pub struct World {
     pub name: String,
 }
 
+const COMP_LEVEL: i32 = 9;
+
 impl World {
     pub fn new(spawn_point: WorldPos, name: &str) -> Self {
         Self {
@@ -81,7 +83,10 @@ impl World {
                 let mut f = File::create(&reg_file_name).unwrap();
                 // Write an empty existence bitset
                 f.write_all(&[0; 8]).unwrap();
-                log::info!("{:?}", f.write_all(&zstd::encode_all(&[][..], 0).unwrap()));
+                log::info!(
+                    "{:?}",
+                    f.write_all(&zstd::encode_all(&[][..], COMP_LEVEL).unwrap())
+                );
             }
             let mut f = OpenOptions::new()
                 .read(true)
@@ -114,7 +119,7 @@ impl World {
                 .unwrap();
             log::info!(
                 "{:?}",
-                f.write_all(&zstd::encode_all(&decomp[..], 0).unwrap())
+                f.write_all(&zstd::encode_all(&decomp[..], COMP_LEVEL).unwrap())
             );
         }
     }
