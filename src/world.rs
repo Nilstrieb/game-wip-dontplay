@@ -90,7 +90,7 @@ impl World {
                 .unwrap();
             let mut existence_bitset = read_existence_bitset_file(&mut f);
             dbg!(existence_bitset);
-            dbg!(f.stream_position());
+            let _ = dbg!(f.stream_position());
             let mut decomp = zstd::decode_all(&mut f).unwrap();
             let (loc_x, loc_y) = pos.local();
             dbg!(loc_x, loc_y);
