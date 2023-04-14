@@ -1,6 +1,9 @@
+mod reg_chunk_existence;
+
 use std::{
+    fmt::Debug,
     fs::{File, OpenOptions},
-    io::{Read, Seek, SeekFrom, Write},
+    io::{Seek, SeekFrom, Write},
     path::Path,
 };
 
@@ -8,7 +11,9 @@ use egui_inspect::derive::Inspect;
 use fnv::FnvHashMap;
 use serde::{Deserialize, Serialize};
 
-use crate::{math::WorldPos, player::Player, worldgen::Worldgen};
+use crate::{
+    math::WorldPos, player::Player, world::reg_chunk_existence::ExistenceBitset, worldgen::Worldgen,
+};
 
 pub type ChkPosSc = u16;
 
@@ -89,9 +94,9 @@ impl World {
                 .open(&reg_file_name)
                 .unwrap();
             let mut existence_bitset = if reg_file_exists {
-                read_existence_bitset_file(&mut f)
+                ExistenceBitset::read_from_file(&mut f)
             } else {
-                0
+                ExistenceBitset::EMPTY
             };
             dbg!(existence_bitset);
             let _ = dbg!(f.stream_position());
@@ -105,14 +110,11 @@ impl World {
             let (loc_x, loc_y) = pos.local();
             dbg!(loc_x, loc_y);
             let loc_idx = loc_idx(loc_y, loc_x);
-            crate::bitmanip::set_nth_bit(&mut existence_bitset, loc_idx as usize, true);
+            crate::bitmanip::set_nth_bit(&mut existence_bitset.0, loc_idx as usize, true);
             let byte_idx = loc_byte_idx(loc_idx);
             dbg!(byte_idx);
             let end_idx = byte_idx + CHUNK_BYTES;
             dbg!(end_idx);
-            if region_tile_data.len() < end_idx + 1 {
-                region_tile_data.resize(end_idx + 1, 0);
-            }
             for (i, tile) in chk.tiles.iter().enumerate() {
                 let off = byte_idx + (i * TILE_BYTES);
                 region_tile_data[off..off + 2].copy_from_slice(&tile.bg.to_le_bytes());
@@ -120,7 +122,7 @@ impl World {
                 region_tile_data[off + 4..off + 6].copy_from_slice(&tile.fg.to_le_bytes());
             }
             f.seek(SeekFrom::Start(0)).unwrap();
-            f.write_all(&u64::to_le_bytes(existence_bitset)[..])
+            f.write_all(&u64::to_le_bytes(existence_bitset.0)[..])
                 .unwrap();
             log::info!(
                 "{:?}",
@@ -128,12 +130,6 @@ impl World {
             );
         }
     }
-}
-
-fn read_existence_bitset_file(f: &mut File) -> u64 {
-    let mut buf = [0; 8];
-    f.read_exact(&mut buf).unwrap();
-    u64::from_le_bytes(buf)
 }
 
 fn loc_byte_idx_xy(x: u8, y: u8) -> usize {
@@ -291,8 +287,12 @@ impl Chunk {
         let chunk = if chunk_exists(&reg_filename, chk) {
             log::info!("Chunk exists, loading");
             let mut f = File::open(&reg_filename).unwrap();
-            log::info!("Existence bitset: {:b}", read_existence_bitset_file(&mut f));
+            log::info!(
+                "Existence bitset: {:?}",
+                ExistenceBitset::read_from_file(&mut f)
+            );
             let decomp_data = zstd::decode_all(f).unwrap();
+            assert_eq!(decomp_data.len(), REGION_BYTES);
             let local_pos = chk.local();
             Chunk::load_from_region(&decomp_data, local_pos.0, local_pos.1)
         } else {
@@ -320,19 +320,14 @@ impl Chunk {
     }
 }
 
-fn read_existence_bitset(reg_filename: &str) -> u64 {
-    let mut f = File::open(reg_filename).unwrap();
-    read_existence_bitset_file(&mut f)
-}
-
 fn chunk_exists(reg_filename: &str, pos: ChunkPos) -> bool {
     if !Path::new(&reg_filename).exists() {
         return false;
     }
-    let bitset = read_existence_bitset(reg_filename);
+    let bitset = ExistenceBitset::read_from_fs(reg_filename);
     let local = pos.local();
     let idx = loc_idx(local.1, local.0);
-    crate::bitmanip::nth_bit_set(bitset, idx as usize)
+    crate::bitmanip::nth_bit_set(bitset.0, idx as usize)
 }
 
 pub type TileId = u16;
