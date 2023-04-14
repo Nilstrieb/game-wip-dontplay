@@ -371,8 +371,6 @@ fn test_chunk_seri() {
     };
     for t in &mut chk.tiles {
         t.bg = 1;
-        t.bg = 1;
-        t.fg = 1;
     }
     save_chunk(&ChunkPos { x: 2, y: 0 }, &chk);
     save_chunk(&ChunkPos { x: 3, y: 0 }, &chk);
