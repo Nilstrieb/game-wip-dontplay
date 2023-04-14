@@ -365,8 +365,6 @@ fn test_world_serialization() {
     env_logger::builder()
         .filter_level(log::LevelFilter::Info)
         .init();
-    let result = std::fs::remove_dir_all("smoltestworld");
-    log::debug!("{result:?}");
     let mut w = World::new(WorldPos { x: 0, y: 0 }, "smoltestworld");
     let wg = Worldgen::from_seed(0);
     for y in 0..400 {
@@ -374,5 +372,21 @@ fn test_world_serialization() {
             w.tile_at_mut(TilePos { x, y }, &wg).mid = 1;
         }
     }
-    w.save();
+    w.save_chunks();
+}
+
+#[test]
+fn test_chunk_seri() {
+    env_logger::builder()
+        .filter_level(log::LevelFilter::Info)
+        .init();
+    let mut chk = Chunk {
+        tiles: default_chunk_tiles(),
+    };
+    for t in &mut chk.tiles {
+        t.bg = 1;
+        t.fg = 2;
+        t.mid = 3;
+    }
+    save_chunk(&ChunkPos { x: 0, y: 0 }, &chk);
 }
