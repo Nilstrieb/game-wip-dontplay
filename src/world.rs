@@ -364,6 +364,8 @@ fn test_world_serialization() {
     env_logger::builder()
         .filter_level(log::LevelFilter::Info)
         .init();
+    let result = std::fs::remove_dir_all("smoltestworld");
+    log::debug!("{result:?}");
     let mut w = World::new(WorldPos { x: 0, y: 0 }, "smoltestworld");
     let wg = Worldgen::from_seed(0);
     for y in 0..400 {
