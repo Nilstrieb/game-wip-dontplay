@@ -343,6 +343,8 @@ impl Tile {
 }
 
 pub const REGION_CHUNK_EXTENT: u8 = 8;
+
+#[allow(clippy::assertions_on_constants)]
 const _: () = assert!(
     REGION_CHUNK_EXTENT * REGION_CHUNK_EXTENT <= 64,
     "A region file uses an existence bitset that's a 64 bit integer"

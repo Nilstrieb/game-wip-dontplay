@@ -16,6 +16,7 @@ pub fn set_nth_bit<N: PrimInt + BitOrAssign + BitAndAssign>(number: &mut N, n: u
 }
 
 #[test]
+#[allow(clippy::bool_assert_comparison)]
 fn test_nth_bit_set() {
     let number: u8 = 0b0100_0100;
     assert_eq!(nth_bit_set(number, 0), false);
@@ -31,6 +32,7 @@ fn test_nth_bit_set() {
 }
 
 #[test]
+#[allow(clippy::bool_assert_comparison)]
 fn test_set_nth_bit() {
     let mut number: u8 = 0b0000_0000;
     set_nth_bit(&mut number, 0, true);
