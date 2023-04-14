@@ -129,8 +129,6 @@ fn save_chunk(pos: &ChunkPos, chk: &Chunk) {
     crate::bitmanip::set_nth_bit(&mut existence_bitset.0, loc_idx as usize, true);
     let byte_idx = loc_byte_idx(loc_idx);
     dbg!(byte_idx);
-    let end_idx = byte_idx + CHUNK_BYTES;
-    dbg!(end_idx);
     for (i, tile) in chk.tiles.iter().enumerate() {
         let off = byte_idx + (i * TILE_BYTES);
         region_tile_data[off..off + 2].copy_from_slice(&tile.bg.to_le_bytes());
