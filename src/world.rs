@@ -376,5 +376,6 @@ fn test_chunk_seri() {
     }
     save_chunk(&ChunkPos { x: 2, y: 0 }, &chk);
     save_chunk(&ChunkPos { x: 3, y: 0 }, &chk);
-    save_chunk(&ChunkPos { x: 0, y: 0 }, &chk);
+    let raw = std::fs::read("0.0.rgn").unwrap();
+    zstd::decode_all(&raw[8..]).unwrap();
 }
