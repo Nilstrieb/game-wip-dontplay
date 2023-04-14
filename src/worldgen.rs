@@ -1,4 +1,3 @@
-use rand::{thread_rng, Rng};
 use worldgen::{
     constraint,
     noise::perlin::PerlinNoise,
@@ -15,17 +14,16 @@ pub struct Worldgen {
     world: World<crate::world::Tile>,
 }
 
-impl Default for Worldgen {
-    fn default() -> Self {
+impl Worldgen {
+    pub fn from_seed(seed: i64) -> Self {
         let noise = PerlinNoise::new();
-        let mut rng = thread_rng();
 
         let nm1 = NoiseMap::new(noise)
-            .set(Seed::of(rng.gen::<i64>()))
+            .set(Seed::of(seed))
             .set(Step::of(0.005, 0.005));
 
         let nm2 = NoiseMap::new(noise)
-            .set(Seed::of(rng.gen::<i64>()))
+            .set(Seed::of(seed))
             .set(Step::of(0.05, 0.05));
 
         let nm = Box::new(nm1 + nm2 * 3);
@@ -67,9 +65,6 @@ impl Default for Worldgen {
             }));
         Self { world }
     }
-}
-
-impl Worldgen {
     pub fn chunk_noise(&self, pos: ChunkPos) -> Vec<Vec<Tl>> {
         self.world.generate(pos.x as i64, pos.y as i64).unwrap()
     }

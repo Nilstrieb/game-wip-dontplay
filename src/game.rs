@@ -124,7 +124,7 @@ impl GameState {
             tile_to_place: 1,
             current_biome: Biome::Surface,
             prev_biome: Biome::Surface,
-            worldgen: Worldgen::default(),
+            worldgen: Worldgen::from_seed(0),
             ambient_light: 0,
             light_sources: Vec::new(),
             tile_db: TileDb::load_or_default(),
