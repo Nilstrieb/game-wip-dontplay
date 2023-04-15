@@ -1,4 +1,4 @@
-use egui_inspect::inspect;
+use egui_inspect::{derive::Inspect, inspect};
 use sfml::{audio::SoundSource, window::Key};
 
 use crate::{
@@ -11,11 +11,12 @@ use crate::{
     tiles::tiledb_edit_ui::tiledb_edit_ui,
 };
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Inspect)]
 pub struct DebugState {
     panel: bool,
     pub freecam: bool,
     tiledb_edit: bool,
+    pub show_atlas: bool,
 }
 
 impl DebugState {
@@ -30,7 +31,7 @@ impl DebugState {
 }
 
 fn debug_panel_ui(
-    debug: &mut DebugState,
+    mut debug: &mut DebugState,
     mut game: &mut GameState,
     ctx: &egui::Context,
     res: &mut Res,
@@ -85,7 +86,7 @@ fn debug_panel_ui(
                     ui,
                     scale,
                     game,
-                    debug.tiledb_edit
+                    debug
                 }
             });
         if ui.button("Reload graphics").clicked() {

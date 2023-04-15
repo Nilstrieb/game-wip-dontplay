@@ -3,16 +3,21 @@ use std::path::PathBuf;
 use derivative::Derivative;
 use egui_inspect::derive::Inspect;
 use sfml::{
-    graphics::{Color, RectangleShape, RenderTarget, RenderTexture, Shape, Sprite, Transformable},
-    system::Vector2u,
+    graphics::{
+        Color, Rect, RectangleShape, RenderTarget, RenderTexture, Shape, Sprite, Transformable,
+    },
+    system::{Vector2f, Vector2u},
+    window::Key,
 };
 
 use crate::{
     graphics::{ScreenSc, ScreenVec},
+    input::Input,
+    inventory::{Inventory, ItemDb},
     math::{smoothwave, wp_to_tp, WorldPos},
     res::Res,
     tiles::TileDb,
-    world::{Tile, TileId, TilePos, World},
+    world::{Tile, TilePos, World},
     worldgen::Worldgen,
 };
 
@@ -22,7 +27,6 @@ pub struct GameState {
     pub camera_offset: WorldPos,
     pub world: World,
     pub gravity: f32,
-    pub tile_to_place: TileId,
     pub current_biome: Biome,
     pub prev_biome: Biome,
     #[derivative(Debug = "ignore")]
@@ -31,6 +35,9 @@ pub struct GameState {
     pub ambient_light: u8,
     pub light_sources: Vec<LightSource>,
     pub tile_db: TileDb,
+    pub inventory: Inventory,
+    pub itemdb: ItemDb,
+    pub selected_inv_slot: usize,
 }
 
 #[derive(Debug, Inspect)]
@@ -45,7 +52,22 @@ pub enum Biome {
 }
 
 impl GameState {
-    pub fn update(&mut self) {
+    pub fn update(&mut self, input: &Input) {
+        if input.pressed(Key::Num1) {
+            self.selected_inv_slot = 0;
+        }
+        if input.pressed(Key::Num2) {
+            self.selected_inv_slot = 1;
+        }
+        if input.pressed(Key::Num3) {
+            self.selected_inv_slot = 2;
+        }
+        if input.pressed(Key::Num4) {
+            self.selected_inv_slot = 3;
+        }
+        if input.pressed(Key::Num5) {
+            self.selected_inv_slot = 4;
+        }
         self.world.ticks += 1;
     }
     pub(crate) fn draw_world(&mut self, rt: &mut RenderTexture, res: &mut Res) {
@@ -75,7 +97,7 @@ impl GameState {
             }
         });
     }
-    pub fn draw_entities(&mut self, rw: &mut RenderTexture) {
+    pub fn draw_entities(&mut self, rt: &mut RenderTexture) {
         let (x, y, w, h) = self.world.player.col_en.en.xywh();
         let mut rect_sh = RectangleShape::new();
         rect_sh.set_position((
@@ -83,14 +105,39 @@ impl GameState {
             (y - self.camera_offset.y as i32) as f32,
         ));
         rect_sh.set_size((w as f32, h as f32));
-        rw.draw(&rect_sh);
+        rt.draw(&rect_sh);
         rect_sh.set_size((2., 2.));
         rect_sh.set_fill_color(Color::RED);
         rect_sh.set_position((
             (self.world.player.col_en.en.pos.x - self.camera_offset.x as i32) as f32,
             (self.world.player.col_en.en.pos.y - self.camera_offset.y as i32) as f32,
         ));
-        rw.draw(&rect_sh);
+        rt.draw(&rect_sh);
+    }
+
+    pub fn draw_ui(&mut self, rt: &mut RenderTexture, res: &Res, ui_dims: Vector2f) {
+        let mut s = Sprite::with_texture(&res.atlas.tex);
+        let mut rs = RectangleShape::from_rect(Rect::new(0., 0., 32., 32.));
+        rs.set_outline_color(Color::YELLOW);
+        rs.set_outline_thickness(1.0);
+        rs.set_fill_color(Color::TRANSPARENT);
+        for (i, slot) in self.inventory.slots.iter().enumerate() {
+            s.set_texture_rect(res.atlas.rects["ui/invframe"].to_sf());
+            let pos = ((i * 38) as f32 + 8.0, (ui_dims.y - 38.));
+            s.set_position(pos);
+            rt.draw(&s);
+            let item_def = &self.itemdb.db[slot.id as usize];
+            if let Some(rect) = res.atlas.rects.get(&item_def.graphic_name) {
+                s.set_texture_rect(rect.to_sf());
+                rt.draw(&s);
+            } else {
+                log::error!("Missing rect for item {}", item_def.name);
+            }
+            if i == self.selected_inv_slot {
+                rs.set_position(pos);
+                rt.draw(&rs);
+            }
+        }
     }
 
     pub(crate) fn light_pass(&mut self, lightmap: &mut RenderTexture, res: &Res) {
@@ -126,13 +173,15 @@ impl GameState {
             camera_offset: spawn_point,
             world: World::new(spawn_point, &world_name, path),
             gravity: 0.55,
-            tile_to_place: 1,
             current_biome: Biome::Surface,
             prev_biome: Biome::Surface,
             worldgen: Worldgen::from_seed(0),
             ambient_light: 0,
             light_sources: Vec::new(),
             tile_db,
+            inventory: Inventory::new_debug(),
+            itemdb: ItemDb::default(),
+            selected_inv_slot: 0,
         }
     }
 }

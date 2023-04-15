@@ -20,7 +20,7 @@ impl AtlasBundle {
             max_height: 4096,
             allow_rotation: false,
             border_padding: 0,
-            texture_padding: 1,
+            texture_padding: 0,
             texture_extrusion: 0,
             trim: true,
             texture_outlines: false,
@@ -34,6 +34,11 @@ impl AtlasBundle {
         });
         let mut rects = HashMap::new();
         let mut tex = Texture::new().unwrap();
+        log::info!(
+            "Texture atlas size is: {}x{}",
+            packer.width(),
+            packer.height()
+        );
         if !tex.create(packer.width(), packer.height()) {
             panic!("Failed to create texture");
         }

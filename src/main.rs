@@ -4,6 +4,7 @@ mod debug;
 mod game;
 mod graphics;
 mod input;
+mod inventory;
 mod math;
 mod player;
 mod res;

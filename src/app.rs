@@ -5,10 +5,10 @@ use gamedebug_core::{imm, imm_dbg};
 use sfml::{
     audio::SoundSource,
     graphics::{
-        BlendMode, Color, Rect, RenderStates, RenderTarget, RenderTexture, RenderWindow, Sprite,
-        Transformable, View,
+        BlendMode, Color, Rect, RectangleShape, RenderStates, RenderTarget, RenderTexture,
+        RenderWindow, Shape, Sprite, Transformable, View,
     },
-    system::Vector2u,
+    system::{Vector2, Vector2u},
     window::{Event, Key},
 };
 
@@ -17,6 +17,7 @@ use crate::{
     game::{for_each_tile_on_screen, Biome, GameState},
     graphics::{self, ScreenSc, ScreenVec},
     input::Input,
+    inventory::TileLayer,
     math::{center_offset, TILE_SIZE},
     res::Res,
     CliArgs,
@@ -231,15 +232,22 @@ impl App {
             self.game.world.player.col_en.en.pos.y = wpos.y as i32;
         }
         if self.input.lmb_down {
-            let t = self.game.world.tile_at_mut(mouse_tpos, &self.game.worldgen);
-            t.mid = 0;
-            t.fg = 0;
-        } else if self.input.rmb_down {
-            let t = self.game.world.tile_at_mut(mouse_tpos, &self.game.worldgen);
-            if self.game.tile_to_place != 7 {
-                t.mid = self.game.tile_to_place;
-            } else {
-                t.bg = self.game.tile_to_place;
+            let active_slot = &self.game.inventory.slots[self.game.selected_inv_slot];
+            if active_slot.qty != 0 {
+                let def = &self.game.itemdb.db[active_slot.id as usize];
+                let t = self.game.world.tile_at_mut(mouse_tpos, &self.game.worldgen);
+                match &def.use_action {
+                    crate::inventory::UseAction::PlaceTile { layer, id } => match layer {
+                        TileLayer::Bg => t.bg = *id,
+                        TileLayer::Mid => t.mid = *id,
+                        TileLayer::Fg => t.fg = *id,
+                    },
+                    crate::inventory::UseAction::RemoveTile { layer } => match layer {
+                        TileLayer::Bg => t.bg = 0,
+                        TileLayer::Mid => t.mid = 0,
+                        TileLayer::Fg => t.fg = 0,
+                    },
+                }
             }
         }
         if self.game.camera_offset.y > 643_000 {
@@ -262,7 +270,7 @@ impl App {
                 }
             }
         }
-        self.game.update();
+        self.game.update(&self.input);
     }
 
     fn do_freecam(&mut self) {
@@ -305,6 +313,18 @@ impl App {
         self.light_map.display();
         spr.set_texture(self.light_map.texture(), false);
         self.rw.draw_with_renderstates(&spr, &rst);
+        drop(spr);
+        // Draw ui on top of in-game scene
+        self.rt.clear(Color::TRANSPARENT);
+        let ui_dims = Vector2 {
+            x: (self.rw.size().x / self.scale as u32) as f32,
+            y: (self.rw.size().y / self.scale as u32) as f32,
+        };
+        self.game.draw_ui(&mut self.rt, &self.res, ui_dims);
+        self.rt.display();
+        let mut spr = Sprite::with_texture(self.rt.texture());
+        spr.set_scale((self.scale as f32, self.scale as f32));
+        self.rw.draw(&spr);
         self.sf_egui
             .do_frame(|ctx| {
                 debug::do_debug_ui(
@@ -317,6 +337,14 @@ impl App {
             })
             .unwrap();
         self.sf_egui.draw(&mut self.rw, None);
+        if self.debug.show_atlas {
+            let atlas = &self.res.atlas.tex;
+            let size = atlas.size();
+            let mut rs = RectangleShape::from_rect(Rect::new(0., 0., size.x as f32, size.y as f32));
+            rs.set_fill_color(Color::MAGENTA);
+            self.rw.draw(&rs);
+            self.rw.draw(&Sprite::with_texture(atlas));
+        }
         self.rw.display();
     }
 }

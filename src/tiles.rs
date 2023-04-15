@@ -19,7 +19,6 @@ pub struct TileDef {
     pub light: Option<ScreenVec>,
     /// Platform behavior: Horizontally passable, vertically passable upwards
     pub platform: bool,
-    #[serde(default)]
     pub graphic_name: String,
     pub tex_rect: IntRect,
 }
