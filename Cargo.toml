@@ -41,3 +41,6 @@ git = "https://github.com/crumblingstatue/gamedebug_core.git"
 
 [dependencies.egui-inspect]
 git = "https://github.com/crumblingstatue/egui-inspect.git"
+
+[profile.dev.package."*"]
+opt-level = 2
