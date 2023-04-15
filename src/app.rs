@@ -17,7 +17,7 @@ use crate::{
     game::{for_each_tile_on_screen, Biome, GameState},
     graphics::{self, ScreenSc, ScreenVec},
     input::Input,
-    inventory::TileLayer,
+    inventory::{TileLayer, UseAction},
     math::{center_offset, TILE_SIZE},
     res::Res,
     CliArgs,
@@ -231,23 +231,30 @@ impl App {
             self.game.world.player.col_en.en.pos.x = wpos.x as i32;
             self.game.world.player.col_en.en.pos.y = wpos.y as i32;
         }
-        if self.input.lmb_down {
-            let active_slot = &self.game.inventory.slots[self.game.selected_inv_slot];
-            if active_slot.qty != 0 {
-                let def = &self.game.itemdb.db[active_slot.id as usize];
-                let t = self.game.world.tile_at_mut(mouse_tpos, &self.game.worldgen);
-                match &def.use_action {
-                    crate::inventory::UseAction::PlaceTile { layer, id } => match layer {
-                        TileLayer::Bg => t.bg = *id,
-                        TileLayer::Mid => t.mid = *id,
-                        TileLayer::Fg => t.fg = *id,
-                    },
-                    crate::inventory::UseAction::RemoveTile { layer } => match layer {
-                        TileLayer::Bg => t.bg = 0,
-                        TileLayer::Mid => t.mid = 0,
-                        TileLayer::Fg => t.fg = 0,
-                    },
-                }
+        'item_use: {
+            if !self.input.lmb_down {
+                break 'item_use;
+            }
+            let Some(active_slot) = self.game.inventory.slots.get(self.game.selected_inv_slot) else {
+                log::error!("Selected slot {} out of bounds", self.game.selected_inv_slot);
+                break 'item_use;
+            };
+            if active_slot.qty == 0 {
+                break 'item_use;
+            }
+            let def = &self.game.itemdb.db[active_slot.id as usize];
+            let t = self.game.world.tile_at_mut(mouse_tpos, &self.game.worldgen);
+            match &def.use_action {
+                UseAction::PlaceTile { layer, id } => match layer {
+                    TileLayer::Bg => t.bg = *id,
+                    TileLayer::Mid => t.mid = *id,
+                    TileLayer::Fg => t.fg = *id,
+                },
+                UseAction::RemoveTile { layer } => match layer {
+                    TileLayer::Bg => t.bg = 0,
+                    TileLayer::Mid => t.mid = 0,
+                    TileLayer::Fg => t.fg = 0,
+                },
             }
         }
         if self.game.camera_offset.y > 643_000 {
