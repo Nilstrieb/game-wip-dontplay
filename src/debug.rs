@@ -1,5 +1,6 @@
 use std::fmt::Write;
 
+use egui::TextBuffer;
 use egui_inspect::{derive::Inspect, inspect};
 use sfml::audio::SoundSource;
 
@@ -29,6 +30,7 @@ pub struct Console {
     pub cmdline: String,
     pub log: String,
     pub just_opened: bool,
+    pub history: Vec<String>,
 }
 
 fn debug_panel_ui(
@@ -128,6 +130,8 @@ pub(crate) fn do_debug_ui(
 
 fn console_ui(ctx: &egui::Context, debug: &mut DebugState, cmd: &mut CmdVec) {
     egui::Window::new("Console (F11)").show(ctx, |ui| {
+        let up_arrow =
+            ui.input_mut(|inp| inp.consume_key(egui::Modifiers::default(), egui::Key::ArrowUp));
         let re =
             ui.add(egui::TextEdit::singleline(&mut debug.console.cmdline).hint_text("Command"));
         if debug.console.just_opened {
@@ -139,14 +143,19 @@ fn console_ui(ctx: &egui::Context, debug: &mut DebugState, cmd: &mut CmdVec) {
                 Ok(cmd) => cmd,
                 Err(e) => {
                     writeln!(&mut debug.console.log, "{e}").unwrap();
-                    debug.console.cmdline.clear();
+                    debug.console.history.push(debug.console.cmdline.take());
                     return;
                 }
             };
-            debug.console.cmdline.clear();
+            debug.console.history.push(debug.console.cmdline.take());
             match cmdline.dispatch() {
                 crate::cmdline::Dispatch::Cmd(command) => cmd.push(command),
                 crate::cmdline::Dispatch::ClearConsole => debug.console.log.clear(),
+            }
+        }
+        if up_arrow {
+            if let Some(line) = debug.console.history.pop() {
+                debug.console.cmdline = line;
             }
         }
         egui::ScrollArea::vertical()
