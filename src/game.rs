@@ -38,6 +38,7 @@ pub struct GameState {
     pub inventory: Inventory,
     pub itemdb: ItemDb,
     pub selected_inv_slot: usize,
+    pub spawn_point: WorldPos,
 }
 
 #[derive(Debug, Inspect)]
@@ -182,6 +183,7 @@ impl GameState {
             inventory: Inventory::new_debug(),
             itemdb: ItemDb::default(),
             selected_inv_slot: 0,
+            spawn_point,
         }
     }
 }

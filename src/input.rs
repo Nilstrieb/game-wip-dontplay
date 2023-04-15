@@ -14,7 +14,7 @@ pub struct Input {
 }
 
 impl Input {
-    pub fn update_from_event(&mut self, ev: &Event) {
+    pub fn update_from_event(&mut self, ev: &Event, egui_kbd: bool, egui_ptr: bool) {
         match ev {
             &Event::KeyPressed { code, .. } => {
                 self.pressed.insert(code);
@@ -51,6 +51,15 @@ impl Input {
                 self.mouse_down_loc.y = y as i16;
             }
             _ => {}
+        }
+        if egui_kbd {
+            self.pressed.clear();
+            self.down.clear();
+        }
+        if egui_ptr {
+            self.lmb_down = false;
+            self.rmb_down = false;
+            self.mid_pressed = false;
         }
     }
     /// Pressed event should be cleared every frame

@@ -16,8 +16,8 @@ pub struct AtlasBundle {
 impl AtlasBundle {
     pub fn new() -> anyhow::Result<Self> {
         let cfg = TexturePackerConfig {
-            max_width: 4096,
-            max_height: 4096,
+            max_width: 512,
+            max_height: 512,
             allow_rotation: false,
             border_padding: 0,
             texture_padding: 0,
@@ -65,7 +65,6 @@ fn make_pix_buf(packer: &TexturePacker<image::DynamicImage, String>) -> Vec<u8> 
     let (w, h) = (packer.width(), packer.height());
     let px_size = 4;
     let mut vec = vec![0; w as usize * h as usize * px_size as usize];
-    dbg!(w, h);
     for y in 0..h {
         for x in 0..w {
             let idx = ((y * w + x) * px_size) as usize;

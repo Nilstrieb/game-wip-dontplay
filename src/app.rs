@@ -13,6 +13,7 @@ use sfml::{
 };
 
 use crate::{
+    command::{Cmd, CmdVec},
     debug::{self, DebugState},
     game::{for_each_tile_on_screen, Biome, GameState},
     graphics::{self, ScreenSc, ScreenVec},
@@ -39,6 +40,7 @@ pub struct App {
     /// Light map overlay, blended together with the non-lighted version of the scene
     pub light_map: RenderTexture,
     pub project_dirs: ProjectDirs,
+    pub cmdvec: CmdVec,
 }
 
 impl App {
@@ -69,6 +71,7 @@ impl App {
             rt,
             light_map,
             project_dirs,
+            cmdvec: CmdVec::default(),
         })
     }
 
@@ -87,7 +90,14 @@ impl App {
     fn do_event_handling(&mut self) {
         while let Some(ev) = self.rw.poll_event() {
             self.sf_egui.add_event(&ev);
-            self.input.update_from_event(&ev);
+            {
+                let ctx = self.sf_egui.context();
+                self.input.update_from_event(
+                    &ev,
+                    ctx.wants_keyboard_input(),
+                    ctx.wants_pointer_input(),
+                );
+            }
             match ev {
                 Event::Closed => self.should_quit = true,
                 Event::Resized { width, height } => {
@@ -100,13 +110,20 @@ impl App {
                     let view = View::from_rect(Rect::new(0., 0., width as f32, height as f32));
                     self.rw.set_view(&view);
                 }
+                Event::KeyPressed { code, .. } => match code {
+                    Key::F11 => {
+                        self.debug.console.show ^= true;
+                        self.debug.console.just_opened = true;
+                    }
+                    Key::F12 => self.debug.panel ^= true,
+                    _ => {}
+                },
                 _ => {}
             }
         }
     }
 
     fn do_update(&mut self) {
-        self.debug.update(&self.input);
         let rt_size = self.rt.size();
         if self.debug.freecam {
             self.do_freecam();
@@ -246,9 +263,21 @@ impl App {
             let t = self.game.world.tile_at_mut(mouse_tpos, &self.game.worldgen);
             match &def.use_action {
                 UseAction::PlaceTile { layer, id } => match layer {
-                    TileLayer::Bg => t.bg = *id,
-                    TileLayer::Mid => t.mid = *id,
-                    TileLayer::Fg => t.fg = *id,
+                    TileLayer::Bg => {
+                        if t.bg == 0 {
+                            t.bg = *id
+                        }
+                    }
+                    TileLayer::Mid => {
+                        if t.mid == 0 {
+                            t.mid = *id
+                        }
+                    }
+                    TileLayer::Fg => {
+                        if t.fg == 0 {
+                            t.fg = *id
+                        }
+                    }
                 },
                 UseAction::RemoveTile { layer } => match layer {
                     TileLayer::Bg => t.bg = 0,
@@ -340,10 +369,10 @@ impl App {
                     &mut self.game,
                     &mut self.res,
                     &mut self.scale,
+                    &mut self.cmdvec,
                 );
             })
             .unwrap();
-        self.sf_egui.draw(&mut self.rw, None);
         if self.debug.show_atlas {
             let atlas = &self.res.atlas.tex;
             let size = atlas.size();
@@ -352,7 +381,31 @@ impl App {
             self.rw.draw(&rs);
             self.rw.draw(&Sprite::with_texture(atlas));
         }
+        self.sf_egui.draw(&mut self.rw, None);
         self.rw.display();
+        drop(spr);
+        self.execute_commands();
+    }
+
+    fn execute_commands(&mut self) {
+        for cmd in self.cmdvec.drain(..) {
+            match cmd {
+                Cmd::QuitApp => self.should_quit = true,
+                Cmd::ToggleFreecam => self.debug.freecam ^= true,
+                Cmd::TeleportPlayer { pos, relative } => {
+                    if relative {
+                        let s2dc = pos.to_s2dc();
+                        self.game.world.player.col_en.en.pos.x += s2dc.x;
+                        self.game.world.player.col_en.en.pos.y += s2dc.y;
+                    } else {
+                        self.game.world.player.col_en.en.pos = pos.to_s2dc()
+                    }
+                }
+                Cmd::TeleportPlayerSpawn => {
+                    self.game.world.player.col_en.en.pos = self.game.spawn_point.to_s2dc()
+                }
+            }
+        }
     }
 }
 

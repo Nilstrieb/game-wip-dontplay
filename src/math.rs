@@ -50,6 +50,13 @@ impl WorldPos {
         x: Self::CENTER,
         y: Self::SURFACE,
     };
+
+    pub(crate) fn to_s2dc(self) -> s2dc::Vec2 {
+        s2dc::Vec2 {
+            x: self.x as i32,
+            y: self.y as i32,
+        }
+    }
 }
 
 pub fn wp_to_tp(wp: WPosSc) -> TPosSc {

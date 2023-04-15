@@ -1,9 +1,12 @@
+use std::fmt::Write;
+
 use egui_inspect::{derive::Inspect, inspect};
-use sfml::{audio::SoundSource, window::Key};
+use sfml::audio::SoundSource;
 
 use crate::{
+    cmdline::CmdLine,
+    command::CmdVec,
     game::GameState,
-    input::Input,
     math::{px_per_frame_to_km_h, WorldPos},
     res::Res,
     stringfmt::LengthDisp,
@@ -13,21 +16,19 @@ use crate::{
 
 #[derive(Default, Debug, Inspect)]
 pub struct DebugState {
-    panel: bool,
+    pub panel: bool,
     pub freecam: bool,
-    tiledb_edit: bool,
+    pub tiledb_edit: bool,
     pub show_atlas: bool,
+    pub console: Console,
 }
 
-impl DebugState {
-    pub fn update(&mut self, input: &Input) {
-        if input.pressed(Key::F12) {
-            self.panel ^= true;
-        }
-        if input.pressed(Key::F10) {
-            self.freecam ^= true;
-        }
-    }
+#[derive(Default, Debug, Inspect)]
+pub struct Console {
+    pub show: bool,
+    pub cmdline: String,
+    pub log: String,
+    pub just_opened: bool,
 }
 
 fn debug_panel_ui(
@@ -112,6 +113,7 @@ pub(crate) fn do_debug_ui(
     game: &mut GameState,
     res: &mut Res,
     scale: &mut u8,
+    cmd: &mut CmdVec,
 ) {
     if debug.panel {
         debug_panel_ui(debug, game, ctx, res, scale);
@@ -119,4 +121,39 @@ pub(crate) fn do_debug_ui(
     if debug.tiledb_edit {
         tiledb_edit_ui(ctx, &mut game.tile_db);
     }
+    if debug.console.show {
+        console_ui(ctx, debug, cmd);
+    }
+}
+
+fn console_ui(ctx: &egui::Context, debug: &mut DebugState, cmd: &mut CmdVec) {
+    egui::Window::new("Console (F11)").show(ctx, |ui| {
+        let re =
+            ui.add(egui::TextEdit::singleline(&mut debug.console.cmdline).hint_text("Command"));
+        if debug.console.just_opened {
+            re.request_focus();
+        }
+        if re.lost_focus() && ui.input(|inp| inp.key_pressed(egui::Key::Enter)) {
+            re.request_focus();
+            let cmdline = match CmdLine::parse_cmdline(&debug.console.cmdline) {
+                Ok(cmd) => cmd,
+                Err(e) => {
+                    writeln!(&mut debug.console.log, "{e}").unwrap();
+                    debug.console.cmdline.clear();
+                    return;
+                }
+            };
+            debug.console.cmdline.clear();
+            match cmdline.dispatch() {
+                crate::cmdline::Dispatch::Cmd(command) => cmd.push(command),
+                crate::cmdline::Dispatch::ClearConsole => debug.console.log.clear(),
+            }
+        }
+        egui::ScrollArea::vertical()
+            .stick_to_bottom(true)
+            .show(ui, |ui| {
+                ui.add(egui::TextEdit::multiline(&mut &debug.console.log[..]));
+            });
+    });
+    debug.console.just_opened = false;
 }
