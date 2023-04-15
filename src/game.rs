@@ -50,16 +50,16 @@ impl GameState {
     }
     pub(crate) fn draw_world(&mut self, rt: &mut RenderTexture, res: &mut Res) {
         self.light_sources.clear();
-        let mut s = Sprite::with_texture(&res.tile_atlas);
+        let mut s = Sprite::with_texture(&res.atlas.tex);
         for_each_tile_on_screen(self.camera_offset, rt.size(), |tp, sp| {
             let tile = self.world.tile_at_mut(tp, &self.worldgen);
             s.set_position(sp.to_sf_vec());
             if tile.bg != Tile::EMPTY {
-                s.set_texture_rect(self.tile_db[tile.bg].atlas_offset.to_sf_rect());
+                s.set_texture_rect(self.tile_db[tile.bg].tex_rect.to_sf());
                 rt.draw(&s);
             }
             if tile.mid != Tile::EMPTY {
-                s.set_texture_rect(self.tile_db[tile.mid].atlas_offset.to_sf_rect());
+                s.set_texture_rect(self.tile_db[tile.mid].tex_rect.to_sf());
                 if let Some(light) = self.tile_db[tile.mid].light {
                     let pos = ScreenVec {
                         x: sp.x + light.x,
@@ -70,7 +70,7 @@ impl GameState {
                 rt.draw(&s);
             }
             if tile.fg != Tile::EMPTY {
-                s.set_texture_rect(self.tile_db[tile.fg].atlas_offset.to_sf_rect());
+                s.set_texture_rect(self.tile_db[tile.fg].tex_rect.to_sf());
                 rt.draw(&s);
             }
         });
@@ -106,8 +106,9 @@ impl GameState {
             self.ambient_light,
             255,
         ));
+        let mut s = Sprite::with_texture(&res.atlas.tex);
+        s.set_texture_rect(res.atlas.rects["light/1"].to_sf());
         for ls in &self.light_sources {
-            let mut s = Sprite::with_texture(&res.light_texture);
             let flicker = smoothwave(self.world.ticks, 40) as f32 / 64.0;
             s.set_scale((4. + flicker, 4. + flicker));
             s.set_origin((128., 128.));
@@ -116,9 +117,11 @@ impl GameState {
         }
     }
 
-    pub(crate) fn new(world_name: String, path: PathBuf) -> GameState {
+    pub(crate) fn new(world_name: String, path: PathBuf, res: &Res) -> GameState {
         let mut spawn_point = WorldPos::SURFACE_CENTER;
         spawn_point.y -= 1104;
+        let mut tile_db = TileDb::load_or_default();
+        tile_db.update_rects(&res.atlas.rects);
         Self {
             camera_offset: spawn_point,
             world: World::new(spawn_point, &world_name, path),
@@ -129,7 +132,7 @@ impl GameState {
             worldgen: Worldgen::from_seed(0),
             ambient_light: 0,
             light_sources: Vec::new(),
-            tile_db: TileDb::load_or_default(),
+            tile_db,
         }
     }
 }

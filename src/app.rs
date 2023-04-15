@@ -59,7 +59,7 @@ impl App {
         Ok(Self {
             rw,
             should_quit: false,
-            game: GameState::new(args.world_name, path),
+            game: GameState::new(args.world_name, path, &res),
             res,
             sf_egui,
             input: Input::default(),

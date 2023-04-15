@@ -8,6 +8,7 @@ mod math;
 mod player;
 mod res;
 mod stringfmt;
+mod texture_atlas;
 mod tiles;
 mod world;
 mod worldgen;

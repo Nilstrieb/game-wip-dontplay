@@ -1,5 +1,8 @@
+use std::fmt::Debug;
+
 use egui_inspect::derive::Inspect;
 use num_traits::{Num, Signed};
+use serde::{Deserialize, Serialize};
 
 use crate::world::{TPosSc, TilePos};
 
@@ -78,6 +81,24 @@ pub fn smoothwave<T: Num + From<u8> + PartialOrd + Copy>(input: T, max: T) -> T 
         value
     } else {
         period - value
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Inspect, Default, Clone, Copy)]
+pub struct IntRect {
+    pub x: i32,
+    pub y: i32,
+    pub w: i32,
+    pub h: i32,
+}
+impl IntRect {
+    pub(crate) fn to_sf(&self) -> sfml::graphics::Rect<i32> {
+        sfml::graphics::Rect::<i32> {
+            left: self.x,
+            top: self.y,
+            width: self.w,
+            height: self.h,
+        }
     }
 }
 

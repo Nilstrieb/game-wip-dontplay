@@ -4,11 +4,11 @@ use std::ops::Index;
 
 use egui_inspect::derive::Inspect;
 use serde::{Deserialize, Serialize};
-use sfml::graphics::IntRect;
 
 use crate::{
     graphics::{ScreenSc, ScreenVec},
-    math::TILE_SIZE,
+    math::{IntRect, TILE_SIZE},
+    texture_atlas::RectMap,
     world::TileId,
 };
 
@@ -17,9 +17,11 @@ pub struct TileDef {
     pub bb: Option<TileBb>,
     /// Whether the tile emits light, and the light source offset
     pub light: Option<ScreenVec>,
-    pub atlas_offset: AtlasOffset,
     /// Platform behavior: Horizontally passable, vertically passable upwards
     pub platform: bool,
+    #[serde(default)]
+    pub graphic_name: String,
+    pub tex_rect: IntRect,
 }
 
 const DEFAULT_TILE_BB: TileBb = TileBb {
@@ -44,9 +46,18 @@ pub struct TileDb {
 
 impl Default for TileDb {
     fn default() -> Self {
+        let unknown = TileDef {
+            bb: None,
+            light: Some(ScreenVec {
+                x: TILE_SIZE as ScreenSc / 2,
+                y: TILE_SIZE as ScreenSc / 2,
+            }),
+            platform: false,
+            graphic_name: String::from("tiles/unknown"),
+            tex_rect: IntRect::default(),
+        };
         Self {
-            // Add empty/air tile
-            db: vec![EMPTY],
+            db: vec![EMPTY, unknown],
         }
     }
 }
@@ -56,51 +67,25 @@ const EMPTY: TileDef = TileDef {
     light: None,
     // Rendering empty tile is actually special cased, and no rendering is done.
     // But just in case, put the offset to UNKNOWN
-    atlas_offset: UNKNOWN_ATLAS_OFF,
+    tex_rect: IntRect {
+        x: 0,
+        y: 0,
+        w: 0,
+        h: 0,
+    },
     platform: false,
+    graphic_name: String::new(),
 };
 
 impl Index<TileId> for TileDb {
     type Output = TileDef;
 
     fn index(&self, index: TileId) -> &Self::Output {
-        self.db.get(index as usize).unwrap_or(&UNKNOWN_TILE)
+        self.db.get(index as usize).unwrap_or_else(|| {
+            &self.db[1] // Unknown tile def is stored at index 1
+        })
     }
 }
-
-#[derive(Debug, Inspect, Serialize, Deserialize)]
-pub struct AtlasOffset {
-    pub x: u16,
-    pub y: u16,
-}
-impl AtlasOffset {
-    pub(crate) fn to_sf_rect(&self) -> IntRect {
-        IntRect {
-            left: self.x as i32,
-            top: self.y as i32,
-            width: TILE_SIZE as i32,
-            height: TILE_SIZE as i32,
-        }
-    }
-}
-
-impl Default for AtlasOffset {
-    fn default() -> Self {
-        UNKNOWN_ATLAS_OFF
-    }
-}
-
-const UNKNOWN_ATLAS_OFF: AtlasOffset = AtlasOffset { x: 320, y: 0 };
-
-static UNKNOWN_TILE: TileDef = TileDef {
-    bb: None,
-    light: Some(ScreenVec {
-        x: TILE_SIZE as ScreenSc / 2,
-        y: TILE_SIZE as ScreenSc / 2,
-    }),
-    atlas_offset: UNKNOWN_ATLAS_OFF,
-    platform: false,
-};
 
 const PATH: &str = "tiles.dat";
 
@@ -127,6 +112,14 @@ impl TileDb {
                 Err(e) => log::warn!("Failed to save tile db: {e}"),
             },
             Err(e) => log::warn!("Failed to save tile db: {e}"),
+        }
+    }
+
+    pub(crate) fn update_rects(&mut self, rects: &RectMap) {
+        for def in &mut self.db {
+            if !def.graphic_name.is_empty() {
+                def.tex_rect = rects[&def.graphic_name];
+            }
         }
     }
 }

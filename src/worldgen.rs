@@ -34,7 +34,7 @@ impl Worldgen {
             .add(
                 Tile::new(Tl {
                     bg: 9,
-                    mid: 2,
+                    mid: 3,
                     fg: 6,
                 })
                 .when(constraint!(nm.clone(), < -0.8)),
@@ -43,7 +43,7 @@ impl Worldgen {
             .add(
                 Tile::new(Tl {
                     bg: 9,
-                    mid: 2,
+                    mid: 3,
                     fg: 0,
                 })
                 .when(constraint!(nm.clone(), < -0.1)),
@@ -52,7 +52,7 @@ impl Worldgen {
             .add(
                 Tile::new(Tl {
                     bg: 7,
-                    mid: 1,
+                    mid: 2,
                     fg: 0,
                 })
                 .when(constraint!(nm, < 0.45)),

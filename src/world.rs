@@ -78,7 +78,7 @@ impl World {
         chk.at_mut(local)
     }
     pub fn save(&self) {
-        let result = std::fs::create_dir(&self.path);
+        let result = std::fs::create_dir_all(&self.path);
         log::info!("{result:?}");
         self.save_meta();
         self.player.save(&self.path);
