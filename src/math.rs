@@ -92,7 +92,7 @@ pub struct IntRect {
     pub h: i32,
 }
 impl IntRect {
-    pub(crate) fn to_sf(&self) -> sfml::graphics::Rect<i32> {
+    pub(crate) fn to_sf(self) -> sfml::graphics::Rect<i32> {
         sfml::graphics::Rect::<i32> {
             left: self.x,
             top: self.y,

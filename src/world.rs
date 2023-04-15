@@ -238,7 +238,7 @@ impl Chunk {
     pub fn load_or_gen(chk: ChunkPos, worldgen: &Worldgen, world_path: &Path) -> Chunk {
         log::info!("Loading chunk {chk:?} (reg: {:?})", chk.region());
         let reg_filename = world_path.join(format_reg_file_name(chk.region()));
-        let chunk = if chunk_exists(&reg_filename, chk) {
+        if chunk_exists(&reg_filename, chk) {
             log::info!("Chunk exists, loading");
             let mut f = File::open(&reg_filename).unwrap();
             let bitset = ExistenceBitset::read_from_file(&mut f);
@@ -251,8 +251,7 @@ impl Chunk {
         } else {
             log::warn!("Chunk at {:?} doesn't exist, generating.", chk);
             Chunk::gen(chk, worldgen)
-        };
-        chunk
+        }
     }
 
     fn at_mut(&mut self, local: ChunkLocalTilePos) -> &mut Tile {
