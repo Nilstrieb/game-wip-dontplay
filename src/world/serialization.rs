@@ -13,7 +13,6 @@ use super::{default_chunk_tiles, loc_byte_idx_xy, Chunk, ChunkPos};
 
 pub(super) fn save_chunk(pos: &ChunkPos, chk: &Chunk) {
     let reg_file_name = format_reg_file_name(pos.region());
-    dbg!(&reg_file_name);
     let reg_file_exists = Path::new(&reg_file_name).exists();
     if !reg_file_exists {
         log::warn!("Region file doesn't exist. Going to create one.");
@@ -29,7 +28,6 @@ pub(super) fn save_chunk(pos: &ChunkPos, chk: &Chunk) {
     } else {
         ExistenceBitset::EMPTY
     };
-    dbg!(existence_bitset);
     let mut region_tile_data = if reg_file_exists {
         assert_eq!(f.stream_position().unwrap(), 8);
         zstd::decode_all(&mut f).unwrap()
@@ -39,11 +37,9 @@ pub(super) fn save_chunk(pos: &ChunkPos, chk: &Chunk) {
     // Even the zstd decompressed data should be exactly REGION_BYTES size
     assert_eq!(region_tile_data.len(), REGION_BYTES);
     let (loc_x, loc_y) = pos.local();
-    dbg!(loc_x, loc_y);
     let loc_idx = loc_idx(loc_y, loc_x);
     crate::bitmanip::set_nth_bit(&mut existence_bitset.0, loc_idx as usize, true);
     let byte_idx = loc_byte_idx(loc_idx);
-    dbg!(byte_idx);
     for (i, tile) in chk.tiles.iter().enumerate() {
         let off = byte_idx + (i * TILE_BYTES);
         region_tile_data[off..off + 2].copy_from_slice(&tile.bg.to_le_bytes());
