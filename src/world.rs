@@ -1,7 +1,12 @@
 mod reg_chunk_existence;
 mod serialization;
 
-use std::{fmt::Debug, fs::File, io::Seek, path::Path};
+use std::{
+    fmt::Debug,
+    fs::File,
+    io::Seek,
+    path::{Path, PathBuf},
+};
 
 use egui_inspect::derive::Inspect;
 use fnv::FnvHashMap;
@@ -47,15 +52,18 @@ pub struct World {
     pub ticks: u64,
     pub player: Player,
     pub name: String,
+    #[opaque]
+    pub path: PathBuf,
 }
 
 impl World {
-    pub fn new(spawn_point: WorldPos, name: &str) -> Self {
+    pub fn new(spawn_point: WorldPos, name: &str, path: PathBuf) -> Self {
         Self {
             chunks: Default::default(),
             ticks: Default::default(),
             player: Player::new_at(spawn_point),
             name: name.to_string(),
+            path,
         }
     }
     /// Get mutable access to the tile at `pos`.
@@ -66,15 +74,14 @@ impl World {
         let chk = self
             .chunks
             .entry(chk)
-            .or_insert_with(|| Chunk::load_or_gen(chk, worldgen, &self.name));
+            .or_insert_with(|| Chunk::load_or_gen(chk, worldgen, &self.path));
         chk.at_mut(local)
     }
     pub fn save(&self) {
-        let result = std::fs::create_dir(&self.name);
+        let result = std::fs::create_dir(&self.path);
         log::info!("{result:?}");
-        std::env::set_current_dir(&self.name).unwrap();
         self.save_meta();
-        self.player.save();
+        self.player.save(&self.path);
         self.save_chunks();
     }
     pub fn save_meta(&self) {
@@ -82,12 +89,15 @@ impl World {
             name: self.name.clone(),
             ticks: self.ticks,
         };
-        let result = std::fs::write("world.dat", rmp_serde::to_vec(&meta).unwrap());
+        let result = std::fs::write(
+            self.path.join("world.dat"),
+            rmp_serde::to_vec(&meta).unwrap(),
+        );
         log::info!("{result:?}");
     }
     pub fn save_chunks(&self) {
         for (pos, chk) in self.chunks.iter() {
-            save_chunk(pos, chk);
+            save_chunk(pos, chk, &self.path);
         }
     }
 }
@@ -225,12 +235,9 @@ impl Chunk {
         Self { tiles }
     }
 
-    pub fn load_or_gen(chk: ChunkPos, worldgen: &Worldgen, world_name: &str) -> Chunk {
+    pub fn load_or_gen(chk: ChunkPos, worldgen: &Worldgen, world_path: &Path) -> Chunk {
         log::info!("Loading chunk {chk:?} (reg: {:?})", chk.region());
-        let prev_dir = std::env::current_dir().unwrap();
-        let result = std::env::set_current_dir(world_name);
-        log::info!("{result:?}");
-        let reg_filename = format_reg_file_name(chk.region());
+        let reg_filename = world_path.join(format_reg_file_name(chk.region()));
         let chunk = if chunk_exists(&reg_filename, chk) {
             log::info!("Chunk exists, loading");
             let mut f = File::open(&reg_filename).unwrap();
@@ -245,8 +252,6 @@ impl Chunk {
             log::warn!("Chunk at {:?} doesn't exist, generating.", chk);
             Chunk::gen(chk, worldgen)
         };
-        let result = std::env::set_current_dir(prev_dir);
-        log::info!("{result:?}");
         chunk
     }
 
@@ -255,11 +260,11 @@ impl Chunk {
     }
 }
 
-fn chunk_exists(reg_filename: &str, pos: ChunkPos) -> bool {
-    if !Path::new(&reg_filename).exists() {
+fn chunk_exists(reg_path: &Path, pos: ChunkPos) -> bool {
+    if !Path::new(&reg_path).exists() {
         return false;
     }
-    let bitset = ExistenceBitset::read_from_fs(reg_filename);
+    let bitset = ExistenceBitset::read_from_fs(reg_path);
     let local = pos.local();
     let idx = loc_idx(local.1, local.0);
     crate::bitmanip::nth_bit_set(bitset.0, idx as usize)

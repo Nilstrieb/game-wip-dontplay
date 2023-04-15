@@ -1,4 +1,4 @@
-use std::{fs::File, io::Read};
+use std::{fs::File, io::Read, path::Path};
 
 #[derive(Clone, Copy)]
 pub struct ExistenceBitset(pub u64);
@@ -12,8 +12,8 @@ impl ExistenceBitset {
         ExistenceBitset(u64::from_le_bytes(buf))
     }
 
-    pub fn read_from_fs(reg_filename: &str) -> ExistenceBitset {
-        let mut f = File::open(reg_filename).unwrap();
+    pub fn read_from_fs(path: &Path) -> ExistenceBitset {
+        let mut f = File::open(path).unwrap();
         Self::read_from_file(&mut f)
     }
 }

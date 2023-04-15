@@ -11,8 +11,8 @@ use crate::world::{
 
 use super::{default_chunk_tiles, loc_byte_idx_xy, Chunk, ChunkPos};
 
-pub(super) fn save_chunk(pos: &ChunkPos, chk: &Chunk) {
-    let reg_file_name = format_reg_file_name(pos.region());
+pub(super) fn save_chunk(pos: &ChunkPos, chk: &Chunk, world_dir: &Path) {
+    let reg_file_name = world_dir.join(format_reg_file_name(pos.region()));
     let reg_file_exists = Path::new(&reg_file_name).exists();
     if !reg_file_exists {
         log::warn!("Region file doesn't exist. Going to create one.");
@@ -86,8 +86,8 @@ fn test_chunk_seri() {
     for t in &mut chk.tiles {
         t.bg = 1;
     }
-    save_chunk(&ChunkPos { x: 2, y: 0 }, &chk);
-    save_chunk(&ChunkPos { x: 3, y: 0 }, &chk);
+    save_chunk(&ChunkPos { x: 2, y: 0 }, &chk, "testworld".as_ref());
+    save_chunk(&ChunkPos { x: 3, y: 0 }, &chk, "testworld".as_ref());
     let raw = std::fs::read("0.0.rgn").unwrap();
     zstd::decode_all(&raw[8..]).unwrap();
     std::fs::remove_file("0.0.rgn").unwrap();

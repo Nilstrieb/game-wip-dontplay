@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use egui_inspect::{derive::Inspect, inspect};
 use s2dc::{vec2, MobileEntity};
 use serde::{Deserialize, Serialize};
@@ -52,8 +54,8 @@ impl Player {
         self.col_en.en.pos.y + self.col_en.en.bb.y
     }
 
-    pub(crate) fn save(&self) {
-        let result = std::fs::write("player.dat", rmp_serde::to_vec(self).unwrap());
+    pub(crate) fn save(&self, path: &Path) {
+        let result = std::fs::write(path.join("player.dat"), rmp_serde::to_vec(self).unwrap());
         log::info!("{result:?}");
     }
 }

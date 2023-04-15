@@ -1,4 +1,5 @@
 use anyhow::Context;
+use directories::ProjectDirs;
 use egui_sfml::SfEgui;
 use gamedebug_core::{imm, imm_dbg};
 use sfml::{
@@ -36,6 +37,7 @@ pub struct App {
     pub rt: RenderTexture,
     /// Light map overlay, blended together with the non-lighted version of the scene
     pub light_map: RenderTexture,
+    pub project_dirs: ProjectDirs,
 }
 
 impl App {
@@ -51,10 +53,13 @@ impl App {
             RenderTexture::new(rw_size.x, rw_size.y).context("Failed to create render texture")?;
         let light_map = RenderTexture::new(rw_size.x, rw_size.y)
             .context("Failed to create lightmap texture")?;
+        let project_dirs = ProjectDirs::from("", "", "mantle-diver").unwrap();
+        let worlds_dir = project_dirs.data_dir().join("worlds");
+        let path = worlds_dir.join(&args.world_name);
         Ok(Self {
             rw,
             should_quit: false,
-            game: GameState::new(args.world_name),
+            game: GameState::new(args.world_name, path),
             res,
             sf_egui,
             input: Input::default(),
@@ -62,6 +67,7 @@ impl App {
             scale: 1,
             rt,
             light_map,
+            project_dirs,
         })
     }
 

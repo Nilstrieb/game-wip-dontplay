@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use derivative::Derivative;
 use egui_inspect::derive::Inspect;
 use sfml::{
@@ -114,12 +116,12 @@ impl GameState {
         }
     }
 
-    pub(crate) fn new(world_name: String) -> GameState {
+    pub(crate) fn new(world_name: String, path: PathBuf) -> GameState {
         let mut spawn_point = WorldPos::SURFACE_CENTER;
         spawn_point.y -= 1104;
         Self {
             camera_offset: spawn_point,
-            world: World::new(spawn_point, &world_name),
+            world: World::new(spawn_point, &world_name, path),
             gravity: 0.55,
             tile_to_place: 1,
             current_biome: Biome::Surface,
