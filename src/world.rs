@@ -217,7 +217,7 @@ impl Chunk {
             }
         }
         // Unbreakable layer at bottom
-        if pos.y > 780 {
+        if pos.y > 798 {
             for b in &mut tiles {
                 b.mid = Tile::UNBREAKANIUM;
             }
