@@ -11,10 +11,10 @@ pub struct Res {
 impl Res {
     pub fn load() -> anyhow::Result<Self> {
         Ok(Self {
-            tile_atlas: Texture::from_file("res/tiles.png")?,
-            light_texture: Texture::from_file("res/light2.png")?,
-            surf_music: Music::from_file("res/music.ogg").unwrap(),
-            und_music: Music::from_file("res/cave2.ogg").unwrap(),
+            tile_atlas: Texture::from_file("res/graphics/tiles.png")?,
+            light_texture: Texture::from_file("res/graphics/light2.png")?,
+            surf_music: Music::from_file("res/music/music.ogg").unwrap(),
+            und_music: Music::from_file("res/music/cave2.ogg").unwrap(),
         })
     }
 }
