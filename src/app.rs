@@ -1,3 +1,5 @@
+use std::fmt::Write;
+
 use anyhow::Context;
 use directories::ProjectDirs;
 use egui_sfml::SfEgui;
@@ -410,9 +412,15 @@ impl App {
                             self.game.inventory.slots.push(Slot {
                                 id: i as ItemId,
                                 qty: 1,
-                            })
+                            });
+                            return;
                         }
                     }
+                    writeln!(
+                        &mut self.debug.console.log,
+                        "Item with name '{name}' not found"
+                    )
+                    .unwrap();
                 }
             }
         }
