@@ -78,8 +78,7 @@ fn test_chunk_seri() {
     env_logger::builder()
         .filter_level(log::LevelFilter::Info)
         .init();
-    let result = std::fs::remove_file("0.0.rgn");
-    log::info!("File del result: {result:?}");
+    let _ = std::fs::create_dir("testworld");
     let mut chk = Chunk {
         tiles: super::default_chunk_tiles(),
     };
@@ -88,7 +87,7 @@ fn test_chunk_seri() {
     }
     save_chunk(&ChunkPos { x: 2, y: 0 }, &chk, "testworld".as_ref());
     save_chunk(&ChunkPos { x: 3, y: 0 }, &chk, "testworld".as_ref());
-    let raw = std::fs::read("0.0.rgn").unwrap();
+    let raw = std::fs::read("testworld/0.0.rgn").unwrap();
     zstd::decode_all(&raw[8..]).unwrap();
-    std::fs::remove_file("0.0.rgn").unwrap();
+    std::fs::remove_dir_all("testworld").unwrap();
 }
