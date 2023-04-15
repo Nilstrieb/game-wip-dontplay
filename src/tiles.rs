@@ -118,7 +118,11 @@ impl TileDb {
     pub(crate) fn update_rects(&mut self, rects: &RectMap) {
         for def in &mut self.db {
             if !def.graphic_name.is_empty() {
-                def.tex_rect = rects[&def.graphic_name];
+                if let Some(rect) = rects.get(&def.graphic_name) {
+                    def.tex_rect = *rect;
+                } else {
+                    log::error!("Missing texture for {}", def.graphic_name);
+                }
             }
         }
     }

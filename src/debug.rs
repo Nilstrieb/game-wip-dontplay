@@ -7,6 +7,7 @@ use crate::{
     math::{px_per_frame_to_km_h, WorldPos},
     res::Res,
     stringfmt::LengthDisp,
+    texture_atlas::AtlasBundle,
     tiles::tiledb_edit_ui::tiledb_edit_ui,
 };
 
@@ -87,6 +88,10 @@ fn debug_panel_ui(
                     debug.tiledb_edit
                 }
             });
+        if ui.button("Reload graphics").clicked() {
+            res.atlas = AtlasBundle::new().unwrap();
+            game.tile_db.update_rects(&res.atlas.rects);
+        }
         ui.separator();
         egui::ScrollArea::vertical().show(ui, |ui| {
             gamedebug_core::for_each_imm(|info| match info {
