@@ -9,6 +9,7 @@ pub enum CmdLine {
     Clear,
     Tp(Tp),
     Spawn,
+    Give(Give),
 }
 
 #[derive(Parser)]
@@ -28,6 +29,11 @@ impl Tp {
     }
 }
 
+#[derive(Parser)]
+pub struct Give {
+    name: String,
+}
+
 pub enum Dispatch {
     Cmd(Cmd),
     ClearConsole,
@@ -39,7 +45,7 @@ impl CmdLine {
         Ok(Self::try_parse_from(words)?)
     }
 
-    pub(crate) fn dispatch(&self) -> Dispatch {
+    pub(crate) fn dispatch(self) -> Dispatch {
         match self {
             CmdLine::Quit => Dispatch::Cmd(Cmd::QuitApp),
             CmdLine::Freecam => Dispatch::Cmd(Cmd::ToggleFreecam),
@@ -49,6 +55,7 @@ impl CmdLine {
                 relative: tp.rel,
             }),
             CmdLine::Spawn => Dispatch::Cmd(Cmd::TeleportPlayerSpawn),
+            CmdLine::Give(give) => Dispatch::Cmd(Cmd::GiveItemByName(give.name)),
         }
     }
 }

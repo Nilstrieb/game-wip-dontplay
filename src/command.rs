@@ -10,6 +10,7 @@ pub enum Cmd {
         relative: bool,
     },
     TeleportPlayerSpawn,
+    GiveItemByName(String),
 }
 
 pub type CmdVec = Vec<Cmd>;

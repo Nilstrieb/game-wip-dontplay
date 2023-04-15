@@ -18,7 +18,7 @@ use crate::{
     game::{for_each_tile_on_screen, Biome, GameState},
     graphics::{self, ScreenSc, ScreenVec},
     input::Input,
-    inventory::{TileLayer, UseAction},
+    inventory::{ItemId, Slot, TileLayer, UseAction},
     math::{center_offset, TILE_SIZE},
     res::Res,
     CliArgs,
@@ -403,6 +403,16 @@ impl App {
                 }
                 Cmd::TeleportPlayerSpawn => {
                     self.game.world.player.col_en.en.pos = self.game.spawn_point.to_s2dc()
+                }
+                Cmd::GiveItemByName(name) => {
+                    for (i, item) in self.game.itemdb.db.iter().enumerate() {
+                        if item.name == name {
+                            self.game.inventory.slots.push(Slot {
+                                id: i as ItemId,
+                                qty: 1,
+                            })
+                        }
+                    }
                 }
             }
         }

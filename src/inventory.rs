@@ -115,6 +115,16 @@ impl Default for ItemDb {
                     },
                     consumable: true,
                 },
+                ItemDef {
+                    name: String::from("Panzerium"),
+                    graphic_name: String::from("tiles/panzerium"),
+                    tex_rect: IntRect::default(),
+                    use_action: UseAction::PlaceTile {
+                        layer: TileLayer::Mid,
+                        id: 6,
+                    },
+                    consumable: true,
+                },
             ],
         }
     }
