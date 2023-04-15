@@ -50,14 +50,13 @@ It's all mantle level specific biomes all the way horizontally.
 
 ## Number of stuff
 
-- Up to 1000 tiles (1024*1024 tile sprite sheet)
-  - At least 50 ore types + 50 gem/etc. types. Copper/Coal could be an ore-gem/etc. pair for example.
-  - On average, one new pair every 750 meters, up to 37 kilometers.
-    The last stretch of 3 km to the bottom is a "buffer zone" of no new content, just more of the same.
-  - The rate of new pairs could start out quicker, for example every 300 meters or so,
-    to make early-game less boring, but gradually become less frequent, up to a kilometer gap.
-  - At least 50 stone types
-  - Maybe background tiles and other stuff, like different break overlay animations
+- At least 50 ore types + 50 gem/etc. types. Copper/Coal could be an ore-gem/etc. pair for example.
+- On average, one new pair every 750 meters, up to 37 kilometers.
+  The last stretch of 3 km to the bottom is a "buffer zone" of no new content, just more of the same.
+- The rate of new pairs could start out quicker, for example every 300 meters or so,
+  to make early-game less boring, but gradually become less frequent, up to a kilometer gap.
+- At least 50 stone types
+- Maybe background tiles and other stuff, like different break overlay animations
 
 
 # Multiplayer
