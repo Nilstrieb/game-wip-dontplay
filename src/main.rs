@@ -7,7 +7,6 @@ mod command;
 mod debug;
 mod game;
 mod math;
-mod texture_atlas;
 mod tiles;
 
 pub(crate) struct App {
