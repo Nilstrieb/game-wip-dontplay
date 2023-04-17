@@ -12,33 +12,7 @@ use self::serialization::save_chunk;
 #[derive(Hash, PartialEq, Eq, Debug, Clone, Copy, Inspect)]
 pub(crate) struct ChunkPos {}
 #[derive(Debug, Inspect)]
-pub(crate) struct World {
-    pub(crate) player: Player,
-}
-impl World {
-    pub(crate) fn new(spawn_point: WorldPos, name: &str, path: PathBuf) -> Self {
-        loop {}
-    }
-    /// Get mutable access to the tile at `pos`.
-    ///
-    /// Loads or generates the containing chunk if necessary.
-    pub(crate) fn tile_at_mut(
-        &mut self,
-        pos: TilePos,
-        worldgen: &Worldgen,
-    ) -> &mut Tile {
-        loop {}
-    }
-    pub(crate) fn save(&self) {
-        loop {}
-    }
-    pub(crate) fn save_meta(&self) {
-        loop {}
-    }
-    pub(crate) fn save_chunks(&self) {
-        loop {}
-    }
-}
+pub(crate) struct World {}
 fn loc_byte_idx_xy(x: u8, y: u8) -> usize {
     loop {}
 }
@@ -55,10 +29,6 @@ const CHUNK_BYTES: usize = CHUNK_N_TILES * TILE_BYTES;
 const TILE_BYTES: usize = 3 * 2;
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct TilePos {}
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
-pub(crate) struct ChunkLocalTilePos {}
-/// Chunk-local tile position scalar. Supports up to 256 tiles per chunk.
-type ChkLocalTPosSc = u8;
 pub(crate) type TPosSc = u32;
 pub(crate) const CHUNK_EXTENT: u16 = 128;
 const CHUNK_N_TILES: usize = CHUNK_EXTENT as usize * CHUNK_EXTENT as usize;

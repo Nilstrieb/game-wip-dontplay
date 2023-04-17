@@ -1,5 +1,4 @@
 mod app;
-mod cmdline;
 mod command;
 mod debug;
 mod game;
@@ -9,7 +8,6 @@ mod inventory;
 mod math;
 mod player;
 mod res;
-mod stringfmt;
 mod texture_atlas;
 mod tiles;
 mod world;
