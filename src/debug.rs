@@ -12,14 +12,14 @@ use crate::{
     res::Res,
     stringfmt::LengthDisp,
     texture_atlas::AtlasBundle,
-    tiles::tiledb_edit_ui::tiledb_edit_ui,
+    tiles::tiledb_edit_ui::TileDbEdit,
 };
 
 #[derive(Default, Debug, Inspect)]
 pub struct DebugState {
     pub panel: bool,
     pub freecam: bool,
-    pub tiledb_edit: bool,
+    pub tiledb_edit: TileDbEdit,
     pub show_atlas: bool,
     pub console: Console,
 }
@@ -120,9 +120,7 @@ pub(crate) fn do_debug_ui(
     if debug.panel {
         debug_panel_ui(debug, game, ctx, res, scale);
     }
-    if debug.tiledb_edit {
-        tiledb_edit_ui(ctx, &mut game.tile_db);
-    }
+    debug.tiledb_edit.ui(ctx, &mut game.tile_db);
     if debug.console.show {
         console_ui(ctx, debug, cmd);
     }
