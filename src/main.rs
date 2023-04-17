@@ -2,19 +2,16 @@ use command::CmdVec;
 use debug::DebugState;
 use egui_sfml::SfEgui;
 use game::GameState;
-use res::Res;
 
 mod command;
 mod debug;
 mod game;
 mod math;
-mod res;
 mod texture_atlas;
 mod tiles;
 
 pub(crate) struct App {
     pub(crate) game: GameState,
-    pub(crate) res: Res,
     pub(crate) sf_egui: SfEgui,
     pub(crate) debug: DebugState,
     /// Integer scale for rendering the game

@@ -1,4 +1,4 @@
-use crate::{command::CmdVec, game::GameState, res::Res};
+use crate::{command::CmdVec, game::GameState};
 use egui_inspect::{derive::Inspect, inspect};
 #[derive(Default, Debug, Inspect)]
 pub(crate) struct DebugState {}
