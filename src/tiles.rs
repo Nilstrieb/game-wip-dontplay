@@ -25,7 +25,6 @@ pub enum Mid {}
 #[derive(Debug)]
 pub enum Fg {}
 
-
 pub trait TileLayer {
     /// Definitions specific to this layer
     type SpecificDef;
@@ -41,28 +40,6 @@ impl TileLayer for Mid {
 
 impl TileLayer for Fg {
     type SpecificDef = ();
-}
-
-pub type BgTileId = TileId<Bg>;
-pub type MidTileId = TileId<Mid>;
-pub type FgTileId = TileId<Fg>;
-
-impl BgTileId {
-    pub const DIRT: Self = Self(1, PhantomData);
-    pub const STONE: Self = Self(2, PhantomData);
-}
-
-impl MidTileId {
-    pub const DIRT: Self = Self(1, PhantomData);
-    pub const STONE: Self = Self(2, PhantomData);
-    pub const TORCH: Self = Self(3, PhantomData);
-    pub const PLATFORM: Self = Self(4, PhantomData);
-    pub const PANZERIUM: Self = Self(5, PhantomData);
-    pub const UNBREAKANIUM: Self = Self(6, PhantomData);
-}
-
-impl FgTileId {
-    pub const COAL: Self = Self(1, PhantomData);
 }
 
 #[derive(Serialize, Deserialize, Inspect)]
@@ -100,7 +77,6 @@ where
         loop {}
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Inspect, Clone, Copy)]
 pub struct TileBb {
