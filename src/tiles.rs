@@ -1,5 +1,3 @@
-pub mod tiledb_edit_ui;
-
 use std::{fmt::Debug, marker::PhantomData, ops::Index};
 
 use egui_inspect::{derive::Inspect, Inspect};
