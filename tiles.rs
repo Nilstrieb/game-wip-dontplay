@@ -1,9 +1,7 @@
-use std::{fmt::Debug, marker::PhantomData, ops::Index};
+use std::{fmt::Debug, marker::PhantomData};
 
 use egui_inspect::{derive::Inspect, Inspect};
 use serde::{Deserialize, Serialize};
-
-use crate::{math::TILE_SIZE, texture_atlas::RectMap};
 
 #[derive(Inspect, PartialEq, Eq)]
 pub struct TileId<Layer>(pub u16, PhantomData<Layer>);
@@ -20,37 +18,12 @@ impl<Layer> Debug for TileId<Layer> {
     }
 }
 
-impl<Layer> TileId<Layer> {
-    pub fn empty(&self) -> bool {
-        loop {}
-    }
-    pub const EMPTY: Self = Self(0, PhantomData);
-}
-
 #[derive(Debug)]
 pub enum Bg {}
 #[derive(Debug)]
 pub enum Mid {}
 #[derive(Debug)]
 pub enum Fg {}
-
-impl Bg {
-    pub fn unknown_def() -> TileDef<Self> {
-        loop {}
-    }
-}
-
-impl Mid {
-    pub fn unknown_def() -> TileDef<Self> {
-        loop {}
-    }
-}
-
-impl Fg {
-    pub fn unknown_def() -> TileDef<Self> {
-        loop {}
-    }
-}
 
 pub trait TileLayer {
     /// Definitions specific to this layer
@@ -126,7 +99,6 @@ where
         loop {}
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Inspect, Clone, Copy)]
 pub struct TileBb {
