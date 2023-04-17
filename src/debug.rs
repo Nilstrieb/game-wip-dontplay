@@ -24,11 +24,6 @@ fn debug_panel_ui(
     mut scale: &mut u8,
 ) {
     egui::Window::new("Debug (F12)").show(ctx, |ui| {
-        ui.label("Music volume");
-        let mut vol = res.surf_music.volume();
-        ui.add(egui::DragValue::new(&mut vol));
-        res.surf_music.set_volume(vol);
-        ui.separator();
         egui::ScrollArea::both()
             .id_source("insp_scroll")
             .max_height(240.)
@@ -39,7 +34,6 @@ fn debug_panel_ui(
                 }
             });
 
-        ui.separator();
         egui::ScrollArea::vertical().show(ui, |ui| {
             gamedebug_core::for_each_imm(|info| match info {
                 gamedebug_core::Info::Msg(msg) => {
