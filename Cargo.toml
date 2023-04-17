@@ -30,8 +30,7 @@ image = "0.24.6"
 bitfield-struct = "0.4.1"
 
 [dependencies.s2dc]
-#git = "https://github.com/crumblingstatue/s2dc.git"
-path = "/home/dew/projects/github/s2dc"
+git = "https://github.com/crumblingstatue/s2dc.git"
 features = ["serde"]
 
 [dependencies.sfml-xt]

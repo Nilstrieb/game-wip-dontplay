@@ -1416,6 +1416,7 @@ dependencies = [
 [[package]]
 name = "s2dc"
 version = "0.1.0"
+source = "git+https://github.com/crumblingstatue/s2dc.git#9fbb354e48d6469a632ec68abeb2b33dc66d6cc7"
 dependencies = [
  "num-traits",
  "serde",
