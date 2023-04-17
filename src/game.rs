@@ -69,6 +69,21 @@ impl GameState {
         if input.pressed(Key::Num5) {
             self.selected_inv_slot = 4;
         }
+        if input.pressed(Key::Num6) {
+            self.selected_inv_slot = 5;
+        }
+        if input.pressed(Key::Num7) {
+            self.selected_inv_slot = 6;
+        }
+        if input.pressed(Key::Num8) {
+            self.selected_inv_slot = 7;
+        }
+        if input.pressed(Key::Num9) {
+            self.selected_inv_slot = 8;
+        }
+        if input.pressed(Key::Num0) {
+            self.selected_inv_slot = 9;
+        }
         self.world.ticks += 1;
     }
     pub(crate) fn draw_world(&mut self, rt: &mut RenderTexture, res: &mut Res) {

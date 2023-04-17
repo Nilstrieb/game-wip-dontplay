@@ -42,6 +42,14 @@ impl Inventory {
                     id: items::PLATFORM,
                     qty: 100,
                 },
+                Slot {
+                    id: items::STONE_WALL,
+                    qty: 100,
+                },
+                Slot {
+                    id: items::PANZERIUM,
+                    qty: 100,
+                },
             ],
         }
     }
@@ -126,6 +134,15 @@ impl Default for ItemDb {
                     },
                     consumable: true,
                 },
+                ItemDef {
+                    name: String::from("Stone wall"),
+                    graphic_name: String::from("tiles/stoneback"),
+                    tex_rect: IntRect::default(),
+                    use_action: UseAction::PlaceBgTile {
+                        id: BgTileId::STONE,
+                    },
+                    consumable: true,
+                },
             ],
         }
     }
@@ -138,4 +155,6 @@ pub mod items {
     pub const TORCH: ItemId = 1;
     pub const PLATFORM: ItemId = 2;
     pub const WOOD_PICK: ItemId = 3;
+    pub const PANZERIUM: ItemId = 4;
+    pub const STONE_WALL: ItemId = 5;
 }
