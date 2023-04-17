@@ -1,5 +1,4 @@
 use std::fmt::Write;
-
 use anyhow::Context;
 use directories::ProjectDirs;
 use egui_sfml::SfEgui;
@@ -7,26 +6,21 @@ use gamedebug_core::{imm, imm_dbg};
 use sfml::{
     audio::SoundSource,
     graphics::{
-        BlendMode, Color, Rect, RectangleShape, RenderStates, RenderTarget, RenderTexture,
-        RenderWindow, Shape, Sprite, Transformable, View,
+        BlendMode, Color, Rect, RectangleShape, RenderStates, RenderTarget,
+        RenderTexture, RenderWindow, Shape, Sprite, Transformable, View,
     },
     system::{Vector2, Vector2u},
     window::{Event, Key},
 };
-
 use crate::{
     command::{Cmd, CmdVec},
     debug::{self, DebugState},
     game::{for_each_tile_on_screen, Biome, GameState},
     graphics::{self, ScreenSc, ScreenVec},
-    input::Input,
-    inventory::{ItemId, Slot, TileLayer, UseAction},
+    input::Input, inventory::{ItemId, Slot, TileLayer, UseAction},
     math::{center_offset, TILE_SIZE},
-    res::Res,
-    tiles::TileId,
-    CliArgs,
+    res::Res, tiles::TileId, CliArgs,
 };
-
 /// Application level state (includes game and ui state, etc.)
 pub struct App {
     pub rw: RenderWindow,
@@ -45,39 +39,10 @@ pub struct App {
     pub project_dirs: ProjectDirs,
     pub cmdvec: CmdVec,
 }
-
 impl App {
     pub fn new(args: CliArgs) -> anyhow::Result<Self> {
-        let rw = graphics::make_window();
-        let sf_egui = SfEgui::new(&rw);
-        let mut res = Res::load()?;
-        res.surf_music.set_looping(true);
-        res.surf_music.set_volume(10.0);
-        res.surf_music.play();
-        let rw_size = rw.size();
-        let rt =
-            RenderTexture::new(rw_size.x, rw_size.y).context("Failed to create render texture")?;
-        let light_map = RenderTexture::new(rw_size.x, rw_size.y)
-            .context("Failed to create lightmap texture")?;
-        let project_dirs = ProjectDirs::from("", "", "mantle-diver").unwrap();
-        let worlds_dir = project_dirs.data_dir().join("worlds");
-        let path = worlds_dir.join(&args.world_name);
-        Ok(Self {
-            rw,
-            should_quit: false,
-            game: GameState::new(args.world_name, path, &res),
-            res,
-            sf_egui,
-            input: Input::default(),
-            debug: DebugState::default(),
-            scale: 1,
-            rt,
-            light_map,
-            project_dirs,
-            cmdvec: CmdVec::default(),
-        })
+        loop {}
     }
-
     pub fn do_game_loop(&mut self) {
         while !self.should_quit {
             self.do_event_handling();
@@ -89,252 +54,15 @@ impl App {
         self.game.tile_db.try_save();
         self.game.world.save();
     }
-
     fn do_event_handling(&mut self) {
-        while let Some(ev) = self.rw.poll_event() {
-            self.sf_egui.add_event(&ev);
-            {
-                let ctx = self.sf_egui.context();
-                self.input.update_from_event(
-                    &ev,
-                    ctx.wants_keyboard_input(),
-                    ctx.wants_pointer_input(),
-                );
-            }
-            match ev {
-                Event::Closed => self.should_quit = true,
-                Event::Resized { width, height } => {
-                    self.rt =
-                        RenderTexture::new(width / self.scale as u32, height / self.scale as u32)
-                            .unwrap();
-                    self.light_map =
-                        RenderTexture::new(width / self.scale as u32, height / self.scale as u32)
-                            .unwrap();
-                    let view = View::from_rect(Rect::new(0., 0., width as f32, height as f32));
-                    self.rw.set_view(&view);
-                }
-                Event::KeyPressed { code, .. } => match code {
-                    Key::F11 => {
-                        self.debug.console.show ^= true;
-                        self.debug.console.just_opened = true;
-                    }
-                    Key::F12 => self.debug.panel ^= true,
-                    _ => {}
-                },
-                _ => {}
-            }
-        }
+        loop {}
     }
-
     fn do_update(&mut self) {
-        let rt_size = self.rt.size();
-        if self.debug.freecam {
-            self.do_freecam();
-        } else {
-            let spd = if self.input.down(Key::LShift) {
-                8.0
-            } else if self.input.down(Key::LControl) {
-                128.0
-            } else {
-                3.0
-            };
-            self.game.world.player.hspeed = 0.;
-            if self.input.down(Key::A) {
-                self.game.world.player.hspeed = -spd;
-            }
-            if self.input.down(Key::D) {
-                self.game.world.player.hspeed = spd;
-            }
-            if self.input.down(Key::W) && self.game.world.player.can_jump() {
-                self.game.world.player.vspeed = -10.0;
-                self.game.world.player.jumps_left = 0;
-            }
-            self.game.world.player.down_intent = self.input.down(Key::S);
-            let terminal_velocity = 60.0;
-            self.game.world.player.vspeed = self
-                .game
-                .world
-                .player
-                .vspeed
-                .clamp(-terminal_velocity, terminal_velocity);
-            let mut on_screen_tile_ents = Vec::new();
-            for_each_tile_on_screen(self.game.camera_offset, self.rt.size(), |tp, _sp| {
-                let tile = self.game.world.tile_at_mut(tp, &self.game.worldgen).mid;
-                if tile.empty() {
-                    return;
-                }
-                let tdef = &self.game.tile_db[tile];
-                let Some(bb) = tdef.layer.bb else {
-                    return;
-                };
-                let x = tp.x as i32 * TILE_SIZE as i32;
-                let y = tp.y as i32 * TILE_SIZE as i32;
-                let en = s2dc::Entity::from_rect_corners(
-                    x + bb.x as i32,
-                    y + bb.y as i32,
-                    x + bb.w as i32,
-                    y + bb.h as i32,
-                );
-                on_screen_tile_ents.push(TileColEn {
-                    col: en,
-                    platform: tdef.layer.platform,
-                });
-            });
-            imm_dbg!(on_screen_tile_ents.len());
-            self.game.world.player.col_en.move_y(
-                self.game.world.player.vspeed,
-                |player_en, off| {
-                    let mut col = false;
-                    for en in &on_screen_tile_ents {
-                        if player_en.would_collide(&en.col, off) {
-                            if en.platform {
-                                if self.game.world.player.vspeed < 0. {
-                                    continue;
-                                }
-                                // If the player's feet are below the top of the platform,
-                                // collision shouldn't happen
-                                let player_feet = player_en.pos.y + player_en.bb.y;
-                                if player_feet > en.col.pos.y || self.game.world.player.down_intent
-                                {
-                                    continue;
-                                }
-                            }
-                            col = true;
-                            if self.game.world.player.vspeed > 0. {
-                                self.game.world.player.jumps_left = 1;
-                            }
-                            self.game.world.player.vspeed = 0.;
-                        }
-                    }
-                    col
-                },
-            );
-            self.game.world.player.col_en.move_x(
-                self.game.world.player.hspeed,
-                |player_en, off| {
-                    let mut col = false;
-                    for en in &on_screen_tile_ents {
-                        if en.platform {
-                            continue;
-                        }
-                        if player_en.would_collide(&en.col, off) {
-                            col = true;
-                            self.game.world.player.hspeed = 0.;
-                        }
-                    }
-                    col
-                },
-            );
-            self.game.world.player.vspeed += self.game.gravity;
-            let (x, y, _w, _h) = self.game.world.player.col_en.en.xywh();
-            self.game.camera_offset.x = (x - rt_size.x as i32 / 2).try_into().unwrap_or(0);
-            self.game.camera_offset.y = (y - rt_size.y as i32 / 2).try_into().unwrap_or(0);
-        }
-        let mut loc = self.input.mouse_down_loc;
-        let vco = viewport_center_offset(self.rw.size(), rt_size, self.scale);
-        loc.x -= vco.x;
-        loc.y -= vco.y;
-        loc.x /= self.scale as ScreenSc;
-        loc.y /= self.scale as ScreenSc;
-        let mut wpos = self.game.camera_offset;
-        wpos.x = wpos.x.saturating_add_signed(loc.x.into());
-        wpos.y = wpos.y.saturating_add_signed(loc.y.into());
-        let mouse_tpos = wpos.tile_pos();
-        imm!(
-            "Mouse @ tile {}, {} ({:?})",
-            mouse_tpos.x,
-            mouse_tpos.y,
-            self.game.world.tile_at_mut(mouse_tpos, &self.game.worldgen)
-        );
-        let m_chk = mouse_tpos.to_chunk();
-        imm!("@ chunk {}, {}", m_chk.x, m_chk.y);
-        let (m_chk_x, m_chk_y) = m_chk.region();
-        imm!("@ region {m_chk_x}, {m_chk_y}");
-        if self.debug.freecam && self.input.pressed(Key::P) {
-            self.game.world.player.col_en.en.pos.x = wpos.x as i32;
-            self.game.world.player.col_en.en.pos.y = wpos.y as i32;
-        }
-        'item_use: {
-            if !self.input.lmb_down {
-                break 'item_use;
-            }
-            let Some(active_slot) = self.game.inventory.slots.get(self.game.selected_inv_slot) else {
-                log::error!("Selected slot {} out of bounds", self.game.selected_inv_slot);
-                break 'item_use;
-            };
-            if active_slot.qty == 0 {
-                break 'item_use;
-            }
-            let def = &self.game.itemdb.db[active_slot.id as usize];
-            let t = self.game.world.tile_at_mut(mouse_tpos, &self.game.worldgen);
-            match &def.use_action {
-                UseAction::PlaceBgTile { id } => {
-                    if t.bg.empty() {
-                        t.bg = *id
-                    }
-                }
-                UseAction::PlaceMidTile { id } => {
-                    if t.mid.empty() {
-                        t.mid = *id
-                    }
-                }
-                UseAction::PlaceFgTile { id } => {
-                    if t.fg.empty() {
-                        t.fg = *id
-                    }
-                }
-                UseAction::RemoveTile { layer } => match layer {
-                    TileLayer::Bg => t.bg = TileId::EMPTY,
-                    TileLayer::Mid => t.mid = TileId::EMPTY,
-                    TileLayer::Fg => t.fg = TileId::EMPTY,
-                },
-            }
-        }
-        if self.game.camera_offset.y > 643_000 {
-            self.game.current_biome = Biome::Underground;
-        } else {
-            self.game.current_biome = Biome::Surface;
-        }
-        if self.game.current_biome != self.game.prev_biome {
-            self.game.prev_biome = self.game.current_biome;
-            match self.game.current_biome {
-                Biome::Surface => {
-                    self.res.und_music.stop();
-                    self.res.surf_music.play();
-                }
-                Biome::Underground => {
-                    self.res.surf_music.stop();
-                    self.res.und_music.set_volume(self.res.surf_music.volume());
-                    self.res.und_music.set_looping(true);
-                    self.res.und_music.play();
-                }
-            }
-        }
-        self.game.update(&self.input);
+        loop {}
     }
-
     fn do_freecam(&mut self) {
-        let spd = if self.input.down(Key::LShift) {
-            100
-        } else if self.input.down(Key::LControl) {
-            1000
-        } else {
-            2
-        };
-        if self.input.down(Key::A) {
-            self.game.camera_offset.x = self.game.camera_offset.x.saturating_sub(spd);
-        }
-        if self.input.down(Key::D) {
-            self.game.camera_offset.x = self.game.camera_offset.x.saturating_add(spd);
-        }
-        if self.input.down(Key::W) {
-            self.game.camera_offset.y = self.game.camera_offset.y.saturating_sub(spd);
-        }
-        if self.input.down(Key::S) {
-            self.game.camera_offset.y = self.game.camera_offset.y.saturating_add(spd);
-        }
+        loop {}
     }
-
     fn do_rendering(&mut self) {
         self.game.light_pass(&mut self.light_map, &self.res);
         self.rt.clear(Color::rgb(55, 221, 231));
@@ -347,14 +75,12 @@ impl App {
         spr.set_position((vco.x as f32, vco.y as f32));
         self.rw.clear(Color::rgb(40, 10, 70));
         self.rw.draw(&spr);
-        // Draw light overlay with multiply blending
         let mut rst = RenderStates::default();
         rst.blend_mode = BlendMode::MULTIPLY;
         self.light_map.display();
         spr.set_texture(self.light_map.texture(), false);
         self.rw.draw_with_renderstates(&spr, &rst);
         drop(spr);
-        // Draw ui on top of in-game scene
         self.rt.clear(Color::TRANSPARENT);
         let ui_dims = Vector2 {
             x: (self.rw.size().x / self.scale as u32) as f32,
@@ -380,7 +106,9 @@ impl App {
         if self.debug.show_atlas {
             let atlas = &self.res.atlas.tex;
             let size = atlas.size();
-            let mut rs = RectangleShape::from_rect(Rect::new(0., 0., size.x as f32, size.y as f32));
+            let mut rs = RectangleShape::from_rect(
+                Rect::new(0., 0., size.x as f32, size.y as f32),
+            );
             rs.set_fill_color(Color::MAGENTA);
             self.rw.draw(&rs);
             self.rw.draw(&Sprite::with_texture(atlas));
@@ -390,58 +118,15 @@ impl App {
         drop(spr);
         self.execute_commands();
     }
-
     fn execute_commands(&mut self) {
-        for cmd in self.cmdvec.drain(..) {
-            match cmd {
-                Cmd::QuitApp => self.should_quit = true,
-                Cmd::ToggleFreecam => self.debug.freecam ^= true,
-                Cmd::TeleportPlayer { pos, relative } => {
-                    if relative {
-                        let s2dc = pos.to_s2dc();
-                        self.game.world.player.col_en.en.pos.x += s2dc.x;
-                        self.game.world.player.col_en.en.pos.y += s2dc.y;
-                    } else {
-                        self.game.world.player.col_en.en.pos = pos.to_s2dc()
-                    }
-                }
-                Cmd::TeleportPlayerSpawn => {
-                    self.game.world.player.col_en.en.pos = self.game.spawn_point.to_s2dc()
-                }
-                Cmd::GiveItemByName(name) => {
-                    for (i, item) in self.game.itemdb.db.iter().enumerate() {
-                        if item.name == name {
-                            self.game.inventory.slots.push(Slot {
-                                id: i as ItemId,
-                                qty: 1,
-                            });
-                            return;
-                        }
-                    }
-                    writeln!(
-                        &mut self.debug.console.log,
-                        "Item with name '{name}' not found"
-                    )
-                    .unwrap();
-                }
-            }
-        }
+        loop {}
     }
 }
-
 /// Tile collision entity for doing physics
 struct TileColEn {
     col: s2dc::Entity,
     platform: bool,
 }
-
 fn viewport_center_offset(rw_size: Vector2u, rt_size: Vector2u, scale: u8) -> ScreenVec {
-    let rw_size = rw_size;
-    let rt_size = rt_size * scale as u32;
-    let x = center_offset(rt_size.x as i32, rw_size.x as i32);
-    let y = center_offset(rt_size.y as i32, rw_size.y as i32);
-    ScreenVec {
-        x: x as ScreenSc,
-        y: y as ScreenSc,
-    }
+    loop {}
 }
