@@ -1,9 +1,7 @@
-use command::CmdVec;
 use debug::DebugState;
 use egui_sfml::SfEgui;
 use game::GameState;
 
-mod command;
 mod debug;
 mod game;
 mod tiles;
@@ -14,7 +12,6 @@ pub(crate) struct App {
     pub(crate) debug: DebugState,
     /// Integer scale for rendering the game
     pub(crate) scale: u8,
-    pub(crate) cmdvec: CmdVec,
 }
 impl App {
     pub(crate) fn new() -> anyhow::Result<Self> {
