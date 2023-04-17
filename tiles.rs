@@ -22,13 +22,13 @@ impl<Layer> Clone for TileId<Layer> {
 }
 impl<Layer> Debug for TileId<Layer> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("TileId").field(&self.0).finish()
+        loop {}
     }
 }
 
 impl<Layer> TileId<Layer> {
     pub fn empty(&self) -> bool {
-        self.0 == 0
+        loop {}
     }
     pub const EMPTY: Self = Self(0, PhantomData);
 }
@@ -42,60 +42,19 @@ pub enum Fg {}
 
 impl Bg {
     pub fn unknown_def() -> TileDef<Self> {
-        TileDef {
-            light: Some(ScreenVec { x: 0, y: 0 }),
-            graphic_name: String::from("tiles/unknown_bg"),
-            tex_rect: IntRect {
-                x: 0,
-                y: 0,
-                w: 0,
-                h: 0,
-            },
-            layer: (),
-            //ADD blend_graphic: String::new(),
-        }
+        loop {}
     }
 }
 
 impl Mid {
     pub fn unknown_def() -> TileDef<Self> {
-        TileDef {
-            light: Some(ScreenVec { x: 0, y: 0 }),
-            graphic_name: String::from("tiles/unknown_mid"),
-            tex_rect: IntRect {
-                x: 0,
-                y: 0,
-                w: 0,
-                h: 0,
-            },
-            layer: MidDef {
-                platform: true,
-                bb: Some(TileBb {
-                    x: 0,
-                    y: 0,
-                    w: 32,
-                    h: 32,
-                }),
-            },
-            //ADD blend_graphic: String::new(),
-        }
+        loop {}
     }
 }
 
 impl Fg {
     pub fn unknown_def() -> TileDef<Self> {
-        TileDef {
-            light: Some(ScreenVec { x: 0, y: 0 }),
-            graphic_name: String::from("tiles/unknown_fg"),
-            tex_rect: IntRect {
-                x: 0,
-                y: 0,
-                w: 0,
-                h: 0,
-            },
-            layer: (),
-            //ADD blend_graphic: String::new(),
-        }
+        loop {}
     }
 }
 
@@ -164,12 +123,7 @@ where
     Layer::SpecificDef: Debug + Inspect,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("TileDef")
-            .field("light", &self.light)
-            .field("graphic_name", &self.graphic_name)
-            .field("tex_rect", &self.tex_rect)
-            .field("layer", &self.layer)
-            .finish()
+        loop {}
     }
 }
 
@@ -178,13 +132,7 @@ where
     Layer::SpecificDef: Default + Debug + Inspect,
 {
     fn default() -> Self {
-        Self {
-            light: Default::default(),
-            graphic_name: Default::default(),
-            tex_rect: Default::default(),
-            layer: Layer::SpecificDef::default(),
-            //ADD blend_graphic: String::new(),
-        }
+        loop {}
     }
 }
 
@@ -215,14 +163,7 @@ pub struct TileDb {
 
 impl Default for TileDb {
     fn default() -> Self {
-        Self {
-            unknown_bg: Bg::unknown_def(),
-            unknown_mid: Mid::unknown_def(),
-            unknown_fg: Fg::unknown_def(),
-            bg: vec![],
-            mid: vec![],
-            fg: vec![],
-        }
+        loop {}
     }
 }
 
@@ -230,9 +171,7 @@ impl Index<BgTileId> for TileDb {
     type Output = TileDef<Bg>;
 
     fn index(&self, index: BgTileId) -> &Self::Output {
-        self.bg
-            .get(index.0 as usize - 1)
-            .unwrap_or(&self.unknown_bg)
+        loop {}
     }
 }
 
@@ -240,9 +179,7 @@ impl Index<MidTileId> for TileDb {
     type Output = TileDef<Mid>;
 
     fn index(&self, index: MidTileId) -> &Self::Output {
-        self.mid
-            .get(index.0 as usize - 1)
-            .unwrap_or(&self.unknown_mid)
+        loop {}
     }
 }
 
@@ -250,9 +187,7 @@ impl Index<FgTileId> for TileDb {
     type Output = TileDef<Fg>;
 
     fn index(&self, index: FgTileId) -> &Self::Output {
-        self.fg
-            .get(index.0 as usize - 1)
-            .unwrap_or(&self.unknown_fg)
+        loop {}
     }
 }
 
@@ -260,37 +195,14 @@ const PATH: &str = "tiles.dat";
 
 impl TileDb {
     pub fn load_or_default() -> Self {
-        match std::fs::read(PATH) {
-            Ok(data) => match rmp_serde::from_slice(&data) {
-                Ok(db) => db,
-                Err(e) => {
-                    log::warn!("Failed to load tile database: {e}\nCreating default.");
-                    Default::default()
-                }
-            },
-            Err(e) => {
-                log::warn!("Failed to load tile database: {e}\nCreating default.");
-                Default::default()
-            }
-        }
+        loop {}
     }
     pub fn try_save(&self) {
-        match rmp_serde::to_vec(self) {
-            Ok(vec) => match std::fs::write(PATH, vec) {
-                Ok(()) => {}
-                Err(e) => log::warn!("Failed to save tile db: {e}"),
-            },
-            Err(e) => log::warn!("Failed to save tile db: {e}"),
-        }
+        loop {}
     }
 
     pub(crate) fn update_rects(&mut self, rects: &RectMap) {
-        update_rect_def(&mut self.unknown_bg, rects);
-        update_rect_def(&mut self.unknown_mid, rects);
-        update_rect_def(&mut self.unknown_fg, rects);
-        update_rect_db(&mut self.bg, rects);
-        update_rect_db(&mut self.mid, rects);
-        update_rect_db(&mut self.fg, rects);
+        loop {}
     }
 }
 
@@ -298,9 +210,7 @@ fn update_rect_db<Layer: TileLayer>(db: &mut Vec<TileDef<Layer>>, rects: &RectMa
 where
     Layer::SpecificDef: Debug + Inspect,
 {
-    for def in db {
-        update_rect_def(def, rects);
-    }
+    loop {}
 }
 
 fn update_rect_def<Layer: TileLayer>(
@@ -309,14 +219,5 @@ fn update_rect_def<Layer: TileLayer>(
 ) where
     Layer::SpecificDef: Debug + Inspect,
 {
-    if !def.graphic_name.is_empty() {
-        if let Some(rect) = rects.get(def.graphic_name.as_str()) {
-            def.tex_rect = *rect;
-            log::info!("Updated rect for {}: {:?}", def.graphic_name.as_str(), rect);
-        } else {
-            log::error!("Missing texture for {:?}", def.graphic_name.as_str());
-        }
-    } else {
-        log::warn!("Empty graphic name!");
-    }
+    loop {}
 }
