@@ -22,28 +22,27 @@ use crate::{
     res::Res, tiles::TileId, CliArgs,
 };
 /// Application level state (includes game and ui state, etc.)
-pub struct App {
-    pub rw: RenderWindow,
-    pub should_quit: bool,
-    pub game: GameState,
-    pub res: Res,
-    pub sf_egui: SfEgui,
-    pub input: Input,
-    pub debug: DebugState,
+pub(crate) struct App {
+    pub(crate) rw: RenderWindow,
+    pub(crate) should_quit: bool,
+    pub(crate) game: GameState,
+    pub(crate) res: Res,
+    pub(crate) sf_egui: SfEgui,
+    pub(crate) input: Input,
+    pub(crate) debug: DebugState,
     /// Integer scale for rendering the game
-    pub scale: u8,
+    pub(crate) scale: u8,
     /// RenderTexture for rendering the game at its native resolution
-    pub rt: RenderTexture,
+    pub(crate) rt: RenderTexture,
     /// Light map overlay, blended together with the non-lighted version of the scene
-    pub light_map: RenderTexture,
-    pub project_dirs: ProjectDirs,
-    pub cmdvec: CmdVec,
+    pub(crate) light_map: RenderTexture,
+    pub(crate) cmdvec: CmdVec,
 }
 impl App {
-    pub fn new(args: CliArgs) -> anyhow::Result<Self> {
+    pub(crate) fn new(args: CliArgs) -> anyhow::Result<Self> {
         loop {}
     }
-    pub fn do_game_loop(&mut self) {
+    pub(crate) fn do_game_loop(&mut self) {
         while !self.should_quit {
             self.do_event_handling();
             self.do_update();
@@ -121,11 +120,6 @@ impl App {
     fn execute_commands(&mut self) {
         loop {}
     }
-}
-/// Tile collision entity for doing physics
-struct TileColEn {
-    col: s2dc::Entity,
-    platform: bool,
 }
 fn viewport_center_offset(rw_size: Vector2u, rt_size: Vector2u, scale: u8) -> ScreenVec {
     loop {}

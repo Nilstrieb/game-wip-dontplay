@@ -1,5 +1,4 @@
 mod app;
-mod bitmanip;
 mod cmdline;
 mod command;
 mod debug;
@@ -15,16 +14,10 @@ mod texture_atlas;
 mod tiles;
 mod world;
 mod worldgen;
-
 use app::App;
 use clap::Parser;
-
 #[derive(Parser)]
-pub struct CliArgs {
-    #[arg(default_value = "TestWorld")]
-    world_name: String,
-}
-
+pub(crate) struct CliArgs {}
 fn try_main() -> anyhow::Result<()> {
     gamedebug_core::set_enabled(true);
     let cli_args = CliArgs::parse();
@@ -32,11 +25,8 @@ fn try_main() -> anyhow::Result<()> {
     app.do_game_loop();
     Ok(())
 }
-
 fn main() {
-    env_logger::builder()
-        .filter_level(log::LevelFilter::Info)
-        .init();
+    env_logger::builder().filter_level(log::LevelFilter::Info).init();
     if let Err(e) = try_main() {
         rfd::MessageDialog::new()
             .set_title("Fatal error")

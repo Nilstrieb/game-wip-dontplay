@@ -5,29 +5,15 @@ use sfml::{
 };
 use sfml_xt::graphics::RenderWindowExt;
 use crate::math::FPS_TARGET;
-pub struct ScreenRes {
-    pub w: u16,
-    pub h: u16,
-}
-impl ScreenRes {
-    fn to_sf(&self) -> VideoMode {
-        loop {}
-    }
+pub(crate) struct ScreenRes {
+    pub(crate) w: u16,
+    pub(crate) h: u16,
 }
 #[derive(Default, Clone, Copy, Debug, Inspect, Serialize, Deserialize)]
 pub struct ScreenVec {
-    pub x: ScreenSc,
-    pub y: ScreenSc,
+    pub(crate) x: ScreenSc,
+    pub(crate) y: ScreenSc,
 }
 /// Screen position/offset scalar
 /// We assume this game won't be played above 32767*32767 resolution
-pub type ScreenSc = i16;
-impl ScreenVec {
-    pub fn to_sf_vec(self) -> Vector2f {
-        loop {}
-    }
-}
-const DEFAULT_RES: ScreenRes = ScreenRes { w: 960, h: 540 };
-pub fn make_window() -> RenderWindow {
-    loop {}
-}
+pub(crate) type ScreenSc = i16;

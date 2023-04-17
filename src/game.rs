@@ -18,43 +18,32 @@ use crate::{
 };
 #[derive(Derivative, Inspect)]
 #[derivative(Debug)]
-pub struct GameState {
-    pub camera_offset: WorldPos,
-    pub world: World,
-    pub gravity: f32,
-    pub current_biome: Biome,
-    pub prev_biome: Biome,
-    #[derivative(Debug = "ignore")]
-    #[opaque]
-    pub worldgen: Worldgen,
-    pub ambient_light: u8,
-    pub light_sources: Vec<LightSource>,
-    pub tile_db: TileDb,
-    pub inventory: Inventory,
-    pub itemdb: ItemDb,
-    pub selected_inv_slot: usize,
-    pub spawn_point: WorldPos,
-}
-#[derive(Debug, Inspect)]
-pub struct LightSource {
-    pub pos: ScreenVec,
+pub(crate) struct GameState {
+    pub(crate) camera_offset: WorldPos,
+    pub(crate) world: World,
+    pub(crate) tile_db: TileDb,
 }
 #[derive(PartialEq, Eq, Clone, Copy, Debug, Inspect)]
-pub enum Biome {
+pub(crate) enum Biome {
     Surface,
     Underground,
 }
 impl GameState {
-    pub fn update(&mut self, input: &Input) {
+    pub(crate) fn update(&mut self, input: &Input) {
         loop {}
     }
     pub(crate) fn draw_world(&mut self, rt: &mut RenderTexture, res: &mut Res) {
         loop {}
     }
-    pub fn draw_entities(&mut self, rt: &mut RenderTexture) {
+    pub(crate) fn draw_entities(&mut self, rt: &mut RenderTexture) {
         loop {}
     }
-    pub fn draw_ui(&mut self, rt: &mut RenderTexture, res: &Res, ui_dims: Vector2f) {
+    pub(crate) fn draw_ui(
+        &mut self,
+        rt: &mut RenderTexture,
+        res: &Res,
+        ui_dims: Vector2f,
+    ) {
         loop {}
     }
     pub(crate) fn light_pass(&mut self, lightmap: &mut RenderTexture, res: &Res) {
@@ -64,7 +53,7 @@ impl GameState {
         loop {}
     }
 }
-pub fn for_each_tile_on_screen(
+pub(crate) fn for_each_tile_on_screen(
     camera_offset: WorldPos,
     rt_size: Vector2u,
     mut f: impl FnMut(TilePos, ScreenVec),

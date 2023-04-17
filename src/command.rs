@@ -1,16 +1,11 @@
 use crate::math::WorldPos;
-
 /// A command that can change application or game state
-pub enum Cmd {
+pub(crate) enum Cmd {
     /// Quit the application
     QuitApp,
     ToggleFreecam,
-    TeleportPlayer {
-        pos: WorldPos,
-        relative: bool,
-    },
+    TeleportPlayer {},
     TeleportPlayerSpawn,
-    GiveItemByName(String),
+    GiveItemByName(),
 }
-
-pub type CmdVec = Vec<Cmd>;
+pub(crate) type CmdVec = Vec<Cmd>;

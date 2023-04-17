@@ -9,20 +9,16 @@ use crate::{
     tiles::tiledb_edit_ui::TileDbEdit,
 };
 #[derive(Default, Debug, Inspect)]
-pub struct DebugState {
-    pub panel: bool,
-    pub freecam: bool,
-    pub tiledb_edit: TileDbEdit,
-    pub show_atlas: bool,
-    pub console: Console,
+pub(crate) struct DebugState {
+    pub(crate) panel: bool,
+    pub(crate) freecam: bool,
+    pub(crate) tiledb_edit: TileDbEdit,
+    pub(crate) show_atlas: bool,
+    pub(crate) console: Console,
 }
 #[derive(Default, Debug, Inspect)]
-pub struct Console {
-    pub show: bool,
-    pub cmdline: String,
-    pub log: String,
-    pub just_opened: bool,
-    pub history: Vec<String>,
+pub(crate) struct Console {
+    pub(crate) show: bool,
 }
 fn debug_panel_ui(
     mut debug: &mut DebugState,

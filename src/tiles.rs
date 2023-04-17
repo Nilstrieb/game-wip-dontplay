@@ -52,6 +52,7 @@ impl Bg {
                 h: 0,
             },
             layer: (),
+            blend_graphic: String::new(),
         }
     }
 }
@@ -76,6 +77,7 @@ impl Mid {
                     h: 32,
                 }),
             },
+            blend_graphic: String::new(),
         }
     }
 }
@@ -92,6 +94,7 @@ impl Fg {
                 h: 0,
             },
             layer: (),
+            blend_graphic: String::new(),
         }
     }
 }
@@ -145,6 +148,7 @@ where
     pub graphic_name: String,
     pub tex_rect: IntRect,
     pub layer: Layer::SpecificDef,
+    pub blend_graphic: String,
 }
 
 #[derive(Debug, Inspect, Default, Serialize, Deserialize)]
@@ -179,6 +183,7 @@ where
             graphic_name: Default::default(),
             tex_rect: Default::default(),
             layer: Layer::SpecificDef::default(),
+            blend_graphic: String::new(),
         }
     }
 }
