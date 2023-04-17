@@ -31,7 +31,6 @@ fn main() {
                 &mut app.debug,
                 &mut app.game,
                 &mut app.scale,
-                &mut app.cmdvec,
             );
         })
         .unwrap();
