@@ -35,7 +35,6 @@ fn main() {
                 ctx,
                 &mut app.debug,
                 &mut app.game,
-                &mut app.res,
                 &mut app.scale,
                 &mut app.cmdvec,
             );

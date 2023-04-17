@@ -6,7 +6,6 @@ fn debug_panel_ui(
     mut debug: &mut DebugState,
     mut game: &mut GameState,
     ctx: &egui::Context,
-    res: &mut Res,
     mut scale: &mut u8,
 ) {
     egui::Window::new("Debug (F12)").show(ctx, |ui| {
@@ -33,9 +32,8 @@ pub(crate) fn do_debug_ui(
     ctx: &egui::Context,
     debug: &mut DebugState,
     game: &mut GameState,
-    res: &mut Res,
     scale: &mut u8,
     cmd: &mut CmdVec,
 ) {
-    debug_panel_ui(debug, game, ctx, res, scale);
+    debug_panel_ui(debug, game, ctx, scale);
 }
