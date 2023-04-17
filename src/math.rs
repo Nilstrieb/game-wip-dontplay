@@ -1,6 +1,4 @@
-use crate::world::TPosSc;
 use egui_inspect::derive::Inspect;
-use num_traits::Num;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 #[derive(Clone, Copy, Debug, Inspect)]

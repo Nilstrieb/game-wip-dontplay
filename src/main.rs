@@ -7,12 +7,10 @@ use res::Res;
 mod command;
 mod debug;
 mod game;
-mod graphics;
 mod math;
 mod res;
 mod texture_atlas;
 mod tiles;
-mod world;
 
 pub(crate) struct App {
     pub(crate) game: GameState,
