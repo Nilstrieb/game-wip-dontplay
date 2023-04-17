@@ -3,15 +3,11 @@ mod command;
 mod debug;
 mod game;
 mod graphics;
-mod input;
-mod inventory;
 mod math;
-mod player;
 mod res;
 mod texture_atlas;
 mod tiles;
 mod world;
-mod worldgen;
 use app::App;
 use clap::Parser;
 #[derive(Parser)]
