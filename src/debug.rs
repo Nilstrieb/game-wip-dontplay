@@ -37,7 +37,22 @@ fn debug_panel_ui(
                 ui.add(egui::DragValue::new(&mut vol));
                 res.surf_music.set_volume(vol);
                 ui.separator();
-
+                egui::ScrollArea::both()
+                    .id_source("insp_scroll")
+                    .max_height(240.)
+                    .max_width(340.0)
+                    .show(
+                        ui,
+                        |ui| {
+                            inspect! {
+                                ui, scale, game, debug
+                            }
+                        },
+                    );
+                if ui.button("Reload graphics").clicked() {
+                    res.atlas = AtlasBundle::new().unwrap();
+                    game.tile_db.update_rects(&res.atlas.rects);
+                }
                 ui.separator();
                 egui::ScrollArea::vertical()
                     .show(
