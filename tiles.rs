@@ -127,12 +127,6 @@ where
     }
 }
 
-const DEFAULT_TILE_BB: TileBb = TileBb {
-    x: 0,
-    y: 0,
-    w: TILE_SIZE,
-    h: TILE_SIZE,
-};
 
 #[derive(Serialize, Deserialize, Debug, Inspect, Clone, Copy)]
 pub struct TileBb {
@@ -150,56 +144,4 @@ pub struct TileDb {
     bg: Vec<TileDef<Bg>>,
     mid: Vec<TileDef<Mid>>,
     fg: Vec<TileDef<Fg>>,
-}
-
-impl Default for TileDb {
-    fn default() -> Self {
-        loop {}
-    }
-}
-
-impl Index<BgTileId> for TileDb {
-    type Output = TileDef<Bg>;
-
-    fn index(&self, index: BgTileId) -> &Self::Output {
-        loop {}
-    }
-}
-
-impl Index<MidTileId> for TileDb {
-    type Output = TileDef<Mid>;
-
-    fn index(&self, index: MidTileId) -> &Self::Output {
-        loop {}
-    }
-}
-
-impl Index<FgTileId> for TileDb {
-    type Output = TileDef<Fg>;
-
-    fn index(&self, index: FgTileId) -> &Self::Output {
-        loop {}
-    }
-}
-
-const PATH: &str = "tiles.dat";
-
-impl TileDb {
-    pub fn load_or_default() -> Self {
-        loop {}
-    }
-    pub fn try_save(&self) {
-        loop {}
-    }
-
-    pub(crate) fn update_rects(&mut self, rects: &RectMap) {
-        loop {}
-    }
-}
-
-fn update_rect_db<Layer: TileLayer>(db: &mut Vec<TileDef<Layer>>, rects: &RectMap)
-where
-    Layer::SpecificDef: Debug + Inspect,
-{
-    loop {}
 }
