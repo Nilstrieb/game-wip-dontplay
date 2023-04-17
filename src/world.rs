@@ -13,7 +13,11 @@ use fnv::FnvHashMap;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    math::WorldPos, player::Player, world::reg_chunk_existence::ExistenceBitset, worldgen::Worldgen,
+    math::WorldPos,
+    player::Player,
+    tiles::{BgTileId, FgTileId, MidTileId, TileId},
+    world::reg_chunk_existence::ExistenceBitset,
+    worldgen::Worldgen,
 };
 
 use self::serialization::save_chunk;
@@ -203,9 +207,9 @@ type ChunkTiles = [Tile; CHUNK_N_TILES];
 
 fn default_chunk_tiles() -> ChunkTiles {
     [Tile {
-        bg: 0,
-        mid: 0,
-        fg: 0,
+        bg: TileId::EMPTY,
+        mid: TileId::EMPTY,
+        fg: TileId::EMPTY,
     }; CHUNK_N_TILES]
 }
 
@@ -229,7 +233,7 @@ impl Chunk {
         // Unbreakable layer at bottom
         if pos.y > 798 {
             for b in &mut tiles {
-                b.mid = Tile::UNBREAKANIUM;
+                b.mid = MidTileId::UNBREAKANIUM;
             }
         }
         Self { tiles }
@@ -269,21 +273,14 @@ fn chunk_exists(reg_path: &Path, pos: ChunkPos) -> bool {
     crate::bitmanip::nth_bit_set(bitset.0, idx as usize)
 }
 
-pub type TileId = u16;
-
 #[derive(Clone, Copy, Debug, Inspect)]
 pub struct Tile {
     /// Background wall behind entities
-    pub bg: TileId,
+    pub bg: BgTileId,
     /// The solid wall on the same level as entities
-    pub mid: TileId,
+    pub mid: MidTileId,
     /// A layer on top of the mid wall. Usually ores or decorative pieces.
-    pub fg: TileId,
-}
-
-impl Tile {
-    pub const EMPTY: TileId = 0;
-    pub const UNBREAKANIUM: TileId = 5;
+    pub fg: FgTileId,
 }
 
 pub const REGION_CHUNK_EXTENT: u8 = 8;

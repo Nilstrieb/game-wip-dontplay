@@ -23,6 +23,7 @@ use crate::{
     inventory::{ItemId, Slot, TileLayer, UseAction},
     math::{center_offset, TILE_SIZE},
     res::Res,
+    tiles::TileId,
     CliArgs,
 };
 
@@ -158,9 +159,12 @@ impl App {
                 .clamp(-terminal_velocity, terminal_velocity);
             let mut on_screen_tile_ents = Vec::new();
             for_each_tile_on_screen(self.game.camera_offset, self.rt.size(), |tp, _sp| {
-                let tid = self.game.world.tile_at_mut(tp, &self.game.worldgen).mid;
-                let tdef = &self.game.tile_db[tid];
-                let Some(bb) = tdef.bb else {
+                let tile = self.game.world.tile_at_mut(tp, &self.game.worldgen).mid;
+                if tile.empty() {
+                    return;
+                }
+                let tdef = &self.game.tile_db[tile];
+                let Some(bb) = tdef.layer.bb else {
                     return;
                 };
                 let x = tp.x as i32 * TILE_SIZE as i32;
@@ -173,7 +177,7 @@ impl App {
                 );
                 on_screen_tile_ents.push(TileColEn {
                     col: en,
-                    platform: tdef.platform,
+                    platform: tdef.layer.platform,
                 });
             });
             imm_dbg!(on_screen_tile_ents.len());
@@ -264,27 +268,25 @@ impl App {
             let def = &self.game.itemdb.db[active_slot.id as usize];
             let t = self.game.world.tile_at_mut(mouse_tpos, &self.game.worldgen);
             match &def.use_action {
-                UseAction::PlaceTile { layer, id } => match layer {
-                    TileLayer::Bg => {
-                        if t.bg == 0 {
-                            t.bg = *id
-                        }
+                UseAction::PlaceBgTile { id } => {
+                    if t.bg.empty() {
+                        t.bg = *id
                     }
-                    TileLayer::Mid => {
-                        if t.mid == 0 {
-                            t.mid = *id
-                        }
+                }
+                UseAction::PlaceMidTile { id } => {
+                    if t.mid.empty() {
+                        t.mid = *id
                     }
-                    TileLayer::Fg => {
-                        if t.fg == 0 {
-                            t.fg = *id
-                        }
+                }
+                UseAction::PlaceFgTile { id } => {
+                    if t.fg.empty() {
+                        t.fg = *id
                     }
-                },
+                }
                 UseAction::RemoveTile { layer } => match layer {
-                    TileLayer::Bg => t.bg = 0,
-                    TileLayer::Mid => t.mid = 0,
-                    TileLayer::Fg => t.fg = 0,
+                    TileLayer::Bg => t.bg = TileId::EMPTY,
+                    TileLayer::Mid => t.mid = TileId::EMPTY,
+                    TileLayer::Fg => t.fg = TileId::EMPTY,
                 },
             }
         }

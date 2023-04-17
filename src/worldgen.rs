@@ -8,7 +8,10 @@ use worldgen::{
     },
 };
 
-use crate::world::{ChunkPos, Tile as Tl, CHUNK_EXTENT};
+use crate::{
+    tiles::{BgTileId, FgTileId, MidTileId, TileId},
+    world::{ChunkPos, Tile as Tl, CHUNK_EXTENT},
+};
 
 pub struct Worldgen {
     world: World<crate::world::Tile>,
@@ -33,35 +36,35 @@ impl Worldgen {
             // Dirt coal
             .add(
                 Tile::new(Tl {
-                    bg: 9,
-                    mid: 3,
-                    fg: 6,
+                    bg: BgTileId::DIRT,
+                    mid: MidTileId::DIRT,
+                    fg: FgTileId::COAL,
                 })
                 .when(constraint!(nm.clone(), < -0.8)),
             )
             // Dirt
             .add(
                 Tile::new(Tl {
-                    bg: 9,
-                    mid: 3,
-                    fg: 0,
+                    bg: BgTileId::DIRT,
+                    mid: MidTileId::DIRT,
+                    fg: TileId::EMPTY,
                 })
                 .when(constraint!(nm.clone(), < -0.1)),
             )
             // Stone
             .add(
                 Tile::new(Tl {
-                    bg: 7,
-                    mid: 2,
-                    fg: 0,
+                    bg: BgTileId::STONE,
+                    mid: MidTileId::STONE,
+                    fg: TileId::EMPTY,
                 })
                 .when(constraint!(nm, < 0.45)),
             )
             // Dirt wall
             .add(Tile::new(Tl {
-                bg: 9,
-                mid: 0,
-                fg: 0,
+                bg: BgTileId::DIRT,
+                mid: TileId::EMPTY,
+                fg: TileId::EMPTY,
             }));
         Self { world }
     }

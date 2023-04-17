@@ -17,7 +17,7 @@ use crate::{
     math::{smoothwave, wp_to_tp, WorldPos},
     res::Res,
     tiles::TileDb,
-    world::{Tile, TilePos, World},
+    world::{TilePos, World},
     worldgen::Worldgen,
 };
 
@@ -77,11 +77,11 @@ impl GameState {
         for_each_tile_on_screen(self.camera_offset, rt.size(), |tp, sp| {
             let tile = self.world.tile_at_mut(tp, &self.worldgen);
             s.set_position(sp.to_sf_vec());
-            if tile.bg != Tile::EMPTY {
+            if !tile.bg.empty() {
                 s.set_texture_rect(self.tile_db[tile.bg].tex_rect.to_sf());
                 rt.draw(&s);
             }
-            if tile.mid != Tile::EMPTY {
+            if !tile.mid.empty() {
                 s.set_texture_rect(self.tile_db[tile.mid].tex_rect.to_sf());
                 if let Some(light) = self.tile_db[tile.mid].light {
                     let pos = ScreenVec {
@@ -92,7 +92,7 @@ impl GameState {
                 }
                 rt.draw(&s);
             }
-            if tile.fg != Tile::EMPTY {
+            if !tile.fg.empty() {
                 s.set_texture_rect(self.tile_db[tile.fg].tex_rect.to_sf());
                 rt.draw(&s);
             }

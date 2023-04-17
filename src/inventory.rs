@@ -1,6 +1,9 @@
 use egui_inspect::derive::Inspect;
 
-use crate::{math::IntRect, world::TileId};
+use crate::{
+    math::IntRect,
+    tiles::{BgTileId, FgTileId, MidTileId},
+};
 
 /// We won't have more than 65535 different items
 pub type ItemId = u16;
@@ -63,7 +66,9 @@ pub enum TileLayer {
 
 #[derive(Debug)]
 pub enum UseAction {
-    PlaceTile { layer: TileLayer, id: TileId },
+    PlaceBgTile { id: BgTileId },
+    PlaceMidTile { id: MidTileId },
+    PlaceFgTile { id: FgTileId },
     RemoveTile { layer: TileLayer },
 }
 
@@ -80,9 +85,8 @@ impl Default for ItemDb {
                     name: String::from("Dirt Block"),
                     graphic_name: String::from("tiles/dirt"),
                     tex_rect: IntRect::default(),
-                    use_action: UseAction::PlaceTile {
-                        layer: TileLayer::Mid,
-                        id: 3,
+                    use_action: UseAction::PlaceMidTile {
+                        id: MidTileId::DIRT,
                     },
                     consumable: true,
                 },
@@ -90,9 +94,8 @@ impl Default for ItemDb {
                     name: String::from("Torch"),
                     graphic_name: String::from("tiles/torch"),
                     tex_rect: IntRect::default(),
-                    use_action: UseAction::PlaceTile {
-                        layer: TileLayer::Mid,
-                        id: 4,
+                    use_action: UseAction::PlaceMidTile {
+                        id: MidTileId::TORCH,
                     },
                     consumable: true,
                 },
@@ -100,9 +103,8 @@ impl Default for ItemDb {
                     name: String::from("Platform"),
                     graphic_name: String::from("tiles/platform"),
                     tex_rect: IntRect::default(),
-                    use_action: UseAction::PlaceTile {
-                        layer: TileLayer::Mid,
-                        id: 5,
+                    use_action: UseAction::PlaceMidTile {
+                        id: MidTileId::PLATFORM,
                     },
                     consumable: true,
                 },
@@ -119,9 +121,8 @@ impl Default for ItemDb {
                     name: String::from("Panzerium"),
                     graphic_name: String::from("tiles/panzerium"),
                     tex_rect: IntRect::default(),
-                    use_action: UseAction::PlaceTile {
-                        layer: TileLayer::Mid,
-                        id: 6,
+                    use_action: UseAction::PlaceMidTile {
+                        id: MidTileId::PANZERIUM,
                     },
                     consumable: true,
                 },

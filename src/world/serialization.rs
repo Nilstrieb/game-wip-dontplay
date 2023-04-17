@@ -42,9 +42,9 @@ pub(super) fn save_chunk(pos: &ChunkPos, chk: &Chunk, world_dir: &Path) {
     let byte_idx = loc_byte_idx(loc_idx);
     for (i, tile) in chk.tiles.iter().enumerate() {
         let off = byte_idx + (i * TILE_BYTES);
-        region_tile_data[off..off + 2].copy_from_slice(&tile.bg.to_le_bytes());
-        region_tile_data[off + 2..off + 4].copy_from_slice(&tile.mid.to_le_bytes());
-        region_tile_data[off + 4..off + 6].copy_from_slice(&tile.fg.to_le_bytes());
+        region_tile_data[off..off + 2].copy_from_slice(&tile.bg.0.to_le_bytes());
+        region_tile_data[off + 2..off + 4].copy_from_slice(&tile.mid.0.to_le_bytes());
+        region_tile_data[off + 4..off + 6].copy_from_slice(&tile.fg.0.to_le_bytes());
     }
     f.rewind().unwrap();
     f.write_all(&u64::to_le_bytes(existence_bitset.0)[..])
@@ -65,9 +65,9 @@ impl Chunk {
         let mut tiles = default_chunk_tiles();
         for (i, t) in tiles.iter_mut().enumerate() {
             let off = byte_idx + (i * TILE_BYTES);
-            t.bg = u16::from_le_bytes(data[off..off + 2].try_into().unwrap());
-            t.mid = u16::from_le_bytes(data[off + 2..off + 4].try_into().unwrap());
-            t.fg = u16::from_le_bytes(data[off + 4..off + 6].try_into().unwrap());
+            t.bg.0 = u16::from_le_bytes(data[off..off + 2].try_into().unwrap());
+            t.mid.0 = u16::from_le_bytes(data[off + 2..off + 4].try_into().unwrap());
+            t.fg.0 = u16::from_le_bytes(data[off + 4..off + 6].try_into().unwrap());
         }
         Self { tiles }
     }
@@ -83,7 +83,7 @@ fn test_chunk_seri() {
         tiles: super::default_chunk_tiles(),
     };
     for t in &mut chk.tiles {
-        t.bg = 1;
+        t.bg = crate::tiles::BgTileId::DIRT;
     }
     save_chunk(&ChunkPos { x: 2, y: 0 }, &chk, "testworld".as_ref());
     save_chunk(&ChunkPos { x: 3, y: 0 }, &chk, "testworld".as_ref());
