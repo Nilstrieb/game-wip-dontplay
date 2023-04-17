@@ -3,7 +3,6 @@ use crate::{
     debug::{self, DebugState},
     game::GameState,
     res::Res,
-    CliArgs,
 };
 use egui_sfml::SfEgui;
 /// Application level state (includes game and ui state, etc.)
@@ -17,7 +16,7 @@ pub(crate) struct App {
     pub(crate) cmdvec: CmdVec,
 }
 impl App {
-    pub(crate) fn new(args: CliArgs) -> anyhow::Result<Self> {
+    pub(crate) fn new() -> anyhow::Result<Self> {
         loop {}
     }
     pub(crate) fn do_game_loop(&mut self) {
