@@ -89,9 +89,5 @@ pub struct TileBb {
 #[derive(Serialize, Deserialize, Debug, Inspect)]
 pub struct TileDb {
     unknown_bg: TileDef<Bg>,
-    unknown_mid: TileDef<Mid>,
-    unknown_fg: TileDef<Fg>,
-    bg: Vec<TileDef<Bg>>,
-    mid: Vec<TileDef<Mid>>,
-    fg: Vec<TileDef<Fg>>,
+
 }
