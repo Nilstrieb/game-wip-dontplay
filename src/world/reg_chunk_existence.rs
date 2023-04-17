@@ -1,3 +1,3 @@
 use std::{fs::File, io::Read, path::Path};
 #[derive(Clone, Copy)]
-pub(crate) struct ExistenceBitset(pub u64);
+pub(crate) struct ExistenceBitset();

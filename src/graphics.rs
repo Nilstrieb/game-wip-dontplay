@@ -5,10 +5,7 @@ use sfml::{
 };
 use sfml_xt::graphics::RenderWindowExt;
 use crate::math::FPS_TARGET;
-pub(crate) struct ScreenRes {
-    pub(crate) w: u16,
-    pub(crate) h: u16,
-}
+pub(crate) struct ScreenRes {}
 #[derive(Default, Clone, Copy, Debug, Inspect, Serialize, Deserialize)]
 pub struct ScreenVec {
     pub(crate) x: ScreenSc,
