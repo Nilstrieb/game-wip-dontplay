@@ -3,7 +3,8 @@
 cp tiles.rs src/tiles.rs
 cargo clean -p mantle-diver
 cargo build
-git apply crash.patch
+
+./apply.py
 
 OUT=$(cargo build 2>&1)
 
