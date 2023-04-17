@@ -1,4 +1,3 @@
-use debug::DebugState;
 use egui_sfml::SfEgui;
 use game::GameState;
 
@@ -9,7 +8,6 @@ mod tiles;
 pub(crate) struct App {
     pub(crate) game: GameState,
     pub(crate) sf_egui: SfEgui,
-    pub(crate) debug: DebugState,
     /// Integer scale for rendering the game
     pub(crate) scale: u8,
 }
@@ -25,7 +23,6 @@ fn main() {
         .do_frame(|ctx| {
             debug::do_debug_ui(
                 ctx,
-                &mut app.debug,
                 &mut app.game,
                 &mut app.scale,
             );
