@@ -5,10 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::world::{TPosSc, TilePos};
 pub(crate) type WPosSc = u32;
 #[derive(Clone, Copy, Debug, Inspect)]
-pub(crate) struct WorldPos {
-    pub(crate) x: WPosSc,
-    pub(crate) y: WPosSc,
-}
+pub(crate) struct WorldPos {}
 /// Tile size in pixels
 pub(crate) const TILE_SIZE: u8 = 32;
 pub(crate) const FPS_TARGET: u8 = 60;
