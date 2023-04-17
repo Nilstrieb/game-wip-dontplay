@@ -48,7 +48,6 @@ fn debug_panel_ui(
                 gamedebug_core::Info::Rect(_, _, _, _, _) => todo!(),
             });
         });
-        gamedebug_core::clear_immediates();
     });
 }
 pub(crate) fn do_debug_ui(
@@ -59,13 +58,7 @@ pub(crate) fn do_debug_ui(
     scale: &mut u8,
     cmd: &mut CmdVec,
 ) {
-    if debug.panel {
-        debug_panel_ui(debug, game, ctx, res, scale);
-    }
-    debug.tiledb_edit.ui(ctx, &mut game.tile_db);
-    if debug.console.show {
-        console_ui(ctx, debug, cmd);
-    }
+    debug_panel_ui(debug, game, ctx, res, scale);
 }
 fn console_ui(ctx: &egui::Context, debug: &mut DebugState, cmd: &mut CmdVec) {
     loop {}
