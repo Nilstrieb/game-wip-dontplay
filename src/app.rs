@@ -1,29 +1,14 @@
 use crate::{
-    command::{Cmd, CmdVec},
+    command::CmdVec,
     debug::{self, DebugState},
-    game::{for_each_tile_on_screen, Biome, GameState},
-    graphics::{self, ScreenSc, ScreenVec},
+    game::GameState,
     input::Input,
-    inventory::{ItemId, Slot, TileLayer, UseAction},
-    math::{center_offset, TILE_SIZE},
     res::Res,
-    tiles::TileId,
     CliArgs,
 };
-use anyhow::Context;
-use directories::ProjectDirs;
+
 use egui_sfml::SfEgui;
-use gamedebug_core::{imm, imm_dbg};
-use sfml::{
-    audio::SoundSource,
-    graphics::{
-        BlendMode, Color, Rect, RectangleShape, RenderStates, RenderTarget, RenderTexture,
-        RenderWindow, Shape, Sprite, Transformable, View,
-    },
-    system::{Vector2, Vector2u},
-    window::{Event, Key},
-};
-use std::fmt::Write;
+use sfml::graphics::{RenderTexture, RenderWindow};
 /// Application level state (includes game and ui state, etc.)
 pub(crate) struct App {
     pub(crate) rw: RenderWindow,
