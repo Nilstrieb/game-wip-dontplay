@@ -77,19 +77,8 @@ impl App {
         let mut rst = RenderStates::default();
         rst.blend_mode = BlendMode::MULTIPLY;
         self.light_map.display();
-        spr.set_texture(self.light_map.texture(), false);
-        self.rw.draw_with_renderstates(&spr, &rst);
-        drop(spr);
-        self.rt.clear(Color::TRANSPARENT);
-        let ui_dims = Vector2 {
-            x: (self.rw.size().x / self.scale as u32) as f32,
-            y: (self.rw.size().y / self.scale as u32) as f32,
-        };
-        self.game.draw_ui(&mut self.rt, &self.res, ui_dims);
-        self.rt.display();
-        let mut spr = Sprite::with_texture(self.rt.texture());
-        spr.set_scale((self.scale as f32, self.scale as f32));
-        self.rw.draw(&spr);
+
+
         self.sf_egui
             .do_frame(|ctx| {
                 debug::do_debug_ui(
@@ -102,20 +91,7 @@ impl App {
                 );
             })
             .unwrap();
-        if self.debug.show_atlas {
-            let atlas = &self.res.atlas.tex;
-            let size = atlas.size();
-            let mut rs = RectangleShape::from_rect(
-                Rect::new(0., 0., size.x as f32, size.y as f32),
-            );
-            rs.set_fill_color(Color::MAGENTA);
-            self.rw.draw(&rs);
-            self.rw.draw(&Sprite::with_texture(atlas));
-        }
-        self.sf_egui.draw(&mut self.rw, None);
-        self.rw.display();
-        drop(spr);
-        self.execute_commands();
+
     }
     fn execute_commands(&mut self) {
         loop {}

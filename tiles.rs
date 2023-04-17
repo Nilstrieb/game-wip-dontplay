@@ -5,11 +5,7 @@ use std::{fmt::Debug, marker::PhantomData, ops::Index};
 use egui_inspect::{derive::Inspect, Inspect};
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    graphics::ScreenVec,
-    math::{IntRect, TILE_SIZE},
-    texture_atlas::RectMap,
-};
+use crate::{math::TILE_SIZE, texture_atlas::RectMap};
 
 #[derive(Inspect, PartialEq, Eq)]
 pub struct TileId<Layer>(pub u16, PhantomData<Layer>);
@@ -103,9 +99,6 @@ where
     Layer::SpecificDef: Debug + Inspect,
 {
     /// Whether the tile emits light, and the light source offset
-    pub light: Option<ScreenVec>,
-    pub graphic_name: String,
-    pub tex_rect: IntRect,
     pub layer: Layer::SpecificDef,
     //ADD pub blend_graphic: String,
 }
@@ -208,15 +201,6 @@ impl TileDb {
 
 fn update_rect_db<Layer: TileLayer>(db: &mut Vec<TileDef<Layer>>, rects: &RectMap)
 where
-    Layer::SpecificDef: Debug + Inspect,
-{
-    loop {}
-}
-
-fn update_rect_def<Layer: TileLayer>(
-    def: &mut TileDef<Layer>,
-    rects: &std::collections::HashMap<String, IntRect>,
-) where
     Layer::SpecificDef: Debug + Inspect,
 {
     loop {}
