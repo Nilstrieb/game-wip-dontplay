@@ -1,6 +1,9 @@
-use crate::{math::WorldPos, tiles::TileDb};
+use crate::tiles::TileDb;
 use derivative::Derivative;
 use egui_inspect::derive::Inspect;
+
+#[derive(Clone, Copy, Debug, Inspect)]
+pub(crate) struct WorldPos {}
 
 #[derive(Derivative, Inspect)]
 #[derivative(Debug)]

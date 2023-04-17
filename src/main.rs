@@ -6,7 +6,6 @@ use game::GameState;
 mod command;
 mod debug;
 mod game;
-mod math;
 mod tiles;
 
 pub(crate) struct App {
