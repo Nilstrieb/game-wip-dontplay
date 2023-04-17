@@ -22,13 +22,13 @@ impl<Layer> Clone for TileId<Layer> {
 }
 impl<Layer> Debug for TileId<Layer> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("TileId").field(&self.0).finish()
+        loop {}
     }
 }
 
 impl<Layer> TileId<Layer> {
     pub fn empty(&self) -> bool {
-        self.0 == 0
+        loop {}
     }
     pub const EMPTY: Self = Self(0, PhantomData);
 }
