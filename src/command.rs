@@ -1,4 +1,3 @@
-use crate::math::WorldPos;
 /// A command that can change application or game state
 pub(crate) enum Cmd {
     /// Quit the application

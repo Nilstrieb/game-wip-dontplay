@@ -1,14 +1,8 @@
 mod reg_chunk_existence;
 mod serialization;
-use std::{fmt::Debug, fs::File, io::Seek, path::{Path, PathBuf}};
 use egui_inspect::derive::Inspect;
-use fnv::FnvHashMap;
-use serde::{Deserialize, Serialize};
-use crate::{
-    math::WorldPos, player::Player, tiles::{BgTileId, FgTileId, MidTileId, TileId},
-    world::reg_chunk_existence::ExistenceBitset, worldgen::Worldgen,
-};
-use self::serialization::save_chunk;
+use std::fmt::Debug;
+
 #[derive(Hash, PartialEq, Eq, Debug, Clone, Copy, Inspect)]
 pub(crate) struct ChunkPos {}
 #[derive(Debug, Inspect)]

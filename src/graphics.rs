@@ -1,10 +1,6 @@
 use egui_inspect::derive::Inspect;
 use serde::{Deserialize, Serialize};
-use sfml::{
-    graphics::RenderWindow, system::Vector2f, window::{ContextSettings, Style, VideoMode},
-};
-use sfml_xt::graphics::RenderWindowExt;
-use crate::math::FPS_TARGET;
+
 #[derive(Default, Clone, Copy, Debug, Inspect, Serialize, Deserialize)]
 pub(crate) struct ScreenVec {}
 /// Screen position/offset scalar

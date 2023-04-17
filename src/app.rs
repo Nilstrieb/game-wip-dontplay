@@ -1,9 +1,11 @@
 use crate::{
-    command::CmdVec, debug::{self, DebugState},
-    game::GameState, input::Input, res::Res, CliArgs,
+    command::CmdVec,
+    debug::{self, DebugState},
+    game::GameState,
+    res::Res,
+    CliArgs,
 };
 use egui_sfml::SfEgui;
-use sfml::graphics::{RenderTexture, RenderWindow};
 /// Application level state (includes game and ui state, etc.)
 pub(crate) struct App {
     pub(crate) game: GameState,

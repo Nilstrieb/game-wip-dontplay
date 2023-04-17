@@ -1,8 +1,8 @@
-use std::fmt::Debug;
+use crate::world::TPosSc;
 use egui_inspect::derive::Inspect;
-use num_traits::{Num, Signed};
+use num_traits::Num;
 use serde::{Deserialize, Serialize};
-use crate::world::{TPosSc, TilePos};
+use std::fmt::Debug;
 pub(crate) type WPosSc = u32;
 #[derive(Clone, Copy, Debug, Inspect)]
 pub(crate) struct WorldPos {}
