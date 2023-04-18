@@ -1,4 +1,4 @@
-use crate::tiles::TileDb;
+use crate::TileDb;
 use egui_inspect::derive::Inspect;
 
 #[derive(Clone, Copy, Debug, Inspect)]
