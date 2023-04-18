@@ -93,9 +93,6 @@ pub fn derive_inspect(input: TokenStream) -> TokenStream {
     let (intro_generics, forward_generics, where_clauses) = input.generics.split_for_impl();
     let expanded = quote! {
         impl #intro_generics ::egui_inspect::Inspect for #ty_ident #forward_generics #where_clauses {
-            fn inspect(&self, ui: &mut ::egui::Ui, id_source: u64) {
-
-            }
             fn inspect_mut(&mut self, ui: &mut ::egui::Ui, id_source: u64) {
                 #ts
             }
