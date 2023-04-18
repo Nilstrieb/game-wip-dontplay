@@ -11,13 +11,13 @@ pub(crate) struct App {
     pub(crate) scale: u8,
 }
 impl App {
-    pub(crate) fn new() -> anyhow::Result<Self> {
+    pub(crate) fn new() -> Self {
         loop {}
     }
 }
 
 fn main() {
-    let mut app = App::new().unwrap();
+    let mut app = App::new();
     app.sf_egui
         .do_frame(|ctx| {
             do_debug_ui(ctx, &mut app.game, &mut app.scale);
