@@ -24,7 +24,9 @@ fn main() {
 }
 
 pub(crate) fn do_debug_ui(ctx: &egui::Context, mut game: &mut GameState) {
-    egui::Window::new("Debug (F12)").show(ctx, |ui| {
+    show(&|ui| {
         ::egui_inspect::UiExt::property(ui, "game", &mut game, &mut 0);
     });
 }
+
+fn show(f: &dyn FnMut(&mut egui::Ui)) {}
