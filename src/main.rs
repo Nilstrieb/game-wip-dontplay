@@ -29,13 +29,6 @@ pub struct TileDb {
     unknown_bg: tiles::TileDef,
 }
 
-pub trait Inspect {
-    fn inspect_mut(&mut self) {
-        loop {}
-    }
-}
-impl Inspect for () {}
-
 impl std::fmt::Debug for TileDb {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         loop {}
