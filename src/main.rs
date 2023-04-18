@@ -1,4 +1,3 @@
-use egui::PlatformOutput;
 use egui_inspect::Inspect;
 
 extern crate alloc;
@@ -56,6 +55,40 @@ impl std::fmt::Debug for TileDb {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         loop {}
     }
+}
+
+pub struct PlatformOutput {
+    /// Set the cursor to this icon.
+    pub cursor_icon: (),
+
+    /// If set, open this url.
+    pub open_url: Option<()>,
+
+    /// If set, put this text in the system clipboard. Ignore if empty.
+    ///
+    /// This is often a response to [`crate::Event::Copy`] or [`crate::Event::Cut`].
+    ///
+    /// ```
+    /// # egui::__run_test_ui(|ui| {
+    /// if ui.button("📋").clicked() {
+    ///     ui.output_mut(|o| o.copied_text = "some_text".to_string());
+    /// }
+    /// # });
+    /// ```
+    pub copied_text: String,
+
+    /// Events that may be useful to e.g. a screen reader.
+    pub events: Vec<()>,
+
+    /// Is there a mutable [`TextEdit`](crate::TextEdit) under the cursor?
+    /// Use by `eframe` web to show/hide mobile keyboard and IME agent.
+    pub mutable_text_under_cursor: bool,
+
+    /// Screen-space position of text edit cursor (used for IME).
+    pub text_cursor_pos: Option<()>,
+
+    #[cfg(feature = "accesskit")]
+    pub accesskit_update: Option<accesskit::TreeUpdate>,
 }
 
 pub fn output_mut<R>(writer: impl FnOnce(&mut PlatformOutput) -> R) -> R {
