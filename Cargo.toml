@@ -9,7 +9,7 @@ edition = "2021"
 egui = "0.21.0"
 
 [dependencies.egui-inspect]
-git = "https://github.com/crumblingstatue/egui-inspect.git"
+path = "./egui_inspect"
 
 #[profile.dev]
 #incremental = false # Buggy on latest rustc nightly, keeps ICEing

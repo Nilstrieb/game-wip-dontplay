@@ -1,5 +1,6 @@
 use egui_inspect::Inspect;
 
+extern crate alloc;
 mod tiles;
 
 pub(crate) struct App {
