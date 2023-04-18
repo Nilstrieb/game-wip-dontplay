@@ -1,4 +1,3 @@
-use egui_sfml::SfEgui;
 use game::GameState;
 
 mod game;
@@ -6,7 +5,6 @@ mod tiles;
 
 pub(crate) struct App {
     pub(crate) game: GameState,
-    pub(crate) sf_egui: SfEgui,
 }
 impl App {
     pub(crate) fn new() -> Self {
