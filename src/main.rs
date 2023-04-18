@@ -4,12 +4,14 @@ pub struct TileDef {
     pub blend_graphic: String,
 }
 
-use egui_inspect_derive::Inspect;
+use egui_inspect_derive::expand;
 
-#[derive(Inspect)]
+
 pub(crate) struct GameState {
     pub(crate) tile_db: TileDb,
 }
+
+expand! {}
 
 fn new() -> GameState {
     loop {}
