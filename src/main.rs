@@ -20,9 +20,7 @@ fn main() {
 
 pub(crate) fn do_debug_ui(mut game: &mut GameState) {
     show(&|ui| {
-        ui.horizontal(|ui| {
-            ui.inspect_mut(&mut game, &mut 0);
-        });
+        ui.inspect_mut(&mut game, &mut 0);
     });
 }
 
