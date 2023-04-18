@@ -1,3 +1,4 @@
+use egui_inspect::UiExt;
 use game::GameState;
 
 mod game;
@@ -19,7 +20,15 @@ fn main() {
 
 pub(crate) fn do_debug_ui(mut game: &mut GameState) {
     show(&|ui| {
-        ::egui_inspect::UiExt::property(ui, "game", &mut game, &mut 0);
+        ui.horizontal(|ui| {
+            if ui
+                .add(egui::Label::new("game").sense(egui::Sense::click()))
+                .clicked()
+            {
+                ui.output_mut(|o| o.copied_text = format!("{:?}", &mut game));
+            }
+            ui.inspect_mut(&mut game, &mut 0);
+        });
     });
 }
 
