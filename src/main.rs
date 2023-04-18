@@ -1,3 +1,4 @@
+use egui::PlatformOutput;
 use egui_inspect::Inspect;
 
 extern crate alloc;
@@ -55,4 +56,8 @@ impl std::fmt::Debug for TileDb {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         loop {}
     }
+}
+
+pub fn output_mut<R>(writer: impl FnOnce(&mut PlatformOutput) -> R) -> R {
+    loop {}
 }
