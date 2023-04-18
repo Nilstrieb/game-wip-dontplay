@@ -4,15 +4,13 @@ pub struct TileDef {
     pub blend_graphic: String,
 }
 
-use egui_inspect_derive::expand;
-
 pub(crate) struct GameState {
     pub(crate) tile_db: TileDb,
 }
 
 impl GameState {
     fn inspect_mut(&mut self) {
-        expand! {}
+        egui_inspect_derive::expand! {}
     }
 }
 
