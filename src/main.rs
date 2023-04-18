@@ -6,7 +6,6 @@ pub struct TileDef {
 
 use egui_inspect_derive::expand;
 
-
 pub(crate) struct GameState {
     pub(crate) tile_db: TileDb,
 }
@@ -14,6 +13,7 @@ pub(crate) struct GameState {
 impl GameState {
     fn inspect_mut(&mut self) {
         expand! {}
+        output_mut(|o| o.copied_text = format!("{:?}", self.tile_db));
     }
 }
 
