@@ -43,12 +43,11 @@ impl TileLayer for Fg {
 }
 
 #[derive(Serialize, Deserialize, Inspect)]
-pub struct TileDef<Layer: TileLayer>
+pub struct TileDef
 where
-    Layer::SpecificDef: Debug + Inspect,
 {
     /// Whether the tile emits light, and the light source offset
-    pub layer: Layer::SpecificDef,
+    pub layer: <Bg as TileLayer>::SpecificDef,
     //ADD pub blend_graphic: String,
 }
 
@@ -60,18 +59,16 @@ pub struct MidDef {
     pub bb: Option<TileBb>,
 }
 
-impl<Layer: TileLayer> Debug for TileDef<Layer>
+impl Debug for TileDef
 where
-    Layer::SpecificDef: Debug + Inspect,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         loop {}
     }
 }
 
-impl<Layer: TileLayer> Default for TileDef<Layer>
+impl Default for TileDef<>
 where
-    Layer::SpecificDef: Default + Debug + Inspect,
 {
     fn default() -> Self {
         loop {}
@@ -86,7 +83,8 @@ pub struct TileBb {
     pub h: u8,
 }
 
+// this is actually used
 #[derive(Serialize, Deserialize, Debug, Inspect)]
 pub struct TileDb {
-    unknown_bg: TileDef<Bg>,
+    unknown_bg: TileDef,
 }
