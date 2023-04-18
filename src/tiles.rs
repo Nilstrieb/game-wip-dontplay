@@ -89,5 +89,4 @@ pub struct TileBb {
 #[derive(Serialize, Deserialize, Debug, Inspect)]
 pub struct TileDb {
     unknown_bg: TileDef<Bg>,
-
 }
