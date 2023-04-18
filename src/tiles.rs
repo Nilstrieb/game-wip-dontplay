@@ -47,7 +47,7 @@ pub struct TileDef
 where
 {
     /// Whether the tile emits light, and the light source offset
-    pub layer: <Bg as TileLayer>::SpecificDef,
+    pub layer: (),
     //ADD pub blend_graphic: String,
 }
 
