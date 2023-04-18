@@ -37,9 +37,7 @@ pub trait Inspect {
 impl Inspect for () {}
 
 impl Inspect for TileDb {
-    fn inspect_mut(&mut self) {
-        let _a = &mut self.unknown_bg;
-    }
+    fn inspect_mut(&mut self) {}
 }
 
 impl std::fmt::Debug for TileDb {
