@@ -12,13 +12,11 @@ pub fn derive_inspect(input: TokenStream) -> TokenStream {
             for (i, f) in s.fields.iter().enumerate() {
                 let ident = &f.ident;
                 exprs.push(quote! {
-                            if ui.add(::egui::Label::new(stringify!(#f)).sense(::egui::Sense::click())).clicked() {
-                                ui.output_mut(|o| o.copied_text = format!("{:?}", self.#ident));
-                            }
+                    ui.output_mut(|o| o.copied_text = format!("{:?}", self.#ident));        
                 });
             }
             quote! {
-                ::egui::CollapsingHeader::new("").id_source(id_source).show(ui, |ui| {
+                ::egui::CollapsingHeader::new("").id_source(0).show(ui, |ui| {
                     #(#exprs)*
                 });
             }
