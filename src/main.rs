@@ -14,12 +14,6 @@ use egui_inspect_derive::Inspect;
 
 pub(crate) struct WorldPos {}
 
-impl ::core::fmt::Debug for WorldPos {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
-        Ok(())
-    }
-}
-
 #[derive(Inspect)]
 pub(crate) struct GameState {
     pub(crate) camera_offset: WorldPos,
