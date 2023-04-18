@@ -8,7 +8,7 @@ cargo build
 
 ./apply.py
 
-OUT=$(cargo build 2>&1)
+OUT=$(cargo rustc -- --cfg second 2>&1)
 
 cp tiles.rs src/tiles.rs
 

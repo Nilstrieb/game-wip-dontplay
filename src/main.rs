@@ -1,5 +1,10 @@
 extern crate alloc;
-mod tiles;
+
+pub struct TileDef {
+    pub layer: (),
+    #[cfg(second)]
+    pub blend_graphic: String,
+}
 
 pub(crate) struct App {
     pub(crate) game: GameState,
@@ -26,7 +31,7 @@ fn main() {
 }
 // this is actually used
 pub struct TileDb {
-    unknown_bg: tiles::TileDef,
+    unknown_bg: TileDef,
 }
 
 impl std::fmt::Debug for TileDb {
