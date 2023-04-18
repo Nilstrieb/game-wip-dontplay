@@ -1,7 +1,6 @@
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, Attribute, Data, DeriveInput, Member};
-
 enum FieldInspectKind {
     /// Auto-inspected (it is assumed that the field implements Inspect)
     Auto,
