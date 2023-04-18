@@ -13,8 +13,17 @@ impl App {
 
 use egui_inspect::derive::Inspect;
 
-#[derive(Debug, Inspect)]
 pub(crate) struct WorldPos {}
+
+impl ::core::fmt::Debug for WorldPos {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        Ok(())
+    }
+}
+impl ::egui_inspect::Inspect for WorldPos {
+    fn inspect(&self, ui: &mut ::egui::Ui, id_source: u64) {}
+    fn inspect_mut(&mut self, ui: &mut ::egui::Ui, id_source: u64) {}
+}
 
 #[derive(Debug, Inspect)]
 pub(crate) struct GameState {
