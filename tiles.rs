@@ -18,29 +18,6 @@ impl<Layer> Debug for TileId<Layer> {
     }
 }
 
-#[derive(Debug)]
-pub enum Bg {}
-#[derive(Debug)]
-pub enum Mid {}
-#[derive(Debug)]
-pub enum Fg {}
-
-pub trait TileLayer {
-    /// Definitions specific to this layer
-    type SpecificDef;
-}
-
-impl TileLayer for Bg {
-    type SpecificDef = ();
-}
-
-impl TileLayer for Mid {
-    type SpecificDef = MidDef;
-}
-
-impl TileLayer for Fg {
-    type SpecificDef = ();
-}
 
 #[derive(Serialize, Deserialize, Inspect)]
 pub struct TileDef
