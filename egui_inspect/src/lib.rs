@@ -3,7 +3,7 @@ use egui::Ui;
 pub use egui_inspect_derive as derive;
 
 pub trait Inspect {
-    fn inspect_mut(&mut self, ui: &mut Ui, id_source: u64) {
+    fn inspect_mut(&mut self, ui: &mut Ui) {
         loop {}
     }
 }

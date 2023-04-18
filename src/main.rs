@@ -22,7 +22,7 @@ impl ::core::fmt::Debug for WorldPos {
     }
 }
 impl ::egui_inspect::Inspect for WorldPos {
-    fn inspect_mut(&mut self, ui: &mut ::egui::Ui, id_source: u64) {}
+    fn inspect_mut(&mut self, ui: &mut ::egui::Ui) {}
 }
 
 #[derive(Debug, Inspect)]
@@ -38,7 +38,7 @@ fn main() {
 
 pub(crate) fn do_debug_ui(game: &mut GameState) {
     show(&|ui| {
-        game.inspect_mut(ui, 0);
+        game.inspect_mut(ui);
     });
 }
 
@@ -49,7 +49,7 @@ pub struct TileDb {
     unknown_bg: tiles::TileDef,
 }
 impl Inspect for TileDb {
-    fn inspect_mut(&mut self, ui: &mut ::egui::Ui, id_source: u64) {
+    fn inspect_mut(&mut self, ui: &mut ::egui::Ui) {
         let _a = &mut self.unknown_bg;
     }
 }
