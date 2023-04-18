@@ -44,28 +44,7 @@ pub struct TileDb {
 impl ::egui_inspect::Inspect for TileDb {
     fn inspect(&self, ui: &mut ::egui::Ui, id_source: u64) {}
     fn inspect_mut(&mut self, ui: &mut ::egui::Ui, id_source: u64) {
-        ::egui::CollapsingHeader::new("TileDb")
-            .id_source(id_source)
-            .show(ui, |ui| {
-                ui.horizontal(|ui| {
-                    if ui
-                        .add(
-                            ::egui::Label::new("unknown_bg : TileDef")
-                                .sense(::egui::Sense::click()),
-                        )
-                        .clicked()
-                    {
-                        ui.output_mut(|o| {
-                            o.copied_text = {
-                                let res =
-                                    ::std::fmt::format(format_args!("{0:?}", self.unknown_bg));
-                                res
-                            };
-                        });
-                    }
-                    ::egui_inspect::Inspect::inspect_mut(&mut self.unknown_bg, ui, 0usize as u64)
-                });
-            });
+        ::egui_inspect::Inspect::inspect_mut(&mut self.unknown_bg, ui, 0usize as u64)
     }
 }
 
