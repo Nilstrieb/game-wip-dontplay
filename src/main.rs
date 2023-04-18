@@ -6,7 +6,6 @@ pub struct TileDef {
 
 use egui_inspect_derive::expand;
 
-
 pub(crate) struct GameState {
     pub(crate) tile_db: TileDb,
 }
