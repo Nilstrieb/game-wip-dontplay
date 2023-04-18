@@ -13,7 +13,7 @@ impl App {
 
 use egui_inspect::derive::Inspect;
 
-#[derive(Clone, Copy, Debug, Inspect)]
+#[derive(Debug, Inspect)]
 pub(crate) struct WorldPos {}
 
 #[derive(Debug, Inspect)]
@@ -21,7 +21,6 @@ pub(crate) struct GameState {
     pub(crate) camera_offset: WorldPos,
     pub(crate) tile_db: TileDb,
 }
-
 
 fn main() {
     let mut app = App::new();
