@@ -7,8 +7,7 @@ pub struct TileDef {
     //ADD pub blend_graphic: String,
 }
 
-fn inspect_mut(_: &mut TileDef, ui: &mut ::egui::Ui, id_source: u64) {}
-
+fn inspect_mut(_: &mut TileDef) {}
 
 impl Debug for TileDef {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -23,7 +22,7 @@ pub struct TileDb {
 impl Inspect for TileDb {
     fn inspect(&self, ui: &mut ::egui::Ui, id_source: u64) {}
     fn inspect_mut(&mut self, ui: &mut ::egui::Ui, id_source: u64) {
-        inspect_mut(&mut self.unknown_bg, ui, 0usize as u64)
+        inspect_mut(&mut self.unknown_bg)
     }
 }
 
