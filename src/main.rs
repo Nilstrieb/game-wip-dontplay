@@ -25,7 +25,7 @@ impl ::egui_inspect::Inspect for WorldPos {
     fn inspect_mut(&mut self, ui: &mut ::egui::Ui) {}
 }
 
-#[derive(Debug, Inspect)]
+#[derive(Inspect)]
 pub(crate) struct GameState {
     pub(crate) camera_offset: WorldPos,
     pub(crate) tile_db: TileDb,
