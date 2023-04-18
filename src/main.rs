@@ -34,19 +34,19 @@ fn main() {
 }
 
 pub(crate) fn do_debug_ui(game: &mut GameState) {
-    show(&|ui| {
-        game.inspect_mut(ui);
+    show(&||{
+        game.inspect_mut();
     });
 }
 
-fn show(f: &dyn FnMut(&mut egui::Ui)) {}
+fn show(f: &dyn FnMut()) {}
 
 // this is actually used
 pub struct TileDb {
     unknown_bg: tiles::TileDef,
 }
 impl Inspect for TileDb {
-    fn inspect_mut(&mut self, ui: &mut ::egui::Ui) {
+    fn inspect_mut(&mut self) {
         let _a = &mut self.unknown_bg;
     }
 }

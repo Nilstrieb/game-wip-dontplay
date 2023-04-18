@@ -10,7 +10,6 @@ derive = ["egui-inspect-derive"]
 default = ["derive"]
 
 [dependencies]
-egui = { path = "../egui/crates/egui" }
 egui-inspect-derive = { path = "egui-inspect-derive", optional = true}
 
 [workspace]
