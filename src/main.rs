@@ -1,5 +1,3 @@
-use egui_inspect::Inspect;
-
 extern crate alloc;
 mod tiles;
 
@@ -12,7 +10,7 @@ impl App {
     }
 }
 
-use egui_inspect::derive::Inspect;
+use egui_inspect_derive::Inspect;
 
 pub(crate) struct WorldPos {}
 
@@ -45,6 +43,16 @@ fn show(f: &dyn FnMut()) {}
 pub struct TileDb {
     unknown_bg: tiles::TileDef,
 }
+
+
+pub trait Inspect {
+    fn inspect_mut(&mut self) {
+        loop {}
+    }
+}
+impl Inspect for () {}
+
+
 impl Inspect for TileDb {
     fn inspect_mut(&mut self) {
         let _a = &mut self.unknown_bg;

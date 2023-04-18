@@ -3,13 +3,6 @@
 version = 3
 
 [[package]]
-name = "egui-inspect"
-version = "0.1.0"
-dependencies = [
- "egui-inspect-derive",
-]
-
-[[package]]
 name = "egui-inspect-derive"
 version = "0.1.0"
 dependencies = [
@@ -21,7 +14,7 @@ dependencies = [
 name = "mantle-diver"
 version = "0.1.0"
 dependencies = [
- "egui-inspect",
+ "egui-inspect-derive",
 ]
 
 [[package]]

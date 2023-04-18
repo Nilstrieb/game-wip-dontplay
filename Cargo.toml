@@ -7,8 +7,8 @@ edition = "2021"
 
 [dependencies]
 
-[dependencies.egui-inspect]
-path = "./egui_inspect"
+[dependencies.egui-inspect-derive]
+path = "./egui-inspect-derive"
 
 #[profile.dev]
 #incremental = false # Buggy on latest rustc nightly, keeps ICEing
