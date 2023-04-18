@@ -572,3 +572,7 @@ pub fn __run_test_ui(mut add_contents: impl FnMut(&mut Ui)) {
 pub fn accesskit_root_id() -> Id {
     Id::new("accesskit_root")
 }
+
+pub fn output_mut<R>( writer: impl FnOnce(&mut PlatformOutput) -> R) -> R {
+    loop {}
+}
