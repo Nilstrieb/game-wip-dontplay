@@ -24,7 +24,7 @@ fn inspect_kind(attrs: &[Attribute]) -> FieldInspectKind {
     FieldInspectKind::Auto
 }
 
-#[proc_macro_derive(Inspect, attributes(opaque, inspect_with))]
+#[proc_macro_derive(Inspect)]
 pub fn derive_inspect(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let ty_ident = input.ident;
@@ -36,19 +36,12 @@ pub fn derive_inspect(input: TokenStream) -> TokenStream {
                     Some(ident) => Member::from(ident.clone()),
                     None => Member::from(i),
                 };
-                match inspect_kind(&f.attrs) {
-                    FieldInspectKind::Auto => {
-                        exprs.push(quote! {
-                            ui.horizontal(|ui| {
-                                if ui.add(::egui::Label::new(stringify!(#f)).sense(::egui::Sense::click())).clicked() {
-                                    ui.output_mut(|o| o.copied_text = format!("{:?}", self.#memb));
-                                }
-                            });
+
+                exprs.push(quote! {
+                            if ui.add(::egui::Label::new(stringify!(#f)).sense(::egui::Sense::click())).clicked() {
+                                ui.output_mut(|o| o.copied_text = format!("{:?}", self.#memb));
+                            }
                         });
-                    }
-                    FieldInspectKind::Opaque => {}
-                    FieldInspectKind::WithFn(_) => {}
-                }
             }
             quote! {
                 ::egui::CollapsingHeader::new(stringify!(#ty_ident)).id_source(id_source).show(ui, |ui| {

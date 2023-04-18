@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export RUSTFLAGS='-Zincremental-verify-ich'
+
 cp tiles.rs src/tiles.rs
 cargo clean -p mantle-diver
 cargo build
