@@ -11,7 +11,11 @@ pub(crate) struct GameState {
     pub(crate) tile_db: TileDb,
 }
 
-expand! {}
+impl GameState {
+    fn inspect_mut(&mut self) {
+        expand! {}
+    }
+}
 
 fn new() -> GameState {
     loop {}
