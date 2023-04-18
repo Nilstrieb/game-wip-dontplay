@@ -32,16 +32,12 @@ pub fn derive_inspect(input: TokenStream) -> TokenStream {
         Data::Struct(s) => {
             let mut exprs = Vec::new();
             for (i, f) in s.fields.iter().enumerate() {
-                let memb = match &f.ident {
-                    Some(ident) => Member::from(ident.clone()),
-                    None => Member::from(i),
-                };
-
+                let ident = &f.ident;
                 exprs.push(quote! {
                             if ui.add(::egui::Label::new(stringify!(#f)).sense(::egui::Sense::click())).clicked() {
-                                ui.output_mut(|o| o.copied_text = format!("{:?}", self.#memb));
+                                ui.output_mut(|o| o.copied_text = format!("{:?}", self.#ident));
                             }
-                        });
+                });
             }
             quote! {
                 ::egui::CollapsingHeader::new(stringify!(#ty_ident)).id_source(id_source).show(ui, |ui| {
