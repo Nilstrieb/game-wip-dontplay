@@ -29,7 +29,6 @@ pub(crate) fn do_debug_ui(ctx: &egui::Context, mut game: &mut GameState, mut sca
     egui::Window::new("Debug (F12)").show(ctx, |ui| {
         egui::ScrollArea::both().show(ui, |ui| {
             let mut id_source = 0;
-            ::egui_inspect::UiExt::property(ui, "scale", &mut scale, &mut id_source);
             ::egui_inspect::UiExt::property(ui, "game", &mut game, &mut id_source);
         });
     });
