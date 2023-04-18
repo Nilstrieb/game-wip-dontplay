@@ -18,7 +18,7 @@ fn main() {
     do_debug_ui(&mut app.game);
 }
 
-pub(crate) fn do_debug_ui(mut game: &mut GameState) {
+pub(crate) fn do_debug_ui(game: &mut GameState) {
     show(&|ui| {
         game.inspect_mut(ui, 0);
     });
