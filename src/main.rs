@@ -25,9 +25,7 @@ fn main() {
 
 pub(crate) fn do_debug_ui(ctx: &egui::Context, mut game: &mut GameState) {
     egui::Window::new("Debug (F12)").show(ctx, |ui| {
-        egui::ScrollArea::both().show(ui, |ui| {
-            let mut id_source = 0;
-            ::egui_inspect::UiExt::property(ui, "game", &mut game, &mut id_source);
-        });
+        let mut id_source = 0;
+        ::egui_inspect::UiExt::property(ui, "game", &mut game, &mut id_source);
     });
 }
