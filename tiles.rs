@@ -1,7 +1,6 @@
 use std::{fmt::Debug, marker::PhantomData};
 
 use egui_inspect::{derive::Inspect, Inspect};
-use serde::{Deserialize, Serialize};
 
 #[derive(Inspect)]
 pub struct TileDef

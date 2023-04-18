@@ -7,7 +7,6 @@ edition = "2021"
 
 [dependencies]
 egui = "0.21.0"
-serde = { version = "1.0.160", features = ["derive"] }
 
 [dependencies.egui-inspect]
 git = "https://github.com/crumblingstatue/egui-inspect.git"
