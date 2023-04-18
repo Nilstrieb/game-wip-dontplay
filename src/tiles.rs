@@ -7,14 +7,6 @@ pub struct TileDef {
     //ADD pub blend_graphic: String,
 }
 
-fn inspect_mut(_: &mut TileDef) {}
-
-impl Debug for TileDef {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        loop {}
-    }
-}
-
 // this is actually used
 pub struct TileDb {
     unknown_bg: TileDef,
