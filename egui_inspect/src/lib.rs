@@ -1,36 +1,10 @@
 use egui::Ui;
 #[cfg(feature = "derive")]
 pub use egui_inspect_derive as derive;
-use std::{
-    collections::{HashMap, HashSet},
-    ffi::OsString,
-    fmt::Debug,
-    marker::PhantomData,
-};
+use std::fmt::Debug;
 pub trait Inspect: Debug {
     fn inspect(&self, ui: &mut Ui, id_source: u64);
     fn inspect_mut(&mut self, ui: &mut Ui, id_source: u64) {
-        loop {}
-    }
-}
-
-macro_rules! impl_num_inspect {
-    ($($ty:ty),*) => {
-        $(impl Inspect for $ty { fn inspect_mut(& mut self, ui : & mut Ui, _id_source :
-        u64) { ui.add(egui::DragValue::new(self)); } fn inspect(& self, ui : & mut Ui,
-        _id_source : u64) { ui.label(self.to_string()); } })*
-    };
-}
-impl_num_inspect!(i8, u8, i16, u16, i32, u32, i64, u64, f32, f64, usize, isize);
-impl<T, U> Inspect for (T, U)
-where
-    T: Inspect,
-    U: Inspect,
-{
-    fn inspect_mut(&mut self, ui: &mut Ui, id_source: u64) {
-        loop {}
-    }
-    fn inspect(&self, ui: &mut Ui, id_source: u64) {
         loop {}
     }
 }
