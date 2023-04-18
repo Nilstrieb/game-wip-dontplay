@@ -3,7 +3,7 @@ use std::{fmt::Debug, marker::PhantomData};
 use egui_inspect::{derive::Inspect, Inspect};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Inspect)]
+#[derive(Inspect)]
 pub struct TileDef
 where
 {
@@ -27,16 +27,9 @@ where
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Inspect, Clone, Copy)]
-pub struct TileBb {
-    pub x: u8,
-    pub y: u8,
-    pub w: u8,
-    pub h: u8,
-}
 
 // this is actually used
-#[derive(Serialize, Deserialize, Debug, Inspect)]
+#[derive(Debug, Inspect)]
 pub struct TileDb {
     unknown_bg: TileDef,
 }
