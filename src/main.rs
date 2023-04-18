@@ -36,10 +36,6 @@ pub trait Inspect {
 }
 impl Inspect for () {}
 
-impl Inspect for TileDb {
-    fn inspect_mut(&mut self) {}
-}
-
 impl std::fmt::Debug for TileDb {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         loop {}
