@@ -1,4 +1,4 @@
-use egui_inspect::UiExt;
+use egui_inspect::Inspect;
 use game::GameState;
 
 mod game;
@@ -20,7 +20,7 @@ fn main() {
 
 pub(crate) fn do_debug_ui(mut game: &mut GameState) {
     show(&|ui| {
-        ui.inspect_mut(&mut game, &mut 0);
+        game.inspect_mut(ui, 0);
     });
 }
 
