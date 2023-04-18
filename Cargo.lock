@@ -48,12 +48,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
-name = "cc"
-version = "1.0.79"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "50d30906286121d95be3d479533b458f87493b30a4b5f79a607db8f5d11aa91f"
-
-[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -128,24 +122,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "gamedebug_core"
-version = "0.1.0"
-source = "git+https://github.com/crumblingstatue/gamedebug_core.git#0afa12c84d865e266ccf6ee31970ff70da0e2ac6"
-
-[[package]]
 name = "libc"
 version = "0.2.141"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3304a64d199bb964be99741b7a14d26972741915b3649639149b2479bb46f4b5"
-
-[[package]]
-name = "link-cplusplus"
-version = "1.0.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ecd207c9c713c34f95a097a5b029ac2ce6010530c7b49d7fea24d977dede04f5"
-dependencies = [
- "cc",
-]
 
 [[package]]
 name = "lock_api"
@@ -164,10 +144,7 @@ dependencies = [
  "derivative",
  "egui",
  "egui-inspect",
- "gamedebug_core",
- "s2dc",
  "serde",
- "sfml-xt",
 ]
 
 [[package]]
@@ -175,15 +152,6 @@ name = "nohash-hasher"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2bf50223579dc7cdcfb3bfcacf7069ff68243f8c363f62ffa99cf000a6b9c451"
-
-[[package]]
-name = "num-traits"
-version = "0.2.15"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "578ede34cf02f8924ab9447f50c28075b4d3e5b269972345e7e0372b38c6cdcd"
-dependencies = [
- "autocfg",
-]
 
 [[package]]
 name = "once_cell"
@@ -251,15 +219,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "s2dc"
-version = "0.1.0"
-source = "git+https://github.com/crumblingstatue/s2dc.git#9fbb354e48d6469a632ec68abeb2b33dc66d6cc7"
-dependencies = [
- "num-traits",
- "serde",
-]
-
-[[package]]
 name = "scopeguard"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -283,28 +242,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.15",
-]
-
-[[package]]
-name = "sfml"
-version = "0.20.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cc90f712d9a93d8db54e53281dbb6dbb29e443abcc83e185df4bbe60ba6e8311"
-dependencies = [
- "bitflags",
- "cc",
- "link-cplusplus",
- "num-traits",
- "once_cell",
- "widestring",
-]
-
-[[package]]
-name = "sfml-xt"
-version = "0.1.0"
-source = "git+https://github.com/crumblingstatue/sfml-xt.git#4eb3ab9e54c3464360709ba8351afc75927908d0"
-dependencies = [
- "sfml",
 ]
 
 [[package]]
@@ -352,12 +289,6 @@ name = "version_check"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
-
-[[package]]
-name = "widestring"
-version = "1.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "653f141f39ec16bba3c5abe400a0c60da7468261cc2cbf36805022876bc721a8"
 
 [[package]]
 name = "windows-sys"

@@ -10,16 +10,6 @@ derivative = "2.2.0"
 egui = "0.21.0"
 serde = { version = "1.0.160", features = ["derive"] }
 
-[dependencies.s2dc]
-git = "https://github.com/crumblingstatue/s2dc.git"
-features = ["serde"]
-
-[dependencies.sfml-xt]
-git = "https://github.com/crumblingstatue/sfml-xt.git"
-
-[dependencies.gamedebug_core]
-git = "https://github.com/crumblingstatue/gamedebug_core.git"
-
 [dependencies.egui-inspect]
 git = "https://github.com/crumblingstatue/egui-inspect.git"
 
