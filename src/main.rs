@@ -1,7 +1,6 @@
 use egui_sfml::SfEgui;
 use game::GameState;
 
-mod debug;
 mod game;
 mod tiles;
 
@@ -21,11 +20,23 @@ fn main() {
     let mut app = App::new().unwrap();
     app.sf_egui
         .do_frame(|ctx| {
-            debug::do_debug_ui(
+            do_debug_ui(
                 ctx,
                 &mut app.game,
                 &mut app.scale,
             );
         })
         .unwrap();
+}
+
+use egui_inspect::inspect;
+
+pub(crate) fn do_debug_ui(ctx: &egui::Context, mut game: &mut GameState, mut scale: &mut u8) {
+    egui::Window::new("Debug (F12)").show(ctx, |ui| {
+        egui::ScrollArea::both().show(ui, |ui| {
+            inspect! {
+                ui, scale, game
+            }
+        });
+    });
 }
