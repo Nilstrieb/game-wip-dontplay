@@ -1,7 +1,5 @@
 use egui_inspect::Inspect;
-use game::GameState;
 
-mod game;
 mod tiles;
 
 pub(crate) struct App {
@@ -12,6 +10,18 @@ impl App {
         loop {}
     }
 }
+
+use egui_inspect::derive::Inspect;
+
+#[derive(Clone, Copy, Debug, Inspect)]
+pub(crate) struct WorldPos {}
+
+#[derive(Debug, Inspect)]
+pub(crate) struct GameState {
+    pub(crate) camera_offset: WorldPos,
+    pub(crate) tile_db: TileDb,
+}
+
 
 fn main() {
     let mut app = App::new();
