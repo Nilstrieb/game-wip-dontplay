@@ -16,14 +16,10 @@ impl App {
 
 fn main() {
     let mut app = App::new();
-    app.sf_egui
-        .do_frame(|ctx| {
-            do_debug_ui(ctx, &mut app.game);
-        })
-        .unwrap();
+    do_debug_ui(&mut app.game);
 }
 
-pub(crate) fn do_debug_ui(ctx: &egui::Context, mut game: &mut GameState) {
+pub(crate) fn do_debug_ui(mut game: &mut GameState) {
     show(&|ui| {
         ::egui_inspect::UiExt::property(ui, "game", &mut game, &mut 0);
     });
