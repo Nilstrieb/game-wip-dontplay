@@ -22,22 +22,12 @@ pub(crate) struct GameState {
 
 fn main() {
     let mut app = App::new();
-    do_debug_ui(&mut app.game);
+    app.game.inspect_mut();
 }
-
-pub(crate) fn do_debug_ui(game: &mut GameState) {
-    show(&||{
-        game.inspect_mut();
-    });
-}
-
-fn show(f: &dyn FnMut()) {}
-
 // this is actually used
 pub struct TileDb {
     unknown_bg: tiles::TileDef,
 }
-
 
 pub trait Inspect {
     fn inspect_mut(&mut self) {
@@ -45,7 +35,6 @@ pub trait Inspect {
     }
 }
 impl Inspect for () {}
-
 
 impl Inspect for TileDb {
     fn inspect_mut(&mut self) {
