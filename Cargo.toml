@@ -6,20 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.70"
 derivative = "2.2.0"
-egui-sfml = "0.4.0"
 egui = "0.21.0"
 serde = { version = "1.0.160", features = ["derive"] }
-log = "0.4.17"
-env_logger = "0.10.0"
-zstd = "0.12.3"
-clap = { version = "4.2.2", features = ["derive"] }
-directories = "5.0.0"
-texture_packer = "0.25.0"
-walkdir = "2.3.3"
-image = "0.24.6"
-bitfield-struct = "0.4.1"
 
 [dependencies.s2dc]
 git = "https://github.com/crumblingstatue/s2dc.git"
