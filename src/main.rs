@@ -21,9 +21,6 @@ impl ::core::fmt::Debug for WorldPos {
         Ok(())
     }
 }
-impl ::egui_inspect::Inspect for WorldPos {
-    fn inspect_mut(&mut self, ui: &mut ::egui::Ui) {}
-}
 
 #[derive(Inspect)]
 pub(crate) struct GameState {

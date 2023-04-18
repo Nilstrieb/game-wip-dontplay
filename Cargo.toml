@@ -6,13 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-egui = "0.21.0"
+egui = { path = "./egui/crates/egui" }
 
 [dependencies.egui-inspect]
 path = "./egui_inspect"
 
 #[profile.dev]
 #incremental = false # Buggy on latest rustc nightly, keeps ICEing
-
-[profile.dev.package."*"]
-opt-level = 2
