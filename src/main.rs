@@ -6,28 +6,20 @@ pub struct TileDef {
     pub blend_graphic: String,
 }
 
-pub(crate) struct App {
-    pub(crate) game: GameState,
-}
-impl App {
-    pub(crate) fn new() -> Self {
-        loop {}
-    }
-}
-
 use egui_inspect_derive::Inspect;
-
-pub(crate) struct WorldPos {}
 
 #[derive(Inspect)]
 pub(crate) struct GameState {
-    pub(crate) camera_offset: WorldPos,
     pub(crate) tile_db: TileDb,
 }
 
+fn new() -> GameState {
+    loop {}
+}
+
 fn main() {
-    let mut app = App::new();
-    app.game.inspect_mut();
+    let mut app = new();
+    app.inspect_mut();
 }
 // this is actually used
 pub struct TileDb {
