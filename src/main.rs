@@ -21,12 +21,6 @@ fn main() {
 pub(crate) fn do_debug_ui(mut game: &mut GameState) {
     show(&|ui| {
         ui.horizontal(|ui| {
-            if ui
-                .add(egui::Label::new("game").sense(egui::Sense::click()))
-                .clicked()
-            {
-                ui.output_mut(|o| o.copied_text = format!("{:?}", &mut game));
-            }
             ui.inspect_mut(&mut game, &mut 0);
         });
     });
