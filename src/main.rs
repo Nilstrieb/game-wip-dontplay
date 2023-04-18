@@ -1,5 +1,3 @@
-extern crate alloc;
-
 pub struct TileDef {
     pub layer: (),
     #[cfg(second)]
