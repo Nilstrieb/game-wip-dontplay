@@ -43,25 +43,11 @@ pub fn derive_inspect(input: TokenStream) -> TokenStream {
                                 if ui.add(::egui::Label::new(stringify!(#f)).sense(::egui::Sense::click())).clicked() {
                                     ui.output_mut(|o| o.copied_text = format!("{:?}", self.#memb));
                                 }
-                                ::egui_inspect::Inspect::inspect_mut(&mut self.#memb, ui, #i as u64)
                             });
                         });
                     }
-                    FieldInspectKind::Opaque => {
-                        exprs.push(quote! {
-                            ui.horizontal(|ui| {
-                                ui.label(concat!(stringify!(#memb), " <opaque>"));
-                            });
-                        });
-                    }
-                    FieldInspectKind::WithFn(fun) => {
-                        exprs.push(quote! {
-                            ui.horizontal(|ui| {
-                                ui.label(stringify!(#memb));
-                                #fun(&mut self.#memb, ui, #i as u64)
-                            });
-                        });
-                    }
+                    FieldInspectKind::Opaque => {}
+                    FieldInspectKind::WithFn(_) => {}
                 }
             }
             quote! {
@@ -70,25 +56,7 @@ pub fn derive_inspect(input: TokenStream) -> TokenStream {
                 });
             }
         }
-        Data::Enum(e) => {
-            let mut sel_name_match_exprs = Vec::new();
-            let mut selectable_value_exprs = Vec::new();
-            for var in &e.variants {
-                let name = &var.ident;
-                sel_name_match_exprs.push(quote! {Self::#name => stringify!(#name)});
-                selectable_value_exprs
-                    .push(quote! {ui.selectable_value(self, Self::#name, stringify!(#name))});
-            }
-            quote! {
-                let sel_text = match self {
-                    #(#sel_name_match_exprs,)*
-                };
-                ::egui::ComboBox::new(id_source, stringify!(#ty_ident)).selected_text(sel_text).show_ui(ui, |ui| {
-                    #(#selectable_value_exprs;)*
-                });
-            }
-        }
-        Data::Union(_) => panic!("Unions are not supported"),
+        _ => panic!(),
     };
     let (intro_generics, forward_generics, where_clauses) = input.generics.split_for_impl();
     let expanded = quote! {
